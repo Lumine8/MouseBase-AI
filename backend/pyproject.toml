@@ -1,0 +1,25 @@
+[project]
+name = "mousebase-backend"
+version = "0.1.0"
+description = "Persistent memory infrastructure for AI applications."
+readme = "README.md"
+requires-python = ">=3.12"
+
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "sqlalchemy",
+    "psycopg[binary]",
+    "alembic",
+    "pgvector",
+    "python-dotenv",
+    "pydantic-settings",
+]
+
+[tool.uv]
+
+[tool.ruff]
+line-length = 100
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
