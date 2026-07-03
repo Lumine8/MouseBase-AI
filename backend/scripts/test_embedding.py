@@ -1,9 +1,16 @@
+from pathlib import Path
+import sys
+
+ROOT_DIR = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT_DIR))
+
 import asyncio
 
-from app.services.openai_embedding_service import OpenAIEmbeddingService
+from app.services.gemini_embedding_service import GeminiEmbeddingService
+
 
 async def main():
-    service = OpenAIEmbeddingService()
+    service = GeminiEmbeddingService()
     text = "MouseBase Remembers things."
 
     print(f"Embedding text: {text}")
