@@ -1,0 +1,2 @@
+def InvalidAPIKeyError(Exception):
+    pass

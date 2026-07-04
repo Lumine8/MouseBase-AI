@@ -1,12 +1,16 @@
 import uuid
 from datetime import datetime, timezone
-from typing import Optional, Any
+from typing import Optional, Any, TYPE_CHECKING
 
 from sqlalchemy import DateTime, ForeignKey, String, Text
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import JSONB
 
 from app.models.base import Base
+
+if TYPE_CHECKING:
+    from app.models.embedding import Embedding
+    from app.models.project import Project
 
 class Memory(Base):
     __tablename__ = "memories"
@@ -23,4 +27,6 @@ class Memory(Base):
                                                  nullable=False, 
                                                  default=lambda: datetime.now(timezone.utc)
                                                  , onupdate=lambda: datetime.now(timezone.utc))
+    project: Mapped["Project"] = relationship(back_populates="memories")
+    embeddings: Mapped[list["Embedding"]] = relationship(back_populates="memory", cascade="all, delete-orphan")
     

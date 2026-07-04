@@ -1,8 +1,15 @@
 from sqlalchemy import String, DateTime
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from typing import TYPE_CHECKING
 from app.models.base import Base
+
 from datetime import datetime, timezone
 import uuid
+
+if TYPE_CHECKING:
+    from app.models.project import Project
+# from backend.app.models.project import Project
 
 class User(Base):
     __tablename__ = "users"
@@ -17,3 +24,4 @@ class User(Base):
                                                  nullable = False, 
                                                  default=lambda:datetime.now(timezone.utc), 
                                                  onupdate=lambda:datetime.now(timezone.utc))
+    projects: Mapped[list["Project"]] = relationship(back_populates="owner", cascade="all, delete-orphan")
