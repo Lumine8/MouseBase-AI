@@ -1,0 +1,23 @@
+from fastapi import APIRouter, Depends, status
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.db.dependencies import get_db
+from app.dependencies.auth import get_current_project
+from app.models.project import Project
+from app.schemas.search import SearchRequest, SearchResponse
+
+from app.services.gemini_embedding_service import GeminiEmbeddingService
+from app.services.search_service import SearchService
+
+router = APIRouter(prefix="/search", tags=["search"],)
+
+@router.post("/", response_model=SearchResponse, status_code=status.HTTP_200_OK,
+             summary="Search for memories in the authenticated project",
+             description="Performs semantic search over memories belonging to the authenticated project.")
+async def search(
+    request: SearchRequest, project: Project = Depends(get_current_project),
+    db: AsyncSession = Depends(get_db),) -> SearchResponse:
+    embedding_service = GeminiEmbeddingService()
+    search_service = SearchService(db=db, embedding_service=embedding_service)
+
+    return await search_service.search(project, request)

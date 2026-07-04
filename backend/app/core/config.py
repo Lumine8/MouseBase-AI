@@ -1,3 +1,4 @@
+from pydantic import Field
 from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -23,6 +24,8 @@ class Settings(BaseSettings):
 
     OPENAI_API_KEY: str | None = None
     GEMINI_API_KEY: str | None = None
+
+    MIN_SCORE: float = Field(default=0.70, ge=0.0, le=1.0)
 
     model_config = SettingsConfigDict(
         env_file=BASE_DIR / ".env",
