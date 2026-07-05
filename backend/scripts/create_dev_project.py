@@ -6,7 +6,7 @@ if sys.platform == "win32":
 
 from sqlalchemy import select
 
-from app.core.security import hash_api_key, generate_api_key
+from app.core.security import hash_api_key, generate_api_key, parse_api_key
 from app.db.database import AsyncSessionLocal
 from app.models.project import Project
 from app.models.user import User
@@ -34,11 +34,14 @@ async def main():
 
         if project is None:
             api_key = generate_api_key()
-            hashed_api_key = hash_api_key(api_key)
+            # hashed_api_key = hash_api_key(api_key)
+            _, secret = parse_api_key(api_key.key)
             project = Project(owner_id=user.id, 
                             name="Development Project", 
-                            description="Development project for testing purposes", 
-                            api_key_hash=hashed_api_key)
+                            description="Development project for testing purposes",
+                            api_key_id=api_key.key_id, 
+                            api_key_hash=hash_api_key(secret),
+            )
             
             db.add(project)
             await db.commit()
@@ -47,7 +50,7 @@ async def main():
             print("\n" + "=" * 60)
             print("Development project created successfully.")
             print(f"Project ID : {project.id}")
-            print(f"API Key    : {api_key}")
+            print(f"API Key    : {api_key.key}")
             print("=" * 60)
             print("Save this API key now. It cannot be recovered later.")
         else:

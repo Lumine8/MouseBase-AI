@@ -19,7 +19,7 @@ class Project(Base):
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     description:Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     api_key_hash: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
-    # api_key_id: Mapped[str] = mapped_column(String(16), unique=True, nullable=False, index=True)
+    api_key_id: Mapped[str] = mapped_column(String(16), unique=True, nullable=False, index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), 
                                                  nullable = False, 
                                                  default=lambda:datetime.now(timezone.utc))
