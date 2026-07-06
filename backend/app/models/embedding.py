@@ -23,4 +23,4 @@ class Embedding(Base):
     model: Mapped[str] = mapped_column(String(255), nullable=False)
     dimensions: Mapped[int] = mapped_column(nullable=False)
     vector: Mapped[list[float]] = mapped_column(Vector, nullable=False)
-    memory: Mapped["Memory"] = relationship(back_populates="embeddings")
+    memory: Mapped["Memory"] = relationship(back_populates="embeddings", lazy="selectin")

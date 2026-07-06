@@ -28,5 +28,5 @@ class Memory(Base):
                                                  default=lambda: datetime.now(timezone.utc)
                                                  , onupdate=lambda: datetime.now(timezone.utc))
     project: Mapped["Project"] = relationship(back_populates="memories")
-    embeddings: Mapped[list["Embedding"]] = relationship(back_populates="memory", cascade="all, delete-orphan")
+    embeddings: Mapped[list["Embedding"]] = relationship(back_populates="memory", cascade="all, delete-orphan", lazy="selectin")
     

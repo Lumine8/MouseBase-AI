@@ -1,0 +1,2 @@
+def MemoryNotFoundError(Exception):
+    pass
