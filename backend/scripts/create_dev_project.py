@@ -53,7 +53,7 @@ async def main():
                 )
             else:
                 api_key = generate_api_key()
-                
+
             # hashed_api_key = hash_api_key(api_key)
             _, secret = parse_api_key(api_key.key)
             project = Project(
