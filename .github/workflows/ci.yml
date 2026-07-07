@@ -37,12 +37,16 @@ jobs:
 
     env:
       DATABASE_URL: postgresql+psycopg://postgres:postgres@localhost:5432/mousebase
+
+      SECRET_KEY: github-actions-secret-key
+
       GEMINI_API_KEY: test
+
       EMBEDDING_MODEL: text-embedding-004
       EMBEDDING_DIMENSIONS: 768
 
     steps:
-      - name: Checkout
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Setup Python
@@ -62,18 +66,19 @@ jobs:
           ruff --version
           black --version
           pytest --version
+          alembic --version
 
-      - name: Ruff
+      - name: Lint with Ruff
         run: ruff check .
 
-      - name: Black
+      - name: Check Formatting
         run: black --check .
 
-      - name: Run Migrations
+      - name: Run Database Migrations
         run: alembic upgrade head
 
       - name: Run Tests
         run: pytest
 
-      - name: Docker Build
+      - name: Build Docker Image
         run: docker build -t mousebase-backend .
