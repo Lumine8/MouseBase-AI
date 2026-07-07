@@ -9,7 +9,7 @@ from sqlalchemy import select
 
 from app.core.security import (
     APIKey,
-    generate_api_key,
+    # generate_api_key,
     hash_api_key,
     parse_api_key,
 )
