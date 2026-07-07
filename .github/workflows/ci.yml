@@ -74,6 +74,36 @@ jobs:
       - name: Check Formatting
         run: black --check .
 
+      - name: Install PostgreSQL Client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
+      - name: Verify PostgreSQL & pgvector
+        run: |
+          echo "PostgreSQL version:"
+          PGPASSWORD=postgres psql \
+            -h localhost \
+            -U postgres \
+            -d mousebase \
+            -c "SELECT version();"
+
+          echo ""
+          echo "Installed extensions:"
+          PGPASSWORD=postgres psql \
+            -h localhost \
+            -U postgres \
+            -d mousebase \
+            -c "\dx"
+
+          echo ""
+          echo "Available vector extension:"
+          PGPASSWORD=postgres psql \
+            -h localhost \
+            -U postgres \
+            -d mousebase \
+            -c "SELECT * FROM pg_available_extensions WHERE name='vector';"
+
       - name: Run Database Migrations
         run: alembic upgrade head
 
