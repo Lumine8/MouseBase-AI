@@ -19,14 +19,6 @@ dependencies = [
     "pwdlib[argon2]>=0.3.0",
 ]
 
-[tool.uv]
-
-[tool.ruff]
-line-length = 100
-
-[tool.pytest.ini_options]
-pythonpath = ["."]
-
 [project.optional-dependencies]
 dev = [
     "black>=26.5.1",
@@ -36,6 +28,12 @@ dev = [
     "pytest-asyncio>=1.4.0",
     "pytest-cov>=7.1.0",
 ]
+
+[tool.ruff]
+line-length = 100
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
 
 [tool.setuptools.packages.find]
 include = ["app*"]
