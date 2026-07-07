@@ -27,7 +27,7 @@ line-length = 100
 [tool.pytest.ini_options]
 pythonpath = ["."]
 
-[dependency-groups]
+[project.optional-dependencies]
 dev = [
     "black>=26.5.1",
     "httpx>=0.28.1",
