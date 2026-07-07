@@ -1,5 +1,6 @@
 import asyncio
 import sys
+import os
 
 if sys.platform == "win32":
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
@@ -40,7 +41,19 @@ async def main():
         project = result.scalar_one_or_none()
 
         if project is None:
-            api_key = generate_api_key()
+            fixed_key = os.getenv("TEST_API_KEY")
+
+            if fixed_key:
+                from app.core.security import APIKey
+
+                key_id, _ = parse_api_key(fixed_key)
+                api_key = APIKey(
+                    key=fixed_key,
+                    key_id=key_id,
+                )
+            else:
+                api_key = generate_api_key()
+                
             # hashed_api_key = hash_api_key(api_key)
             _, secret = parse_api_key(api_key.key)
             project = Project(

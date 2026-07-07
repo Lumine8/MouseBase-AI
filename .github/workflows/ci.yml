@@ -107,6 +107,9 @@ jobs:
       - name: Run Database Migrations
         run: alembic upgrade head
 
+      - name: Create Development Project
+        run: python -m scripts.create_dev_project
+
       - name: Run Tests
         run: pytest
 
