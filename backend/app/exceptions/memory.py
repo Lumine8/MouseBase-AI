@@ -7,5 +7,5 @@ class MemoryNotFoundError(APIException):
         super().__init__(
             code="memory_not_found",
             message="Memory not found",
-            status_code=status.HTTP_404_NOT_FOUND
+            status_code=status.HTTP_404_NOT_FOUND,
         )

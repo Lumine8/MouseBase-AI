@@ -20,8 +20,6 @@ class GeminiEmbeddingService(EmbeddingService):
         vector = response.embeddings[0].values
 
         if len(vector) != settings.EMBEDDING_DIMENSIONS:
-            raise RuntimeError(
-                f"Expected {settings.EMBEDDING_DIMENSIONS} dimensions"
-            )
+            raise RuntimeError(f"Expected {settings.EMBEDDING_DIMENSIONS} dimensions")
 
         return vector
