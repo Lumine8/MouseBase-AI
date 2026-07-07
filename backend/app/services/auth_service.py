@@ -17,10 +17,10 @@ class AuthService:
         project = result.scalar_one_or_none()
 
         if project is None:
-            raise InvalidAPIKeyError("Invalid API key")
+            raise InvalidAPIKeyError()
         
         if not verify_api_key(secret, project.api_key_hash):
-            raise InvalidAPIKeyError("Invalid API key")
+            raise InvalidAPIKeyError()
         
         return project
             

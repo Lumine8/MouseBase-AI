@@ -10,6 +10,10 @@ from app.schemas.remember import RememberRequest, RememberResponse
 from app.services.embedding_service import EmbeddingService
 
 from app.exceptions.memory import MemoryNotFoundError
+from app.exceptions.update import EmptyUpdateError
+from app.exceptions.embedding import EmbeddingServiceUnavailableError
+
+
 from app.models.memory import Memory
 from app.schemas.memory import MemoryResponse
 from app.schemas.update import UpdateMemoryRequest
@@ -53,7 +57,7 @@ class MemoryService:
         memory = result.scalar_one_or_none()
         
         if memory is None:
-            raise MemoryNotFoundError("Memory Not Found.")
+            raise MemoryNotFoundError()
         return memory
     
     def _to_response(self, memory: Memory) -> MemoryResponse:
@@ -76,18 +80,18 @@ class MemoryService:
         
         memory = await self._get_memory(memory_id, project)
         if request.content is None and request.metadata is None and request.external_id is None:
-            raise ValueError("No Field Provided for Update.")
+            raise EmptyUpdateError()
         
         if request.content is not None and request.content != memory.content:
             if self.embedding_service is None:
-                raise RuntimeError("Embedding service is not initialized.")
+                raise EmbeddingServiceUnavailableError()
             
             embedding_stmt = select(Embedding).where(Embedding.memory_id == memory.id, Embedding.model == settings.EMBEDDING_MODEL)
             
             embedding_result = await self.db.execute(embedding_stmt)
             embedding = embedding_result.scalar_one_or_none()
             if embedding is None:
-                raise RuntimeError("Embedding not found")
+                raise EmbeddingServiceUnavailableError()
 
             memory.content = request.content
             embedding.vector = await self.embedding_service.embed(request.content)
