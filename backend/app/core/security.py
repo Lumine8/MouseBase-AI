@@ -18,7 +18,10 @@ def generate_api_key() -> APIKey:
     key_id = token_urlsafe(12)
     secret_key = token_urlsafe(32)
 
-    return APIKey(key=f"mb_live_{key_id}_{secret_key}", key_id=key_id)
+    return APIKey(
+        key=f"mb_live_{key_id}_{secret_key}",
+        key_id=key_id,
+    )
 
 
 def hash_api_key(secret: str) -> str:

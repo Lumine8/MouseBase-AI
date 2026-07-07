@@ -1,61 +1,71 @@
 import asyncio
-import sys
 import os
+import sys
 
 if sys.platform == "win32":
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 from sqlalchemy import select
 
-from app.core.security import hash_api_key, generate_api_key, parse_api_key
+from app.core.security import (
+    APIKey,
+    generate_api_key,
+    hash_api_key,
+    parse_api_key,
+)
 from app.db.database import AsyncSessionLocal
 from app.models.project import Project
 from app.models.user import User
 
+DEFAULT_TEST_API_KEY = (
+    "mb_live_ZbqFJSTeqGsxQUFT_"
+    "C56InqSqcVN36jb-jzUYqF2q3XToAz1z_96vDE1FB2E"
+)
+
 
 async def main():
     print("Starting...")
+
     async with AsyncSessionLocal() as db:
         print("Connected to database.")
+
         result = await db.execute(
             select(User).where(User.email == "dev@mousebase.local")
         )
         user = result.scalar_one_or_none()
+
         if user is None:
             print("Creating new user...")
-            user = User(email="dev@mousebase.local", password_hash="development-only")
+            user = User(
+                email="dev@mousebase.local",
+                password_hash="development-only",
+            )
             db.add(user)
             await db.commit()
             await db.refresh(user)
 
-            print(f"Created user: {user.email} with ID: {user.id}")
-
+            print(f"Created user: {user.email}")
         else:
-            print(f"User already exists: {user.email} with ID: {user.id}")
+            print(f"User already exists: {user.email}")
 
         result = await db.execute(
             select(Project).where(
-                Project.owner_id == user.id, Project.name == "Development Project"
+                Project.owner_id == user.id,
+                Project.name == "Development Project",
             )
         )
         project = result.scalar_one_or_none()
 
         if project is None:
-            fixed_key = os.getenv("TEST_API_KEY")
+            fixed_key = os.getenv("TEST_API_KEY", DEFAULT_TEST_API_KEY)
 
-            if fixed_key:
-                from app.core.security import APIKey
+            key_id, secret = parse_api_key(fixed_key)
 
-                key_id, _ = parse_api_key(fixed_key)
-                api_key = APIKey(
-                    key=fixed_key,
-                    key_id=key_id,
-                )
-            else:
-                api_key = generate_api_key()
+            api_key = APIKey(
+                key=fixed_key,
+                key_id=key_id,
+            )
 
-            # hashed_api_key = hash_api_key(api_key)
-            _, secret = parse_api_key(api_key.key)
             project = Project(
                 owner_id=user.id,
                 name="Development Project",
@@ -73,14 +83,12 @@ async def main():
             print(f"Project ID : {project.id}")
             print(f"API Key    : {api_key.key}")
             print("=" * 60)
-            print("Save this API key now. It cannot be recovered later.")
+
         else:
-            print(f"Project already exists: {project.name} with ID: {project.id}")
-            print(
-                "API Key is not retrievable for existing projects. If you need a new API key, please create a new project."
-            )
+            print("Development project already exists.")
+            print(f"Project ID : {project.id}")
+            print(f"API Key ID : {project.api_key_id}")
 
 
 if __name__ == "__main__":
-    print("Running script...")
     asyncio.run(main())
