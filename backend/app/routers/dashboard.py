@@ -96,18 +96,25 @@ async def dashboard_analytics(
                 ).where(Usage.project_id.in_(project_ids), Usage.date == d)
             )
             r = row.one()
-            daily_usage.append({
-                "day": day_label,
-                "requests": r[0] or 0,
-                "searches": r[1] or 0,
-                "embeddings": r[2] or 0,
-                "storage_bytes": r[3] or 0,
-            })
+            daily_usage.append(
+                {
+                    "day": day_label,
+                    "requests": r[0] or 0,
+                    "searches": r[1] or 0,
+                    "embeddings": r[2] or 0,
+                    "storage_bytes": r[3] or 0,
+                }
+            )
         else:
-            daily_usage.append({
-                "day": day_label, "requests": 0, "searches": 0,
-                "embeddings": 0, "storage_bytes": 0,
-            })
+            daily_usage.append(
+                {
+                    "day": day_label,
+                    "requests": 0,
+                    "searches": 0,
+                    "embeddings": 0,
+                    "storage_bytes": 0,
+                }
+            )
 
     total = await db.execute(
         select(

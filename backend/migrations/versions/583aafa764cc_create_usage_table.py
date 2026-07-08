@@ -5,11 +5,11 @@ Revises: 113c31deb105
 Create Date: 2026-07-09 00:35:00.000000
 
 """
+
 from typing import Sequence, Union
 
 from alembic import op
 import sqlalchemy as sa
-
 
 revision: str = "583aafa764cc"
 down_revision: Union[str, Sequence[str], None] = "113c31deb105"
