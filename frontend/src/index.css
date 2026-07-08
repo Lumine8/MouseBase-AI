@@ -217,7 +217,27 @@ code, pre {
   background: var(--bg-base);
 }
 
-.navbar-left { display: flex; align-items: center; gap: 12px; }
+.navbar-left { display: flex; align-items: center; gap: 8px; }
+
+.navbar-toggle {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  font-size: 20px;
+}
+
+.navbar-brand {
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+}
 
 .navbar-project-selector {
   display: flex;
@@ -1278,6 +1298,10 @@ tbody tr.clickable { cursor: pointer; }
 
   .navbar {
     padding: 0 12px;
+  }
+
+  .navbar-desktop-only {
+    display: none !important;
   }
 
   .app-content {

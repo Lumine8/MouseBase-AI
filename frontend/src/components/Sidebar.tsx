@@ -19,9 +19,9 @@ export default function Sidebar() {
 
   return (
     <>
-      {open && <div className="sidebar-overlay" onClick={close} />}
+      <div className={`sidebar-overlay ${open ? "open" : ""}`} onClick={close} />
 
-      <aside className="sidebar" data-open={open}>
+      <aside className={`sidebar ${open ? "open" : ""}`}>
         <div style={{ padding: "20px 20px 0" }}>
           <div
             onClick={() => { navigate("/dashboard"); close(); }}
