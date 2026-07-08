@@ -1,7 +1,7 @@
 """add api_key_encrypted to projects
 
 Revision ID: d3fee61ccd7b
-Revises: 81b73c131bd8
+Revises: 5a6b7c8d9e0f
 Create Date: 2026-07-08 21:01:29.772184
 
 """
@@ -12,7 +12,7 @@ from alembic import op
 import sqlalchemy as sa
 
 revision: str = "d3fee61ccd7b"
-down_revision: Union[str, Sequence[str], None] = "44cb37ca26cf"
+down_revision: Union[str, Sequence[str], None] = "5a6b7c8d9e0f"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
