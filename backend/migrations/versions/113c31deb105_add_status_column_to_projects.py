@@ -5,10 +5,10 @@ Revises: 3ec9751287fe
 Create Date: 2026-07-09 00:10:00.000000
 
 """
+
 from typing import Sequence, Union
 
 from alembic import op
-
 
 revision: str = "113c31deb105"
 down_revision: Union[str, Sequence[str], None] = "3ec9751287fe"
