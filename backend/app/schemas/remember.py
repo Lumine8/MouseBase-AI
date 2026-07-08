@@ -41,7 +41,7 @@ class RememberRequest(BaseModel):
 
 
 class RememberResponse(BaseModel):
-    memory_id: UUID = Field(
+    id: UUID = Field(
         ..., description="The unique identifier for the stored memory."
     )
     created_at: datetime = Field(

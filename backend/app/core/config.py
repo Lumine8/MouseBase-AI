@@ -27,7 +27,20 @@ class Settings(BaseSettings):
     OPENAI_API_KEY: str | None = None
     GEMINI_API_KEY: str | None = None
 
-    MIN_SCORE: float = Field(default=0.55, ge=0.0, le=1.0)
+    MIN_SCORE: float = Field(default=0.65, ge=0.0, le=1.0)
+
+    JWT_SECRET: str = "dev-jwt-secret-do-not-use-in-production"
+    JWT_EXPIRY_HOURS: int = 72
+
+    REDIS_URL: str = "redis://localhost:6379/0"
+
+    FRONTEND_URL: str = "http://localhost:5173"
+
+    API_KEY_ENCRYPTION_KEY: str = ""
+
+    RAZORPAY_KEY_ID: str = "rzp_test_TB2VM5X7PpcyWj"
+    RAZORPAY_KEY_SECRET: str = "dBl2qXe0Lfya1XzNt2cHmJbN"
+    RAZORPAY_WEBHOOK_SECRET: str = "whsec_XXXXXXXXXXXXXXXXXXXXXXXXXXX"
 
     model_config = SettingsConfigDict(
         env_file=BASE_DIR / ".env",

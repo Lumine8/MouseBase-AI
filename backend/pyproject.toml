@@ -4,10 +4,15 @@ version = "0.1.0"
 description = "Persistent memory infrastructure for AI applications."
 readme = "README.md"
 requires-python = ">=3.12"
+authors = [{ name = "MouseBase" }]
+license = { text = "Proprietary" }
+keywords = ["mousebase", "memory", "ai", "sdk", "httpx"]
 
 dependencies = [
     "fastapi",
     "uvicorn",
+    "httpx>=0.28.1",
+    "pydantic>=2.0",
     "sqlalchemy",
     "psycopg[binary]",
     "alembic",
@@ -17,6 +22,9 @@ dependencies = [
     "openai>=2.44.0",
     "google-genai>=2.10.0",
     "pwdlib[argon2]>=0.3.0",
+    "pyjwt>=2.0.0",
+    "redis>=5.0.0",
+    "jinja2",
 ]
 
 [project.optional-dependencies]
@@ -36,12 +44,15 @@ line-length = 100
 pythonpath = ["."]
 
 [tool.setuptools.packages.find]
-include = ["app*"]
+include = ["app*", "mousebase*"]
 exclude = [
     "tests*",
     "migrations*",
     "temp_migrations*",
 ]
+
+[tool.setuptools.package-data]
+mousebase = ["py.typed"]
 
 [build-system]
 requires = ["setuptools>=68", "wheel"]

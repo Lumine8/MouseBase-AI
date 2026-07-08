@@ -29,17 +29,17 @@ class SearchRequest(BaseModel):
 
 
 class SearchResult(BaseModel):
-    memory_id: UUID = Field(..., description="The unique identifier of the memory.")
+    id: UUID = Field(..., description="The unique identifier of the memory.")
     external_id: str | None = Field(
         default=None, description="An optional external identifier for the memory."
     )
-    content: str = Field(..., description="The content of the memory.")
+    content: str = Field(..., description="The content of the memory.", examples=["The user clicked on the settings page."])
     metadata: dict[str, Any] = Field(
         default_factory=dict,
         description="Optional developer-defined metadata associated with the memory.",
     )
     score: float = Field(
-        ..., description="The similarity score between the query and the memory."
+        ..., description="The similarity score between the query and the memory.", examples=[0.89]
     )
 
 

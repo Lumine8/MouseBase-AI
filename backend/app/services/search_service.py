@@ -42,7 +42,7 @@ class SearchService:
 
             results.append(
                 SearchResult(
-                    memory_id=memory.id,
+                    id=memory.id,
                     external_id=memory.external_id,
                     content=memory.content,
                     metadata=memory.metadata_,

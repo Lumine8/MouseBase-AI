@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Body, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.dependencies import get_db
@@ -23,7 +23,26 @@ router = APIRouter(
     description="Performs semantic search over memories belonging to the authenticated project.",
 )
 async def search(
-    request: SearchRequest,
+    request: SearchRequest = Body(
+        openapi_examples={
+            "basic": {
+                "summary": "Simple search",
+                "description": "Search with a default top_k of 10.",
+                "value": {
+                    "query": "user settings page",
+                    "top_k": 10,
+                },
+            },
+            "custom_top_k": {
+                "summary": "Search with custom top_k",
+                "description": "Search and return only the top 3 results.",
+                "value": {
+                    "query": "onboarding flow",
+                    "top_k": 3,
+                },
+            },
+        }
+    ),
     project: Project = Depends(get_current_project),
     db: AsyncSession = Depends(get_db),
 ) -> SearchResponse:
