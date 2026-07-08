@@ -9,10 +9,14 @@ from app.dependencies.auth import get_current_user
 from app.models.user import User
 from app.models.webhook_event import WebhookEvent
 from app.schemas.payment import (
-    BillingHistory, CancelSubscriptionResponse,
-    CreateOrderRequest, CreateOrderResponse,
-    PlanInfo, SubscriptionInfo,
-    VerifyPaymentRequest, VerifyPaymentResponse,
+    BillingHistory,
+    CancelSubscriptionResponse,
+    CreateOrderRequest,
+    CreateOrderResponse,
+    PlanInfo,
+    SubscriptionInfo,
+    VerifyPaymentRequest,
+    VerifyPaymentResponse,
 )
 from app.services.exchange_rate import get_rate
 from app.services.payment_service import (
@@ -23,9 +27,12 @@ from app.services.payment_service import (
     verify_payment as payment_verify_payment,
 )
 from app.services.subscription_service import (
-    add_addon, cancel_addon, cancel_subscription,
+    add_addon,
+    cancel_addon,
+    cancel_subscription,
     get_available_plans,
-    get_billing_history, get_subscription,
+    get_billing_history,
+    get_subscription,
     upgrade_subscription,
 )
 
@@ -40,6 +47,7 @@ async def list_plans():
 @router.get("/addons", response_model=dict)
 async def list_addons():
     from app.core.limits import ADDON_PRICING
+
     return ADDON_PRICING
 
 
@@ -60,7 +68,10 @@ async def create_order(
 ):
     try:
         result = await payment_create_order(
-            request.plan_id, current_user.email, str(current_user.id), request.currency,
+            request.plan_id,
+            current_user.email,
+            str(current_user.id),
+            request.currency,
         )
         return result
     except ValueError as e:
@@ -86,13 +97,17 @@ async def verify_payment(
         raise HTTPException(status_code=400, detail=str(e))
     try:
         sub = await upgrade_subscription(
-            db, current_user.id, request.plan_id,
-            request.razorpay_payment_id, request.razorpay_order_id,
+            db,
+            current_user.id,
+            request.plan_id,
+            request.razorpay_payment_id,
+            request.razorpay_order_id,
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     return VerifyPaymentResponse(
-        status="success", message="Payment verified and plan upgraded",
+        status="success",
+        message="Payment verified and plan upgraded",
         plan=sub.plan,
     )
 
@@ -127,7 +142,8 @@ async def cancel_user_subscription(
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     return CancelSubscriptionResponse(
-        status="canceled", message="Subscription has been canceled",
+        status="canceled",
+        message="Subscription has been canceled",
         subscription_status=sub.status,
     )
 
@@ -169,20 +185,27 @@ async def verify_addon(
 ):
     try:
         payment_verify_addon_payment(
-            razorpay_order_id, razorpay_payment_id,
-            razorpay_signature, addon_type,
+            razorpay_order_id,
+            razorpay_payment_id,
+            razorpay_signature,
+            addon_type,
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     try:
         sub = await add_addon(
-            db, current_user.id, addon_type, quantity,
-            razorpay_payment_id, razorpay_order_id,
+            db,
+            current_user.id,
+            addon_type,
+            quantity,
+            razorpay_payment_id,
+            razorpay_order_id,
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     return VerifyPaymentResponse(
-        status="success", message=f"Addon {addon_type} activated",
+        status="success",
+        message=f"Addon {addon_type} activated",
         plan=sub.plan,
     )
 

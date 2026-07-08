@@ -25,7 +25,8 @@ class Payment(Base):
     razorpay_payment_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
     razorpay_order_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False,
+        DateTime(timezone=True),
+        nullable=False,
         default=lambda: datetime.now(timezone.utc),
     )
     subscription: Mapped["Subscription"] = relationship(back_populates="payments")

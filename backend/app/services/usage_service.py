@@ -38,8 +38,6 @@ class UsageService:
         usage = await self._get_or_create(project_id, date.today())
         usage.embeddings += count
 
-    async def increment_storage(
-        self, project_id: UUID, bytes_count: int
-    ) -> None:
+    async def increment_storage(self, project_id: UUID, bytes_count: int) -> None:
         usage = await self._get_or_create(project_id, date.today())
         usage.storage_bytes += bytes_count

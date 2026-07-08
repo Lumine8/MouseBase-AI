@@ -33,13 +33,19 @@ class SearchResult(BaseModel):
     external_id: str | None = Field(
         default=None, description="An optional external identifier for the memory."
     )
-    content: str = Field(..., description="The content of the memory.", examples=["The user clicked on the settings page."])
+    content: str = Field(
+        ...,
+        description="The content of the memory.",
+        examples=["The user clicked on the settings page."],
+    )
     metadata: dict[str, Any] = Field(
         default_factory=dict,
         description="Optional developer-defined metadata associated with the memory.",
     )
     score: float = Field(
-        ..., description="The similarity score between the query and the memory.", examples=[0.89]
+        ...,
+        description="The similarity score between the query and the memory.",
+        examples=[0.89],
     )
 
 

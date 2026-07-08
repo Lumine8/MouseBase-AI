@@ -7,10 +7,17 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.plan_enforcer import check_project_limit
 from app.core.security import (
-    decrypt_api_key, encrypt_api_key, generate_api_key,
-    hash_api_key, parse_api_key,
+    decrypt_api_key,
+    encrypt_api_key,
+    generate_api_key,
+    hash_api_key,
+    parse_api_key,
 )
-from app.exceptions.project import EmptyProjectUpdateError, ProjectLimitError, ProjectNotFoundError
+from app.exceptions.project import (
+    EmptyProjectUpdateError,
+    ProjectLimitError,
+    ProjectNotFoundError,
+)
 from app.models.project import Project
 from app.schemas.project import (
     ApiKeyResponse,
@@ -51,7 +58,11 @@ class ProjectService:
         return ProjectKeyResponse.model_validate(payload)
 
     async def list_projects(self, owner_id: UUID) -> list[ProjectKeyResponse]:
-        stmt = select(Project).where(Project.owner_id == owner_id).order_by(Project.created_at.desc())
+        stmt = (
+            select(Project)
+            .where(Project.owner_id == owner_id)
+            .order_by(Project.created_at.desc())
+        )
         result = await self.db.execute(stmt)
         projects = result.scalars().all()
         result_list = []
@@ -116,7 +127,9 @@ class ProjectService:
         return ProjectKeyResponse.model_validate(payload)
 
     async def _get_owned_project(self, owner_id: UUID, project_id: UUID) -> Project:
-        stmt = select(Project).where(Project.id == project_id, Project.owner_id == owner_id)
+        stmt = select(Project).where(
+            Project.id == project_id, Project.owner_id == owner_id
+        )
         result = await self.db.execute(stmt)
         project = result.scalar_one_or_none()
 

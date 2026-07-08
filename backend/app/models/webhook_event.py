@@ -18,6 +18,7 @@ class WebhookEvent(Base):
     event_type: Mapped[str] = mapped_column(String(100), nullable=False)
     payload: Mapped[dict] = mapped_column(JSON, nullable=False)
     processed_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False,
+        DateTime(timezone=True),
+        nullable=False,
         default=lambda: datetime.now(timezone.utc),
     )

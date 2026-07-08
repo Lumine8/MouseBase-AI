@@ -37,27 +37,35 @@ class Subscription(Base):
         ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
     plan: Mapped[PlanType] = mapped_column(
-        Enum(PlanType, create_constraint=False),
-        nullable=False, default=PlanType.FREE
+        Enum(PlanType, create_constraint=False), nullable=False, default=PlanType.FREE
     )
     status: Mapped[SubscriptionStatus] = mapped_column(
         Enum(SubscriptionStatus, create_constraint=False),
-        nullable=False, default=SubscriptionStatus.ACTIVE
+        nullable=False,
+        default=SubscriptionStatus.ACTIVE,
     )
-    renewal_date: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    renewal_date: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
     razorpay_customer_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
-    razorpay_subscription_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    razorpay_subscription_id: Mapped[str | None] = mapped_column(
+        String(255), nullable=True
+    )
     cancel_at_period_end: Mapped[bool] = mapped_column(Boolean, default=False)
     max_projects: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
     max_memories: Mapped[int] = mapped_column(Integer, nullable=False, default=1000)
-    max_searches_per_month: Mapped[int] = mapped_column(Integer, nullable=False, default=1000)
+    max_searches_per_month: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=1000
+    )
     requests_per_hour: Mapped[int] = mapped_column(Integer, nullable=False, default=100)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False,
+        DateTime(timezone=True),
+        nullable=False,
         default=lambda: datetime.now(timezone.utc),
     )
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False,
+        DateTime(timezone=True),
+        nullable=False,
         default=lambda: datetime.now(timezone.utc),
         onupdate=lambda: datetime.now(timezone.utc),
     )

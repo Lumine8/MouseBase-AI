@@ -6,7 +6,10 @@ from fastapi import APIRouter, Body, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.dependencies import get_db
-from app.dependencies.auth import get_current_user_jwt_only, get_current_user_or_project as get_current_user
+from app.dependencies.auth import (
+    get_current_user_jwt_only,
+    get_current_user_or_project as get_current_user,
+)
 from app.models.user import User
 from app.schemas.project import (
     ApiKeyResponse,

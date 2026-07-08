@@ -13,6 +13,7 @@ class RateLimiter:
         if self.redis is None:
             try:
                 import redis.asyncio as aioredis
+
                 self.redis = aioredis.from_url(
                     settings.REDIS_URL, decode_responses=True
                 )

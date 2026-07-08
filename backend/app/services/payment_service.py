@@ -18,7 +18,9 @@ def get_razorpay_client():
     )
 
 
-async def create_order(plan_id: PlanType, user_email: str, user_id: str, currency: str = "USD") -> CreateOrderResponse:
+async def create_order(
+    plan_id: PlanType, user_email: str, user_id: str, currency: str = "USD"
+) -> CreateOrderResponse:
     plan_info = PLAN_LIMITS.get(plan_id)
     if not plan_info:
         raise ValueError(f"Invalid plan: {plan_id}")
@@ -29,12 +31,18 @@ async def create_order(plan_id: PlanType, user_email: str, user_id: str, currenc
     converted = convert_amount(usd_amount, rate)
     client = get_razorpay_client()
     receipt = f"plan_{user_id[:8]}_{uuid.uuid4().hex[:8]}"
-    order = client.order.create({
-        "amount": converted,
-        "currency": currency,
-        "receipt": receipt,
-        "notes": {"plan_id": plan_id.value, "user_id": user_id, "user_email": user_email},
-    })
+    order = client.order.create(
+        {
+            "amount": converted,
+            "currency": currency,
+            "receipt": receipt,
+            "notes": {
+                "plan_id": plan_id.value,
+                "user_id": user_id,
+                "user_email": user_email,
+            },
+        }
+    )
     return CreateOrderResponse(
         order_id=order["id"],
         amount=converted,
@@ -61,7 +69,11 @@ def verify_payment(
     payment = client.payment.fetch(razorpay_payment_id)
     if payment.get("status") != "captured":
         raise ValueError(f"Payment not captured: {payment.get('status')}")
-    return {"status": "success", "plan_id": plan_id.value, "payment_id": razorpay_payment_id}
+    return {
+        "status": "success",
+        "plan_id": plan_id.value,
+        "payment_id": razorpay_payment_id,
+    }
 
 
 def process_webhook(payload: bytes, signature: str) -> dict:
@@ -95,17 +107,19 @@ async def create_addon_order(
     converted = convert_amount(usd_amount, rate)
     client = get_razorpay_client()
     receipt = f"addon_{user_id[:8]}_{uuid.uuid4().hex[:8]}"
-    order = client.order.create({
-        "amount": converted,
-        "currency": currency,
-        "receipt": receipt,
-        "notes": {
-            "addon_type": addon_type,
-            "quantity": str(quantity),
-            "user_id": user_id,
-            "user_email": user_email,
-        },
-    })
+    order = client.order.create(
+        {
+            "amount": converted,
+            "currency": currency,
+            "receipt": receipt,
+            "notes": {
+                "addon_type": addon_type,
+                "quantity": str(quantity),
+                "user_id": user_id,
+                "user_email": user_email,
+            },
+        }
+    )
     return CreateOrderResponse(
         order_id=order["id"],
         amount=converted,
@@ -132,4 +146,8 @@ def verify_addon_payment(
     payment = client.payment.fetch(razorpay_payment_id)
     if payment.get("status") != "captured":
         raise ValueError(f"Payment not captured: {payment.get('status')}")
-    return {"status": "success", "addon_type": addon_type, "payment_id": razorpay_payment_id}
+    return {
+        "status": "success",
+        "addon_type": addon_type,
+        "payment_id": razorpay_payment_id,
+    }

@@ -62,9 +62,7 @@ class AuthService:
         )
 
     async def login(self, request: LoginRequest) -> AuthResponse:
-        result = await self.db.execute(
-            select(User).where(User.email == request.email)
-        )
+        result = await self.db.execute(select(User).where(User.email == request.email))
         user = result.scalar_one_or_none()
 
         if user is None or not password_hash.verify(

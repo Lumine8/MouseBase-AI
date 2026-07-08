@@ -11,7 +11,6 @@ from typing import Sequence, Union
 from alembic import op
 import sqlalchemy as sa
 
-
 revision: str = "4a5b6c7d8e9f"
 down_revision: Union[str, None] = "3c4d5e6f7g8h"
 branch_labels: Union[str, Sequence[str], None] = None
@@ -28,11 +27,20 @@ def upgrade() -> None:
         sa.Column("renewal_date", sa.DateTime(timezone=True), nullable=True),
         sa.Column("razorpay_customer_id", sa.String(255), nullable=True),
         sa.Column("razorpay_subscription_id", sa.String(255), nullable=True),
-        sa.Column("cancel_at_period_end", sa.Boolean(), nullable=False, server_default="false"),
+        sa.Column(
+            "cancel_at_period_end", sa.Boolean(), nullable=False, server_default="false"
+        ),
         sa.Column("max_projects", sa.Integer(), nullable=False, server_default="1"),
         sa.Column("max_memories", sa.Integer(), nullable=False, server_default="1000"),
-        sa.Column("max_searches_per_month", sa.Integer(), nullable=False, server_default="1000"),
-        sa.Column("requests_per_hour", sa.Integer(), nullable=False, server_default="100"),
+        sa.Column(
+            "max_searches_per_month",
+            sa.Integer(),
+            nullable=False,
+            server_default="1000",
+        ),
+        sa.Column(
+            "requests_per_hour", sa.Integer(), nullable=False, server_default="100"
+        ),
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
         sa.Column("updated_at", sa.DateTime(timezone=True), nullable=False),
         sa.ForeignKeyConstraint(["user_id"], ["users.id"], ondelete="CASCADE"),
@@ -50,7 +58,9 @@ def upgrade() -> None:
         sa.Column("razorpay_payment_id", sa.String(255), nullable=True),
         sa.Column("razorpay_order_id", sa.String(255), nullable=True),
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
-        sa.ForeignKeyConstraint(["subscription_id"], ["subscriptions.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(
+            ["subscription_id"], ["subscriptions.id"], ondelete="CASCADE"
+        ),
         sa.PrimaryKeyConstraint("id"),
     )
 

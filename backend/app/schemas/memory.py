@@ -10,9 +10,17 @@ class MemoryResponse(BaseModel):
     external_id: str | None = Field(
         default=None, description="External identifier for the memory"
     )
-    content: str = Field(..., description="Content of the memory", examples=["The user clicked on the settings page."])
+    content: str = Field(
+        ...,
+        description="Content of the memory",
+        examples=["The user clicked on the settings page."],
+    )
     metadata: dict[str, Any] = Field(
         default_factory=dict, description="Metadata associated with the memory"
     )
-    created_at: datetime = Field(..., description="Timestamp when the memory was created")
-    updated_at: datetime = Field(..., description="Timestamp when the memory was last updated")
+    created_at: datetime = Field(
+        ..., description="Timestamp when the memory was created"
+    )
+    updated_at: datetime = Field(
+        ..., description="Timestamp when the memory was last updated"
+    )

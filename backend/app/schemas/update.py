@@ -5,7 +5,9 @@ from pydantic import BaseModel, Field, field_validator
 
 class UpdateMemoryRequest(BaseModel):
     content: str | None = Field(
-        default=None, min_length=1, max_length=8000,
+        default=None,
+        min_length=1,
+        max_length=8000,
         description="The new text content for the memory.",
     )
     metadata: dict[str, Any] | None = Field(

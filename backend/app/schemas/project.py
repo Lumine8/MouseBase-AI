@@ -56,16 +56,24 @@ class ProjectResponse(BaseModel):
     id: UUID = Field(..., description="Unique identifier for the project")
     owner_id: UUID = Field(..., description="Unique identifier of the project owner")
     name: str = Field(..., description="Name of the project", examples=["My Project"])
-    description: str | None = Field(default=None, description="Description of the project")
+    description: str | None = Field(
+        default=None, description="Description of the project"
+    )
     api_key_id: str = Field(..., description="Prefix identifier for the API key")
     plan: str = Field(default="free", description="Billing plan")
     status: str = Field(default="ACTIVE", description="Project status")
-    created_at: datetime = Field(..., description="Timestamp when the project was created")
-    updated_at: datetime = Field(..., description="Timestamp when the project was last updated")
+    created_at: datetime = Field(
+        ..., description="Timestamp when the project was created"
+    )
+    updated_at: datetime = Field(
+        ..., description="Timestamp when the project was last updated"
+    )
 
 
 class ProjectKeyResponse(ProjectResponse):
-    api_key: str | None = Field(default=None, description="The full API key (only returned to the owner)")
+    api_key: str | None = Field(
+        default=None, description="The full API key (only returned to the owner)"
+    )
 
 
 class ApiKeyResponse(BaseModel):

@@ -10,7 +10,9 @@ from app.models.memory import Memory
 from app.models.project import Project
 
 
-async def get_subscription_for_project(db: AsyncSession, project: Project) -> Optional[Subscription]:
+async def get_subscription_for_project(
+    db: AsyncSession, project: Project
+) -> Optional[Subscription]:
     result = await db.execute(
         select(Subscription).where(Subscription.user_id == project.owner_id)
     )
@@ -18,7 +20,8 @@ async def get_subscription_for_project(db: AsyncSession, project: Project) -> Op
 
 
 async def check_memory_limit(
-    db: AsyncSession, project: Project,
+    db: AsyncSession,
+    project: Project,
 ) -> tuple[bool, str]:
     sub = await get_subscription_for_project(db, project)
     if sub is None:
@@ -26,9 +29,11 @@ async def check_memory_limit(
     plan_limits = PLAN_LIMITS.get(sub.plan, PLAN_LIMITS[PlanType.FREE])
     max_memories = max(sub.max_memories, plan_limits["max_memories"])
     count_result = await db.execute(
-        select(func.count(Memory.id)).where(Memory.project_id.in_(
-            select(Project.id).where(Project.owner_id == project.owner_id)
-        ))
+        select(func.count(Memory.id)).where(
+            Memory.project_id.in_(
+                select(Project.id).where(Project.owner_id == project.owner_id)
+            )
+        )
     )
     total = count_result.scalar() or 0
     if total >= max_memories:
@@ -37,7 +42,8 @@ async def check_memory_limit(
 
 
 async def check_project_limit(
-    db: AsyncSession, owner_id: UUID,
+    db: AsyncSession,
+    owner_id: UUID,
 ) -> tuple[bool, str]:
     sub_result = await db.execute(
         select(Subscription).where(Subscription.user_id == owner_id)
@@ -64,9 +70,25 @@ async def get_effective_limits(db: AsyncSession, owner_id: UUID) -> dict:
     plan = sub.plan if sub else PlanType.FREE
     plan_limits = PLAN_LIMITS.get(plan, PLAN_LIMITS[PlanType.FREE])
     return {
-        "max_memories": max(sub.max_memories, plan_limits["max_memories"]) if sub else plan_limits["max_memories"],
-        "max_searches_per_month": max(sub.max_searches_per_month, plan_limits["max_searches_per_month"]) if sub else plan_limits["max_searches_per_month"],
-        "max_projects": max(sub.max_projects, plan_limits["max_projects"]) if sub else plan_limits["max_projects"],
-        "requests_per_hour": max(sub.requests_per_hour, plan_limits["requests_per_hour"]) if sub else plan_limits["requests_per_hour"],
+        "max_memories": (
+            max(sub.max_memories, plan_limits["max_memories"])
+            if sub
+            else plan_limits["max_memories"]
+        ),
+        "max_searches_per_month": (
+            max(sub.max_searches_per_month, plan_limits["max_searches_per_month"])
+            if sub
+            else plan_limits["max_searches_per_month"]
+        ),
+        "max_projects": (
+            max(sub.max_projects, plan_limits["max_projects"])
+            if sub
+            else plan_limits["max_projects"]
+        ),
+        "requests_per_hour": (
+            max(sub.requests_per_hour, plan_limits["requests_per_hour"])
+            if sub
+            else plan_limits["requests_per_hour"]
+        ),
         "plan": plan.value,
     }

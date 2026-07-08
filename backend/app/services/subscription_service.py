@@ -9,11 +9,19 @@ from app.core.limits import PLAN_LIMITS, PLAN_HIERARCHY, ADDON_PRICING
 from app.models.subscription import Subscription, PlanType, SubscriptionStatus
 from app.models.payment import Payment
 from app.schemas.payment import (
-    PlanInfo, PaymentHistory, BillingHistory,
+    PlanInfo,
+    PaymentHistory,
+    BillingHistory,
 )
 
-
-PLAN_ORDER = [PlanType.FREE, PlanType.DEVELOPER, PlanType.PRO, PlanType.TEAM_5, PlanType.TEAM_10, PlanType.ENTERPRISE]
+PLAN_ORDER = [
+    PlanType.FREE,
+    PlanType.DEVELOPER,
+    PlanType.PRO,
+    PlanType.TEAM_5,
+    PlanType.TEAM_10,
+    PlanType.ENTERPRISE,
+]
 
 
 def _get_default_limits(plan: PlanType) -> dict:
@@ -21,7 +29,9 @@ def _get_default_limits(plan: PlanType) -> dict:
 
 
 async def create_subscription(
-    db: AsyncSession, user_id: uuid.UUID, plan: PlanType = PlanType.FREE,
+    db: AsyncSession,
+    user_id: uuid.UUID,
+    plan: PlanType = PlanType.FREE,
 ) -> Subscription:
     limits = _get_default_limits(plan)
     sub = Subscription(
@@ -39,7 +49,9 @@ async def create_subscription(
     return sub
 
 
-async def get_subscription(db: AsyncSession, user_id: uuid.UUID) -> Optional[Subscription]:
+async def get_subscription(
+    db: AsyncSession, user_id: uuid.UUID
+) -> Optional[Subscription]:
     result = await db.execute(
         select(Subscription).where(Subscription.user_id == user_id)
     )
@@ -63,7 +75,9 @@ async def upgrade_subscription(
     current_limits = _get_default_limits(sub.plan)
     addon_projects = sub.max_projects - current_limits["max_projects"]
     addon_memories = sub.max_memories - current_limits["max_memories"]
-    addon_searches = sub.max_searches_per_month - current_limits["max_searches_per_month"]
+    addon_searches = (
+        sub.max_searches_per_month - current_limits["max_searches_per_month"]
+    )
     limits = _get_default_limits(new_plan)
     sub.plan = new_plan
     sub.renewal_date = datetime.now(timezone.utc) + timedelta(days=30)
@@ -102,7 +116,9 @@ async def get_billing_history(db: AsyncSession, user_id: uuid.UUID) -> BillingHi
     if not sub:
         return BillingHistory(payments=[])
     result = await db.execute(
-        select(Payment).where(Payment.subscription_id == sub.id).order_by(Payment.created_at.desc())
+        select(Payment)
+        .where(Payment.subscription_id == sub.id)
+        .order_by(Payment.created_at.desc())
     )
     payments = result.scalars().all()
     return BillingHistory(

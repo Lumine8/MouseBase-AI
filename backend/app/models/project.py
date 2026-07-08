@@ -34,9 +34,7 @@ class Project(Base):
     api_key_id: Mapped[str] = mapped_column(
         String(16), unique=True, nullable=False, index=True
     )
-    api_key_encrypted: Mapped[Optional[str]] = mapped_column(
-        String(512), nullable=True
-    )
+    api_key_encrypted: Mapped[Optional[str]] = mapped_column(String(512), nullable=True)
     plan: Mapped[str] = mapped_column(String(20), nullable=False, default="free")
     status: Mapped[ProjectStatus] = mapped_column(
         String(20), nullable=False, default=ProjectStatus.ACTIVE
@@ -74,9 +72,7 @@ class ApiKey(Base):
         String(16), unique=True, nullable=False, index=True
     )
     api_key_hash: Mapped[str] = mapped_column(String(255), nullable=False)
-    encrypted_api_key: Mapped[Optional[str]] = mapped_column(
-        String(512), nullable=True
-    )
+    encrypted_api_key: Mapped[Optional[str]] = mapped_column(String(512), nullable=True)
     name: Mapped[str] = mapped_column(String(100), nullable=False, default="default")
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     created_at: Mapped[datetime] = mapped_column(

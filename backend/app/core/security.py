@@ -83,4 +83,5 @@ def verify_access_token(token: str) -> UUID:
         return UUID(payload["sub"])
     except (jwt.ExpiredSignatureError, jwt.InvalidTokenError, ValueError):
         from app.exceptions.auth import InvalidTokenError
+
         raise InvalidTokenError()
