@@ -12,7 +12,7 @@ export default function Navbar() {
         <button className="navbar-toggle" onClick={toggle}>
           <FiMenu size={20} />
         </button>
-        <div className="navbar-brand">Mouse<span style="color: var(--accent);">Base</span></div>
+        <div className="navbar-brand">Mouse<span style={{ color: "var(--accent)" }}>Base</span></div>
       </div>
 
       <div className="navbar-right">
