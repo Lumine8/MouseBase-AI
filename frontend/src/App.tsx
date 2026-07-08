@@ -6,6 +6,7 @@ import Dashboard from "./pages/Dashboard";
 import Projects from "./pages/Projects";
 import ProjectDetail from "./pages/ProjectDetail";
 import Playground from "./pages/Playground";
+import SearchPage from "./pages/Search";
 import Documentation from "./pages/Documentation";
 import Analytics from "./pages/Analytics";
 import Settings from "./pages/Settings";
@@ -65,6 +66,7 @@ export default function App() {
       <Route path="/projects" element={<ProtectedRoute><Projects /></ProtectedRoute>} />
       <Route path="/projects/:id" element={<ProtectedRoute><ProjectDetail /></ProtectedRoute>} />
       <Route path="/playground" element={<ProtectedRoute><Playground /></ProtectedRoute>} />
+      <Route path="/search" element={<ProtectedRoute><SearchPage /></ProtectedRoute>} />
       <Route path="/docs" element={<Documentation />} />
       <Route path="/docs/:section" element={<Documentation />} />
       <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
