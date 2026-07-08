@@ -30,3 +30,13 @@ htmlcov/
 
 # Windows
 Thumbs.db
+
+# Node
+node_modules/
+frontend/dist/
+frontend/tsconfig.tsbuildinfo
+
+# Python build artifacts
+*.egg-info/
+**/__pycache__/
+**/*.egg
