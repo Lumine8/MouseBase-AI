@@ -1,7 +1,7 @@
 """add billing tables (subscriptions, payments, webhook_events)
 
 Revision ID: 4a5b6c7d8e9f
-Revises: 3c4d5e6f7g8h
+Revises: 2a3b4c5d6e7f
 Create Date: 2026-07-08 14:00:00.000000
 
 """
@@ -12,7 +12,7 @@ from alembic import op
 import sqlalchemy as sa
 
 revision: str = "4a5b6c7d8e9f"
-down_revision: Union[str, None] = "3c4d5e6f7g8h"
+down_revision: Union[str, None] = "2a3b4c5d6e7f"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
