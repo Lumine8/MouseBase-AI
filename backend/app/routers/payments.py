@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Body, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Body, Depends, HTTPException, Request
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -24,7 +24,7 @@ from app.services.payment_service import (
 )
 from app.services.subscription_service import (
     add_addon, cancel_addon, cancel_subscription,
-    get_addon_info, get_available_plans,
+    get_available_plans,
     get_billing_history, get_subscription,
     upgrade_subscription,
 )
