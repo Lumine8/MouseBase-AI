@@ -30,7 +30,7 @@ export default function Sidebar() {
             <div className="sidebar-brand-icon" style={{ width: 36, height: 36, borderRadius: 10, background: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center", color: "rgb(9, 9, 9)", fontSize: 18, fontWeight: 700 }}>
               M
             </div>
-            <span>Mouse<span className="accent-text">Base</span></span>
+            <span>Mouse<span style="color: var(--accent);">Base</span></span>
           </div>
 
           <nav style={{ display: "flex", flexDirection: "column", gap: 2 }}>
