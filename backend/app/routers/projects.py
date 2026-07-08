@@ -7,7 +7,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.dependencies import get_db
 from app.dependencies.auth import (
-    get_current_user_jwt_only,
     get_current_user_or_project as get_current_user,
 )
 from app.models.user import User
@@ -94,14 +93,11 @@ async def get_project(
     response_model=ApiKeyResponse,
     status_code=status.HTTP_200_OK,
     summary="View API key",
-    description=(
-        "Returns the full decrypted API key for a project. "
-        "Only accessible with a valid JWT (not via API key auth)."
-    ),
+    description="Returns the full decrypted API key for a project.",
 )
 async def get_api_key(
     project_id: UUID,
-    current_user: User = Depends(get_current_user_jwt_only),
+    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> ApiKeyResponse:
     service = ProjectService(db)
