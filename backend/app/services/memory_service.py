@@ -19,8 +19,6 @@ from app.schemas.update import UpdateMemoryRequest
 from app.models.embedding import Embedding
 
 from app.core.config import settings
-from app.core.plan_enforcer import check_memory_limit
-from app.exceptions.memory import MemoryLimitError
 
 # from app.routers import memory
 
@@ -38,10 +36,6 @@ class MemoryService:
 
         if self.embedding_service is None:
             raise RuntimeError("Embedding service is not initialized.")
-
-        limited, msg = await check_memory_limit(self.db, project)
-        if limited:
-            raise MemoryLimitError(msg)
 
         vector = await self.embedding_service.embed(request.content)
 
@@ -64,7 +58,7 @@ class MemoryService:
         await self.db.commit()
         await self.db.refresh(memory)
 
-        return RememberResponse(id=memory.id, created_at=memory.created_at)
+        return RememberResponse(memory_id=memory.id, created_at=memory.created_at)
 
     async def _get_memory(self, memory_id: UUID, project: Project) -> Memory:
         stmt = select(Memory).where(
@@ -79,7 +73,7 @@ class MemoryService:
 
     def _to_response(self, memory: Memory) -> MemoryResponse:
         return MemoryResponse(
-            id=memory.id,
+            memory_id=memory.id,
             external_id=memory.external_id,
             content=memory.content,
             metadata=memory.metadata_,

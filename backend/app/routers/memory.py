@@ -1,6 +1,8 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Body, Depends, status
+from fastapi import APIRouter, Depends, status
+
+# from httpx import request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.dependencies import get_db
@@ -9,6 +11,9 @@ from app.models.project import Project
 
 from app.services.memory_service import MemoryService
 
+# from app.services.gemini_embedding_service import GeminiEmbeddingService
+
+# from app.exceptions.memory import MemoryNotFoundError
 from app.schemas.memory import MemoryResponse
 from app.schemas.update import UpdateMemoryRequest
 from app.services.gemini_embedding_service import GeminiEmbeddingService
@@ -28,7 +33,10 @@ async def get_memory(
     project: Project = Depends(get_current_project),
     db: AsyncSession = Depends(get_db),
 ) -> MemoryResponse:
-    memory_service = MemoryService(db=db)
+    memory_service = MemoryService(
+        db=db
+    )  # Replace with actual embedding service if needed
+
     return await memory_service.get_memory(memory_id, project)
 
 
@@ -41,28 +49,7 @@ async def get_memory(
 )
 async def update_memory(
     memory_id: UUID,
-    request: UpdateMemoryRequest = Body(
-        openapi_examples={
-            "update_content": {
-                "summary": "Update content",
-                "description": "Update only the content of a memory.",
-                "value": {
-                    "content": "Updated memory content.",
-                    "metadata": None,
-                    "external_id": None,
-                },
-            },
-            "update_metadata": {
-                "summary": "Update metadata",
-                "description": "Update only the metadata of a memory.",
-                "value": {
-                    "content": None,
-                    "metadata": {"source": "updated", "priority": "high"},
-                    "external_id": None,
-                },
-            },
-        }
-    ),
+    request: UpdateMemoryRequest,
     project: Project = Depends(get_current_project),
     db: AsyncSession = Depends(get_db),
 ) -> MemoryResponse:

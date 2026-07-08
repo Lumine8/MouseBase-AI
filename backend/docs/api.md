@@ -8,58 +8,6 @@ Authorization: Bearer <API_KEY>
 
 The key resolves to exactly one Project. There is no separate permission tier in v1 — a key is either valid for a project or it isn't.
 
-## Projects API
-
-Projects are owner-scoped. The authenticated project determines the owner for create/list/update/delete/rotate operations.
-
-### POST /projects
-
-Creates a new project for the authenticated owner and returns the API key once.
-
-Request:
-
-```json
-{
-  "name": "My Project",
-  "description": "Optional description"
-}
-```
-
-Response:
-
-```json
-{
-  "id": "...",
-  "owner_id": "...",
-  "name": "My Project",
-  "description": "Optional description",
-  "api_key_id": "...",
-  "created_at": "...",
-  "updated_at": "...",
-  "api_key": "mb_live_..."
-}
-```
-
-### GET /projects
-
-Returns a list of projects owned by the authenticated owner.
-
-### GET /projects/{id}
-
-Returns one project owned by the authenticated owner.
-
-### PATCH /projects/{id}
-
-Updates the project name and/or description.
-
-### DELETE /projects/{id}
-
-Deletes the project.
-
-### POST /projects/{id}/api-key/rotate
-
-Generates a new API key for the project and returns the new secret once.
-
 ## Content-Type
 
 ```

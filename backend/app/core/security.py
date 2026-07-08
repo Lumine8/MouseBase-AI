@@ -1,32 +1,11 @@
-import base64
-import hashlib
 from dataclasses import dataclass
-from datetime import datetime, timedelta, timezone
-from secrets import token_hex
-from uuid import UUID
+from secrets import token_urlsafe
 
-import jwt
-from cryptography.fernet import Fernet
 from pwdlib import PasswordHash
 
-from app.core.config import settings
 from app.exceptions.auth import InvalidAPIKeyError
 
 password_hash = PasswordHash.recommended()
-
-
-def _get_fernet() -> Fernet:
-    raw = settings.API_KEY_ENCRYPTION_KEY or settings.SECRET_KEY
-    key = hashlib.sha256(raw.encode()).digest()
-    return Fernet(base64.urlsafe_b64encode(key))
-
-
-def encrypt_api_key(api_key: str) -> str:
-    return _get_fernet().encrypt(api_key.encode()).decode()
-
-
-def decrypt_api_key(encrypted: str) -> str:
-    return _get_fernet().decrypt(encrypted.encode()).decode()
 
 
 @dataclass
@@ -36,8 +15,8 @@ class APIKey:
 
 
 def generate_api_key() -> APIKey:
-    key_id = token_hex(8)
-    secret_key = token_hex(16)
+    key_id = token_urlsafe(12)
+    secret_key = token_urlsafe(32)
 
     return APIKey(
         key=f"mb_live_{key_id}_{secret_key}",
@@ -65,22 +44,3 @@ def parse_api_key(api_key: str) -> tuple[str, str]:
 
 def verify_api_key(secret: str, hashed_secret: str) -> bool:
     return password_hash.verify(secret, hashed_secret)
-
-
-def create_access_token(user_id: UUID) -> str:
-    expire = datetime.now(timezone.utc) + timedelta(hours=settings.JWT_EXPIRY_HOURS)
-    payload = {
-        "sub": str(user_id),
-        "exp": expire,
-        "iat": datetime.now(timezone.utc),
-    }
-    return jwt.encode(payload, settings.JWT_SECRET, algorithm="HS256")
-
-
-def verify_access_token(token: str) -> UUID:
-    try:
-        payload = jwt.decode(token, settings.JWT_SECRET, algorithms=["HS256"])
-        return UUID(payload["sub"])
-    except (jwt.ExpiredSignatureError, jwt.InvalidTokenError, ValueError):
-        from app.exceptions.auth import InvalidTokenError
-        raise InvalidTokenError()
