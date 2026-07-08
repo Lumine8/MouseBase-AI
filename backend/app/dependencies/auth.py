@@ -1,10 +1,10 @@
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.dependencies import get_db
+from app.exceptions.auth import InvalidAPIKeyError, InvalidTokenError
 from app.models.project import Project
 from app.models.user import User
 from app.services.auth_service import AuthService
@@ -17,10 +17,7 @@ async def get_current_user(
     db: AsyncSession = Depends(get_db),
 ) -> User:
     if credentials is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Not authenticated",
-        )
+        raise InvalidTokenError()
     auth_service = AuthService(db)
     token = credentials.credentials
     return await auth_service.get_current_user(token)
@@ -32,10 +29,7 @@ async def get_current_user_jwt_only(
 ) -> User:
     """JWT-only authentication. Does NOT fall back to API key auth."""
     if credentials is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Not authenticated",
-        )
+        raise InvalidTokenError()
     auth_service = AuthService(db)
     token = credentials.credentials
     return await auth_service.get_current_user(token)
@@ -46,10 +40,7 @@ async def get_current_project(
     db: AsyncSession = Depends(get_db),
 ) -> Project:
     if credentials is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Not authenticated",
-        )
+        raise InvalidAPIKeyError()
     auth_service = AuthService(db)
     api_key = credentials.credentials
     return await auth_service.authenticate_api_key(api_key)
@@ -61,10 +52,7 @@ async def get_current_user_or_project(
 ) -> User:
     """Try JWT auth first, fall back to API key auth for dashboard backwards compat."""
     if credentials is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Not authenticated",
-        )
+        raise InvalidTokenError()
     auth_service = AuthService(db)
     token = credentials.credentials
 
@@ -90,7 +78,4 @@ async def get_current_user_or_project(
     except Exception:
         pass
 
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Invalid authentication",
-    )
+    raise InvalidAPIKeyError()

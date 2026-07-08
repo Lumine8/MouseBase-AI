@@ -52,10 +52,14 @@ export default function Login() {
       });
 
       if (!res.ok) {
-        const data = await res.json();
-        throw new Error(
-          data?.error?.message ?? "Invalid API key. Please try again."
-        );
+        let message = "Invalid API key. Please try again.";
+        try {
+          const data = await res.json();
+          message = data?.error?.message ?? data?.detail ?? message;
+        } catch {
+          // response body was empty or not JSON
+        }
+        throw new Error(message);
       }
 
       localStorage.setItem("mb_api_key", apiKey.trim());
