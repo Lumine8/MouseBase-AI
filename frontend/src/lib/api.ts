@@ -177,9 +177,32 @@ export interface DashboardMetrics {
   plan: string;
 }
 
+export interface DailyUsage {
+  day: string;
+  requests: number;
+  searches: number;
+  embeddings: number;
+  storage_bytes: number;
+}
+
+export interface AnalyticsTotals {
+  requests: number;
+  searches: number;
+  embeddings: number;
+  memories: number;
+  storage_bytes: number;
+}
+
+export interface AnalyticsResponse {
+  daily: DailyUsage[];
+  totals: AnalyticsTotals;
+}
+
 export const dashboard = {
   metrics: () =>
     request<DashboardMetrics>("GET", "/dashboard/metrics"),
+  analytics: () =>
+    request<AnalyticsResponse>("GET", "/dashboard/analytics"),
 };
 
 export interface PlanInfo {

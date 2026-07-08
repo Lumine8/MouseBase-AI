@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, timedelta
 
 from fastapi import APIRouter, Depends
 from sqlalchemy import select, func
@@ -65,4 +65,85 @@ async def dashboard_metrics(
         "total_embeddings": total_embeddings,
         "total_projects": len(project_list),
         "plan": plan,
+    }
+
+
+@router.get("/analytics")
+async def dashboard_analytics(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> dict:
+    projects = await db.execute(
+        select(Project).where(Project.owner_id == current_user.id)
+    )
+    project_list = projects.scalars().all()
+    project_ids = [p.id for p in project_list]
+
+    today = date.today()
+    days = 7
+    daily_usage = []
+
+    for i in range(days - 1, -1, -1):
+        d = today - timedelta(days=i)
+        day_label = d.strftime("%a")
+        if project_ids:
+            row = await db.execute(
+                select(
+                    func.coalesce(func.sum(Usage.requests), 0),
+                    func.coalesce(func.sum(Usage.searches), 0),
+                    func.coalesce(func.sum(Usage.embeddings), 0),
+                    func.coalesce(func.sum(Usage.storage_bytes), 0),
+                ).where(Usage.project_id.in_(project_ids), Usage.date == d)
+            )
+            r = row.one()
+            daily_usage.append({
+                "day": day_label,
+                "requests": r[0] or 0,
+                "searches": r[1] or 0,
+                "embeddings": r[2] or 0,
+                "storage_bytes": r[3] or 0,
+            })
+        else:
+            daily_usage.append({
+                "day": day_label, "requests": 0, "searches": 0,
+                "embeddings": 0, "storage_bytes": 0,
+            })
+
+    total = await db.execute(
+        select(
+            func.coalesce(func.sum(Usage.requests), 0),
+            func.coalesce(func.sum(Usage.searches), 0),
+            func.coalesce(func.sum(Usage.embeddings), 0),
+        ).where(
+            Usage.project_id.in_(project_ids) if project_ids else False,
+        )
+    )
+    t = total.one()
+    requests_total = t[0] or 0
+    searches_total = t[1] or 0
+    embeddings_total = t[2] or 0
+
+    mem_count = await db.execute(
+        select(func.count(Memory.id)).where(
+            Memory.project_id.in_(project_ids) if project_ids else False,
+        )
+    )
+    total_memories = mem_count.scalar() or 0
+
+    storage = await db.execute(
+        select(func.coalesce(func.sum(Usage.storage_bytes), 0)).where(
+            Usage.project_id.in_(project_ids) if project_ids else False,
+        )
+    )
+    total_storage_bytes = storage.scalar() or 0
+
+    return {
+        "daily": daily_usage,
+        "totals": {
+            "requests": requests_total,
+            "searches": searches_total,
+            "embeddings": embeddings_total,
+            "memories": total_memories,
+            "storage_bytes": total_storage_bytes,
+        },
     }
