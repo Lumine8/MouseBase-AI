@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from secrets import token_urlsafe
 from uuid import UUID
 
 import jwt
@@ -49,7 +50,7 @@ class AuthService:
         if settings.ENVIRONMENT == "development":
             user.email_verified = True
 
-        await create_subscription(self.db, user.id, PlanType.FREE)
+        sub = await create_subscription(self.db, user.id, PlanType.FREE)
         await self.db.flush()
 
         await self.db.commit()

@@ -54,7 +54,7 @@ async def dashboard_metrics(
         total_searches = row[0] or 0
         total_requests = row[1] or 0
         total_embeddings = row[2] or 0
-        _ = row[3] or 0
+        total_storage_bytes = row[3] or 0
 
     plan = project_list[0].plan if project_list else "free"
 

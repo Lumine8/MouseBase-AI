@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, timezone
 from uuid import UUID
 
 from sqlalchemy import select

@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime, timezone
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 from enum import Enum as PyEnum
 
 from sqlalchemy import Enum, String, DateTime, ForeignKey, Integer, Boolean

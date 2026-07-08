@@ -1,11 +1,12 @@
+from datetime import date
 from typing import Optional
 from uuid import UUID
 
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.limits import PLAN_LIMITS
-from app.models.subscription import Subscription, PlanType
+from app.core.limits import PLAN_LIMITS, PLAN_HIERARCHY
+from app.models.subscription import Subscription, PlanType, SubscriptionStatus
 from app.models.memory import Memory
 from app.models.project import Project
 
