@@ -67,8 +67,8 @@ export default function Signup() {
       <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", width: "100%" }}>
       <div className="login-box">
         <div className="login-logo">
-          <div className="login-logo-icon">
-            <FiCpu />
+          <div className="login-logo-icon" style={{ width: 56, height: 56, borderRadius: 16, background: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center", color: "rgb(9, 9, 9)", fontSize: 28, fontWeight: 700, boxShadow: "rgba(245, 197, 66, 0.15) 0px 0px 40px" }}>
+            M
           </div>
           <h1>Mouse<span style={{ color: "var(--accent)" }}>Base</span></h1>
           <p>Create your account</p>

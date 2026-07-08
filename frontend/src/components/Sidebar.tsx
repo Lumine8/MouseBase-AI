@@ -27,8 +27,8 @@ export default function Sidebar() {
             onClick={() => { navigate("/dashboard"); close(); }}
             style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", marginBottom: 32, fontWeight: 700, fontSize: 17 }}
           >
-            <div className="sidebar-brand-icon">
-              <FiCpu />
+            <div className="sidebar-brand-icon" style={{ width: 36, height: 36, borderRadius: 10, background: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center", color: "rgb(9, 9, 9)", fontSize: 18, fontWeight: 700 }}>
+              M
             </div>
             <span>Mouse<span className="accent-text">Base</span></span>
           </div>
