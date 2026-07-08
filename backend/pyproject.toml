@@ -25,6 +25,7 @@ dependencies = [
     "pyjwt>=2.0.0",
     "redis>=5.0.0",
     "jinja2",
+    "razorpay>=1.4.0",
 ]
 
 [project.optional-dependencies]
