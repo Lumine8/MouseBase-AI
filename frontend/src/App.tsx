@@ -12,6 +12,7 @@ import Analytics from "./pages/Analytics";
 import Settings from "./pages/Settings";
 import Landing from "./pages/Landing";
 import Pricing from "./pages/Pricing";
+import Billing from "./pages/Billing";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
 
@@ -70,6 +71,7 @@ export default function App() {
       <Route path="/docs" element={<Documentation />} />
       <Route path="/docs/:section" element={<Documentation />} />
       <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
+      <Route path="/billing" element={<ProtectedRoute><Billing /></ProtectedRoute>} />
       <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
       <Route path="*" element={<Navigate to={hasAuth() ? "/dashboard" : "/"} replace />} />
     </Routes>

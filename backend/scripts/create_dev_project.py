@@ -9,7 +9,7 @@ from sqlalchemy import select
 
 from app.core.security import (
     APIKey,
-    # generate_api_key,
+    encrypt_api_key,
     hash_api_key,
     parse_api_key,
 )
@@ -47,6 +47,10 @@ async def main():
         else:
             print(f"User already exists: {user.email}")
 
+        fixed_key = os.getenv("TEST_API_KEY", DEFAULT_TEST_API_KEY)
+        key_id, secret = parse_api_key(fixed_key)
+        api_key = APIKey(key=fixed_key, key_id=key_id)
+
         result = await db.execute(
             select(Project).where(
                 Project.owner_id == user.id,
@@ -56,37 +60,32 @@ async def main():
         project = result.scalar_one_or_none()
 
         if project is None:
-            fixed_key = os.getenv("TEST_API_KEY", DEFAULT_TEST_API_KEY)
-
-            key_id, secret = parse_api_key(fixed_key)
-
-            api_key = APIKey(
-                key=fixed_key,
-                key_id=key_id,
-            )
-
             project = Project(
                 owner_id=user.id,
                 name="Development Project",
                 description="Development project for testing purposes",
                 api_key_id=api_key.key_id,
                 api_key_hash=hash_api_key(secret),
+                api_key_encrypted=encrypt_api_key(fixed_key),
             )
-
             db.add(project)
-            await db.commit()
-            await db.refresh(project)
-
-            print("\n" + "=" * 60)
-            print("Development project created successfully.")
-            print(f"Project ID : {project.id}")
-            print(f"API Key    : {api_key.key}")
-            print("=" * 60)
-
         else:
-            print("Development project already exists.")
-            print(f"Project ID : {project.id}")
-            print(f"API Key ID : {project.api_key_id}")
+            project.api_key_id = api_key.key_id
+            project.api_key_hash = hash_api_key(secret)
+            project.api_key_encrypted = encrypt_api_key(fixed_key)
+            print(f"Updated existing project key.")
+
+        await db.commit()
+        await db.refresh(project)
+
+        print("\n" + "=" * 60)
+        print("Development project ready.")
+        print(f"Project ID : {project.id}")
+        print(f"API Key    : {api_key.key}")
+        print("=" * 60)
+
+        print("\nFull key for sign-in:")
+        print(f"  {fixed_key}")
 
 
 if __name__ == "__main__":

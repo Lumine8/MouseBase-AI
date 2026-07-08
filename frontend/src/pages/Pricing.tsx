@@ -38,8 +38,9 @@ async function fetchJson<T>(path: string, method = "GET", body?: unknown): Promi
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   if (token) headers["Authorization"] = `Bearer ${token}`;
   const res = await fetch(`/api/v1${path}`, { method, headers, body: body ? JSON.stringify(body) : undefined });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data?.error?.message || "Request failed");
+  let data: any;
+  try { data = await res.json(); } catch { data = {}; }
+  if (!res.ok) throw new Error(data?.error?.message || data?.detail || "Request failed");
   return data as T;
 }
 

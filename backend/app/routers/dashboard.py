@@ -10,6 +10,7 @@ from app.db.dependencies import get_db
 from app.dependencies.auth import get_current_user_or_project as get_current_user
 from app.models.memory import Memory
 from app.models.project import Project
+from app.models.subscription import Subscription
 from app.models.usage import Usage
 from app.models.user import User
 
@@ -153,4 +154,64 @@ async def dashboard_analytics(
             "memories": total_memories,
             "storage_bytes": total_storage_bytes,
         },
+    }
+
+
+@router.get("/billing-usage")
+async def billing_usage(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> dict:
+    projects = await db.execute(
+        select(Project).where(Project.owner_id == current_user.id)
+    )
+    project_list = projects.scalars().all()
+    project_ids = [p.id for p in project_list]
+
+    today = date.today()
+    month_start = today.replace(day=1)
+
+    mem_count = await db.execute(
+        select(func.count(Memory.id)).where(
+            Memory.project_id.in_(project_ids) if project_ids else False,
+        )
+    )
+    total_memories = mem_count.scalar() or 0
+
+    monthly = await db.execute(
+        select(
+            func.coalesce(func.sum(Usage.requests), 0),
+            func.coalesce(func.sum(Usage.searches), 0),
+            func.coalesce(func.sum(Usage.embeddings), 0),
+            func.coalesce(func.sum(Usage.storage_bytes), 0),
+        ).where(
+            Usage.project_id.in_(project_ids) if project_ids else False,
+            Usage.date >= month_start,
+            Usage.date <= today,
+        )
+    )
+    m = monthly.one()
+
+    sub = await db.execute(
+        select(Subscription).where(Subscription.user_id == current_user.id)
+    )
+    subscription = sub.scalar_one_or_none()
+
+    plan_limits = None
+    if subscription:
+        plan_limits = {
+            "max_memories": subscription.max_memories,
+            "max_searches_per_month": subscription.max_searches_per_month,
+            "max_projects": subscription.max_projects,
+            "requests_per_hour": subscription.requests_per_hour,
+        }
+
+    return {
+        "monthly_requests": m[0] or 0,
+        "monthly_searches": m[1] or 0,
+        "monthly_embeddings": m[2] or 0,
+        "total_storage_bytes": m[3] or 0,
+        "total_memories": total_memories,
+        "total_projects": len(project_list),
+        "plan_limits": plan_limits,
     }

@@ -11,7 +11,7 @@ export default function Sidebar() {
     { to: "/projects", icon: FiDatabase, label: "Projects" },
     { to: "/playground", icon: FiCode, label: "Playground" },
     { to: "/search", icon: FiSearch, label: "Search" },
-    { to: "/pricing", icon: FiCreditCard, label: "Billing" },
+    { to: "/billing", icon: FiCreditCard, label: "Billing" },
     { to: "/analytics", icon: FiActivity, label: "Analytics" },
     { to: "/docs/getting-started", icon: FiBookOpen, label: "Documentation" },
     { to: "/settings", icon: FiSettings, label: "Settings" },
