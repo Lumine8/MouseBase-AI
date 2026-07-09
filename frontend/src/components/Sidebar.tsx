@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from "react-router-dom";
-import { FiGrid, FiDatabase, FiSearch, FiCode, FiBookOpen, FiActivity, FiSettings, FiUser, FiLogOut, FiCpu, FiCreditCard } from "react-icons/fi";
+import { FiGrid, FiDatabase, FiSearch, FiCode, FiBookOpen, FiActivity, FiSettings, FiUser, FiLogOut, FiCreditCard } from "react-icons/fi";
 import { useSidebar } from "../App";
 
 export default function Sidebar() {

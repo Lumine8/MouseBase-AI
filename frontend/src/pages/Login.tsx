@@ -1,6 +1,6 @@
 import { useState, FormEvent } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { FiCpu, FiKey } from "react-icons/fi";
+import { FiKey } from "react-icons/fi";
 import { auth } from "../lib/api";
 import PublicNav from "../components/PublicNav";
 
