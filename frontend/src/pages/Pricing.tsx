@@ -228,7 +228,7 @@ export default function Pricing() {
         )}
 
         <div className="pricing-grid">
-          {plans.filter((p) => p.id !== "TEAM_5" && p.id !== "TEAM_10").map((plan) => {
+          {plans.filter((p) => !p.id.startsWith("TEAM_") && p.id !== "ENTERPRISE").map((plan) => {
             const isActive = activePlanId === plan.id;
             const isCurrent = isActive && sub?.status === "ACTIVE";
             return (
