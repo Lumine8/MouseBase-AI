@@ -40,17 +40,17 @@ pip install mousebase
 ### 2. Use it
 
 ```python
-from mousebase import Client
+from mousebase import MouseBase
 
-client = Client(api_key="mb_live_...")
+client = MouseBase(api_key="mb_live_...")
 
 # Store a memory
 result = client.remember("The user prefers dark mode.")
-print(result.id)
+print(result.memory_id)
 
 # Search semantically
 results = client.search("What theme does the user want?")
-for r in results:
+for r in results.results:
     print(f"{r.content} (score: {r.score})")
 ```
 
@@ -93,9 +93,9 @@ uvicorn app.main:app --reload
 ## Python SDK
 
 ```python
-from mousebase import Client
+from mousebase import MouseBase
 
-client = Client(api_key="mb_live_...")
+client = MouseBase(api_key="mb_live_...")
 
 # Remember
 result = client.remember("content", external_id="opt", metadata={})
@@ -104,13 +104,13 @@ result = client.remember("content", external_id="opt", metadata={})
 results = client.search("query", top_k=10)
 
 # Get
-memory = client.get_memory("id")
+memory = client.get("id")
 
 # Update
-client.update_memory("id", content="new content")
+client.update("id", content="new content")
 
 # Delete
-client.delete_memory("id")
+client.delete("id")
 ```
 
 ## API
@@ -133,28 +133,28 @@ All endpoints are documented with OpenAPI at `/docs` when the server is running.
 
 ## Examples
 
-See the [examples directory](examples/) for complete examples:
+See the [examples directory](mousebase/examples/) for complete runnable scripts:
 
-- `basic.py` — Basic remember and search
-- `chatbot.py` — Chatbot with persistent memory
-- `rag.py` — RAG (Retrieval-Augmented Generation) pipeline
-- `customer_support.py` — Support ticket memory
-- `ai_agent.py` — AI agent with session memory
+- `notes.py` — Simple notes app with semantic search
+- `rag.py` — RAG pipeline (index → retrieve → LLM prompt)
+- `discord.py` — Discord bot with per-user memory recall
+- `notion.py` — Full CRUD notes app with MouseBase search
+- `customer_support.py` — Support ticket system with similar-issue lookup
+- `agent_memory.py` — AI agent with session-based memory management
 
 ## Documentation
 
-Full documentation is available at `/docs` on the server, or in the [docs](docs/) directory:
+Full documentation is available at the in-app `/docs` page, or in the [VitePress docs](docs/) directory:
 
-- [Getting Started](docs/installation.md)
-- [Authentication](docs/auth.md)
-- [Projects](docs/projects.md)
-- [Remember](docs/remember.md)
-- [Search](docs/search.md)
-- [Update & Delete](docs/update-delete.md)
-- [Python SDK](docs/python-sdk.md)
-- [API Reference](docs/api.md)
-- [Docker](docs/docker.md)
-- [Deployment](docs/deployment.md)
+- [Introduction](docs/guide/introduction.md)
+- [Quickstart](docs/guide/quickstart.md)
+- [Authentication](docs/guide/authentication.md)
+- [Projects](docs/guide/projects.md)
+- [Remember](docs/guide/remember.md)
+- [Search](docs/guide/search.md)
+- [Errors](docs/guide/errors.md)
+- [Python SDK](docs/guide/python-sdk.md)
+- [FAQ](docs/guide/faq.md)
 
 ## Architecture
 

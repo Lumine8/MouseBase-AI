@@ -476,6 +476,23 @@ All exceptions have `.code` (str), `.message` (str), and `.status_code` (int) at
 
 ---
 
+## Examples
+
+Complete runnable examples are in the [examples directory](https://github.com/anomalyco/MouseBase/tree/main/mousebase/examples):
+
+| File | What it demonstrates |
+|------|---------------------|
+| `notes.py` | Simple notes app with semantic search |
+| `rag.py` | RAG pipeline — index documents, retrieve context, build LLM prompt |
+| `discord.py` | Discord bot with per-user memory recall |
+| `notion.py` | Full CRUD notes app with MouseBase search |
+| `customer_support.py` | Support ticket system with similar-issue lookup and customer history |
+| `agent_memory.py` | AI agent with `SessionMemory` class for per-session remember/recall/summarize |
+
+Each file can be run directly: `python examples/rag.py` (requires `MOUSEBASE_API_KEY`).
+
+---
+
 ## Migration: `Client` → `MouseBase`
 
 The old `Client` class was renamed to `MouseBase`. The API is identical:

@@ -253,9 +253,35 @@ Open an issue on GitHub or check the documentation.`
 mb_live_<key_id>_<secret>
 \`\`\`
 
-## Sending the API Key
+## Python
 
-Include your API key in the \`Authorization\` header:
+\`\`\`python
+from mousebase import MouseBase
+
+# Pass API key directly
+client = MouseBase(api_key="mb_live_abc123_def456")
+
+# Or use the MOUSEBASE_API_KEY environment variable
+client = MouseBase()
+\`\`\`
+
+## JavaScript
+
+\`\`\`javascript
+const API_KEY = "mb_live_abc123_def456";
+const BASE_URL = "http://localhost:8000";
+
+const response = await fetch(\`\${BASE_URL}/api/v1/remember/\`, {
+  method: "POST",
+  headers: {
+    "Authorization": \`Bearer \${API_KEY}\`,
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({ content: "Hello, world!" })
+});
+\`\`\`
+
+## cURL
 
 \`\`\`bash
 curl -X POST http://localhost:8000/api/v1/remember/ \\
@@ -276,49 +302,103 @@ Set \`MOUSEBASE_API_KEY\` in your environment and the SDK will pick it up automa
 
 \`POST /api/v1/projects\`
 
-## Create a Project
+## Python
+
+\`\`\`python
+from mousebase import MouseBase
+
+client = MouseBase(api_key="mb_live_xxx")
+
+# Create a project
+project = client.projects.create(
+    name="My Project",
+    description="My first project"
+)
+print(project.api_key)
+
+# List all projects
+projects = client.projects.list()
+for p in projects:
+    print(f"{p.name} ({p.id})")
+
+# Get a project by ID
+project = client.projects.get("proj_abc123")
+
+# Update a project
+client.projects.update("proj_abc123", name="New Name")
+
+# Delete a project
+client.projects.delete("proj_abc123")
+
+# Rotate API key
+project = client.projects.rotate_key("proj_abc123")
+print(project.api_key)
+\`\`\`
+
+## JavaScript
+
+\`\`\`javascript
+const API_KEY = "mb_live_xxx";
+const BASE = "http://localhost:8000/api/v1";
+const headers = {
+  "Authorization": \`Bearer \${API_KEY}\`,
+  "Content-Type": "application/json"
+};
+
+// Create
+const created = await fetch(\`\${BASE}/projects/\`, {
+  method: "POST", headers,
+  body: JSON.stringify({ name: "My Project", description: "My first project" })
+});
+
+// List
+const listed = await fetch(\`\${BASE}/projects/\`, { headers });
+
+// Get
+const gotten = await fetch(\`\${BASE}/projects/proj_abc123\`, { headers });
+
+// Update
+await fetch(\`\${BASE}/projects/proj_abc123\`, {
+  method: "PATCH", headers,
+  body: JSON.stringify({ name: "New Name" })
+});
+
+// Delete
+await fetch(\`\${BASE}/projects/proj_abc123\`, { method: "DELETE", headers });
+
+// Rotate API key
+await fetch(\`\${BASE}/projects/proj_abc123/api-key/rotate\`, { method: "POST", headers });
+\`\`\`
+
+## cURL
 
 \`\`\`bash
+# Create
 curl -X POST http://localhost:8000/api/v1/projects/ \\
   -H "Authorization: Bearer YOUR_API_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{"name": "My Project", "description": "My first project"}'
-\`\`\`
 
-## List Projects
-
-\`\`\`bash
+# List
 curl http://localhost:8000/api/v1/projects/ \\
   -H "Authorization: Bearer YOUR_API_KEY"
-\`\`\`
 
-## Get a Project
-
-\`\`\`bash
-curl http://localhost:8000/api/v1/projects/<id> \\
+# Get
+curl http://localhost:8000/api/v1/projects/proj_abc123 \\
   -H "Authorization: Bearer YOUR_API_KEY"
-\`\`\`
 
-## Update a Project
-
-\`\`\`bash
-curl -X PATCH http://localhost:8000/api/v1/projects/<id> \\
+# Update
+curl -X PATCH http://localhost:8000/api/v1/projects/proj_abc123 \\
   -H "Authorization: Bearer YOUR_API_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{"name": "New Name"}'
-\`\`\`
 
-## Delete a Project
-
-\`\`\`bash
-curl -X DELETE http://localhost:8000/api/v1/projects/<id> \\
+# Delete
+curl -X DELETE http://localhost:8000/api/v1/projects/proj_abc123 \\
   -H "Authorization: Bearer YOUR_API_KEY"
-\`\`\`
 
-## Rotate API Key
-
-\`\`\`bash
-curl -X POST http://localhost:8000/api/v1/projects/<id>/api-key/rotate \\
+# Rotate API Key
+curl -X POST http://localhost:8000/api/v1/projects/proj_abc123/api-key/rotate \\
   -H "Authorization: Bearer YOUR_API_KEY"
 \`\`\``
   },
@@ -350,6 +430,44 @@ curl -X POST http://localhost:8000/api/v1/projects/<id>/api-key/rotate \\
   "id": "mem_abc123",
   "created_at": "2025-01-15T10:30:00Z"
 }
+\`\`\`
+
+## Python
+
+\`\`\`python
+from mousebase import MouseBase
+
+client = MouseBase(api_key="mb_live_xxx")
+
+result = client.remember(
+    content="The user's favorite framework is React.",
+    external_id="user_123",
+    metadata={"source": "chat", "importance": "high"}
+)
+print(f"Stored: {result.memory_id}")
+# Stored: mem_abc123
+\`\`\`
+
+## JavaScript
+
+\`\`\`javascript
+const API_KEY = "mb_live_xxx";
+
+const response = await fetch("http://localhost:8000/api/v1/remember/", {
+  method: "POST",
+  headers: {
+    "Authorization": \`Bearer \${API_KEY}\`,
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    content: "The user's favorite framework is React.",
+    external_id: "user_123",
+    metadata: { source: "chat", importance: "high" }
+  })
+});
+const data = await response.json();
+console.log(data);
+// { id: "mem_abc123", created_at: "2025-01-15T10:30:00Z" }
 \`\`\`
 
 ## cURL
@@ -394,6 +512,37 @@ curl -X POST http://localhost:8000/api/v1/remember/ \\
 }
 \`\`\`
 
+## Python
+
+\`\`\`python
+from mousebase import MouseBase
+
+client = MouseBase(api_key="mb_live_xxx")
+
+results = client.search("What framework does the user prefer?", top_k=10)
+for r in results.results:
+    print(f"  [{r.score:.2f}] {r.content}")
+#   [0.92] The user's favorite framework is React.
+\`\`\`
+
+## JavaScript
+
+\`\`\`javascript
+const API_KEY = "mb_live_xxx";
+
+const response = await fetch("http://localhost:8000/api/v1/search/", {
+  method: "POST",
+  headers: {
+    "Authorization": \`Bearer \${API_KEY}\`,
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({ query: "What framework does the user prefer?", top_k: 10 })
+});
+const data = await response.json();
+data.results.forEach(r => console.log(\`[\${r.score.toFixed(2)}] \${r.content}\`));
+// [0.92] The user's favorite framework is React.
+\`\`\`
+
 ## cURL
 
 \`\`\`bash
@@ -422,6 +571,33 @@ curl -X POST http://localhost:8000/api/v1/search/ \\
   "created_at": "2025-01-15T10:30:00Z",
   "updated_at": "2025-01-15T10:30:00Z"
 }
+\`\`\`
+
+## Python
+
+\`\`\`python
+from mousebase import MouseBase
+
+client = MouseBase(api_key="mb_live_xxx")
+
+memory = client.get("mem_abc123")
+print(memory.content)       # The user prefers dark mode.
+print(memory.external_id)   # user_456
+print(memory.metadata)      # {"source": "settings"}
+print(memory.created_at)    # 2025-01-15 10:30:00+00:00
+\`\`\`
+
+## JavaScript
+
+\`\`\`javascript
+const API_KEY = "mb_live_xxx";
+
+const response = await fetch("http://localhost:8000/api/v1/memory/mem_abc123", {
+  headers: { "Authorization": \`Bearer \${API_KEY}\` }
+});
+const memory = await response.json();
+console.log(memory.content);     // The user prefers dark mode.
+console.log(memory.external_id); // user_456
 \`\`\`
 
 ## cURL
@@ -460,9 +636,55 @@ Returns the updated memory object.
 
 Returns \`204 No Content\` on success.
 
-### cURL
+## Python
+
+\`\`\`python
+from mousebase import MouseBase
+
+client = MouseBase(api_key="mb_live_xxx")
+
+# Update a memory
+client.update(
+    memory_id="mem_abc123",
+    content="Updated content",
+    metadata={"edited": True}
+)
+
+# Delete a memory
+client.delete("mem_abc123")  # Returns None on success
+\`\`\`
+
+## JavaScript
+
+\`\`\`javascript
+const API_KEY = "mb_live_xxx";
+const BASE = "http://localhost:8000/api/v1";
+const headers = {
+  "Authorization": \`Bearer \${API_KEY}\`,
+  "Content-Type": "application/json"
+};
+
+// Update
+await fetch(\`\${BASE}/memory/mem_abc123\`, {
+  method: "PATCH", headers,
+  body: JSON.stringify({ content: "Updated content", metadata: { edited: true } })
+});
+
+// Delete
+await fetch(\`\${BASE}/memory/mem_abc123\`, { method: "DELETE", headers });
+// Returns 204 No Content
+\`\`\`
+
+## cURL
 
 \`\`\`bash
+# Update
+curl -X PATCH http://localhost:8000/api/v1/memory/mem_abc123 \\
+  -H "Authorization: Bearer YOUR_API_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '{"content": "Updated content", "metadata": {"edited": true}}'
+
+# Delete
 curl -X DELETE http://localhost:8000/api/v1/memory/mem_abc123 \\
   -H "Authorization: Bearer YOUR_API_KEY"
 \`\`\``
@@ -491,7 +713,86 @@ curl -X DELETE http://localhost:8000/api/v1/memory/mem_abc123 \\
 | \`validation_error\` | 422 | Request body validation failed |
 | \`forbidden\` | 403 | Insufficient permissions |
 | \`rate_limited\` | 429 | Too many requests |
-| \`internal_error\` | 500 | Unexpected server error |`
+| \`internal_error\` | 500 | Unexpected server error |
+
+## Python
+
+\`\`\`python
+from mousebase import (
+    MouseBase, MouseBaseError,
+    AuthenticationError, ValidationError, RateLimitError
+)
+
+client = MouseBase(api_key="mb_live_xxx")
+
+try:
+    result = client.remember("Test memory")
+except AuthenticationError:
+    print("Invalid or expired API key")
+except ValidationError as e:
+    print(f"Validation failed: {e}")
+except RateLimitError:
+    print("Too many requests — slow down")
+except MouseBaseError as e:
+    print(f"Error {e.code}: {e.message} (HTTP {e.status_code})")
+\`\`\`
+
+## JavaScript
+
+\`\`\`javascript
+const API_KEY = "mb_live_xxx";
+
+async function rememberMemory(content) {
+  const response = await fetch("http://localhost:8000/api/v1/remember/", {
+    method: "POST",
+    headers: {
+      "Authorization": \`Bearer \${API_KEY}\`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ content })
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    switch (response.status) {
+      case 401:
+        throw new Error("Invalid or expired API key");
+      case 422:
+        throw new Error(\`Validation failed: \${error.error.message}\`);
+      case 429:
+        throw new Error("Too many requests — slow down");
+      default:
+        throw new Error(\`Error \${error.error.code}: \${error.error.message}\`);
+    }
+  }
+
+  return response.json();
+}
+
+try {
+  const data = await rememberMemory("Test memory");
+  console.log(data);
+} catch (err) {
+  console.error(err.message);
+}
+\`\`\`
+
+## cURL
+
+\`\`\`bash
+# Example: missing API key returns 401
+curl -X POST http://localhost:8000/api/v1/remember/ \\
+  -H "Content-Type: application/json" \\
+  -d '{"content": "test"}'
+# {"error": {"code": "invalid_api_key", "message": "The provided API key is invalid."}}
+
+# Example: invalid body returns 422
+curl -X POST http://localhost:8000/api/v1/remember/ \\
+  -H "Authorization: Bearer YOUR_API_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '{"bad_field": true}'
+# {"error": {"code": "validation_error", "message": "field required: content"}}
+\`\`\``
   },
   "sdk-installation": {
     title: "Installation",

@@ -466,6 +466,21 @@ def search_similar_issues(description: str) -> list[tuple[str, float]]:
 
 ---
 
+## Examples
+
+Complete runnable examples are in the [examples directory](examples/):
+
+- `notes.py` — Simple notes app with semantic search
+- `rag.py` — RAG pipeline (index → retrieve → LLM prompt)
+- `discord.py` — Discord bot with per-user memory via `!recall`
+- `notion.py` — Full CRUD notes app with MouseBase search
+- `customer_support.py` — Support ticket system with similar-issue lookup
+- `agent_memory.py` — AI agent with session-based memory management
+
+Run any example with: `python examples/rag.py` (requires `MOUSEBASE_API_KEY`).
+
+---
+
 ## Migration: `Client` → `MouseBase`
 
 If you were using the older `Client` class, it has been renamed to `MouseBase`. The API is identical — simply replace `Client` with `MouseBase` in your imports:

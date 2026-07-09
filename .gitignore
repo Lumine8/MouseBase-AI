@@ -38,3 +38,4 @@ frontend/tsconfig.tsbuildinfo
 
 # Python build artifacts
 *.egg-info/
+dist/

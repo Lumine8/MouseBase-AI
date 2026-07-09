@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { api, RememberResponse, Memory, SearchResponse } from "../lib/api";
-import { FiCpu, FiSearch, FiEye, FiEdit, FiTrash2, FiPlay, FiCopy, FiLoader, FiKey, FiEyeOff } from "react-icons/fi";
+import { FiCpu, FiSearch, FiEye, FiEdit, FiTrash2, FiCopy, FiLoader, FiKey, FiEyeOff, FiChevronDown, FiChevronUp, FiTerminal } from "react-icons/fi";
 
 type Tab = "remember" | "search" | "get" | "update" | "delete";
 
@@ -14,10 +14,18 @@ const tabIcons: Record<Tab, React.ReactNode> = {
   delete: <FiTrash2 />,
 };
 
+const LANGUAGE_OPTIONS = [
+  { lang: "python", label: "Python" },
+  { lang: "javascript", label: "JavaScript" },
+  { lang: "curl", label: "cURL" },
+];
+
 export default function Playground() {
   const [tab, setTab] = useState<Tab>("remember");
   const [apiKeyInput, setApiKeyInput] = useState(localStorage.getItem("mb_api_key") ?? "");
   const [showKey, setShowKey] = useState(false);
+  const [codeLang, setCodeLang] = useState("python");
+  const [responseOpen, setResponseOpen] = useState(true);
 
   const handleKeyChange = (val: string) => {
     setApiKeyInput(val);
@@ -44,35 +52,35 @@ export default function Playground() {
 
   const handleRemember = async () => {
     setError(""); setLoading(true);
-    try { const r = await api.remember({ content: remContent, external_id: remExtId || null, metadata: {} }, activeKey); setRemResult(r); }
+    try { const r = await api.remember({ content: remContent, external_id: remExtId || null, metadata: {} }, activeKey); setRemResult(r); setResponseOpen(true); }
     catch (e: unknown) { setError(e instanceof Error ? e.message : "Request failed"); }
     finally { setLoading(false); }
   };
 
   const handleSearch = async () => {
     setError(""); setLoading(true);
-    try { const r = await api.search({ query: searchQuery, top_k: searchTopK }, activeKey); setSearchResult(r); }
+    try { const r = await api.search({ query: searchQuery, top_k: searchTopK }, activeKey); setSearchResult(r); setResponseOpen(true); }
     catch (e: unknown) { setError(e instanceof Error ? e.message : "Request failed"); }
     finally { setLoading(false); }
   };
 
   const handleGet = async () => {
     setError(""); setLoading(true);
-    try { const r = await api.memory.get(getMemoryId, activeKey); setGetResult(r); }
+    try { const r = await api.memory.get(getMemoryId, activeKey); setGetResult(r); setResponseOpen(true); }
     catch (e: unknown) { setError(e instanceof Error ? e.message : "Request failed"); }
     finally { setLoading(false); }
   };
 
   const handleUpdate = async () => {
     setError(""); setLoading(true);
-    try { const r = await api.memory.update(updMemoryId, { content: updContent || null }, activeKey); setUpdResult(r); }
+    try { const r = await api.memory.update(updMemoryId, { content: updContent || null }, activeKey); setUpdResult(r); setResponseOpen(true); }
     catch (e: unknown) { setError(e instanceof Error ? e.message : "Request failed"); }
     finally { setLoading(false); }
   };
 
   const handleDelete = async () => {
     setError(""); setLoading(true);
-    try { await api.memory.delete(delMemoryId, activeKey); setDelDone(true); }
+    try { await api.memory.delete(delMemoryId, activeKey); setDelDone(true); setResponseOpen(true); }
     catch (e: unknown) { setError(e instanceof Error ? e.message : "Request failed"); }
     finally { setLoading(false); }
   };
@@ -88,8 +96,6 @@ export default function Playground() {
         code: `import httpx\n\nresponse = httpx.post(\n    "${baseUrl}/remember/",\n    headers={"Authorization": "Bearer ${apiKey}"},\n    json={"content": "${remContent || "The user clicked the settings page."}"},\n)\nprint(response.json())` },
       { lang: "javascript", label: "JavaScript",
         code: `const response = await fetch("${baseUrl}/remember/", {\n  method: "POST",\n  headers: { Authorization: "Bearer ${apiKey}", "Content-Type": "application/json" },\n  body: JSON.stringify({ content: "${remContent || "The user clicked the settings page."}" }),\n});\nconst data = await response.json();\nconsole.log(data);` },
-      { lang: "node", label: "Node",
-        code: `import mousebase\n\nconst client = new mousebase.Client({ apiKey: "${apiKey}" });\nconst result = await client.remember("${remContent || "The user clicked the settings page."}");\nconsole.log(result);` },
     ],
     search: [
       { lang: "curl", label: "cURL",
@@ -98,36 +104,44 @@ export default function Playground() {
         code: `import httpx\n\nresponse = httpx.post(\n    "${baseUrl}/search/",\n    headers={"Authorization": "Bearer ${apiKey}"},\n    json={"query": "${searchQuery || "user settings page"}", "top_k": ${searchTopK}},\n)\nprint(response.json())` },
       { lang: "javascript", label: "JavaScript",
         code: `const response = await fetch("${baseUrl}/search/", {\n  method: "POST",\n  headers: { Authorization: "Bearer ${apiKey}", "Content-Type": "application/json" },\n  body: JSON.stringify({ query: "${searchQuery || "user settings page"}", top_k: ${searchTopK} }),\n});\nconst data = await response.json();\nconsole.log(data);` },
-      { lang: "node", label: "Node",
-        code: `import mousebase\n\nconst client = new mousebase.Client({ apiKey: "${apiKey}" });\nconst results = await client.search("${searchQuery || "user settings page"}", { topK: ${searchTopK} });\nconsole.log(results);` },
     ],
     get: [
       { lang: "curl", label: "cURL", code: `curl ${baseUrl}/memory/${getMemoryId || "<memory_id>"} \\\n  -H "Authorization: Bearer ${apiKey}"` },
       { lang: "python", label: "Python", code: `import httpx\n\nresponse = httpx.get("${baseUrl}/memory/${getMemoryId || "<memory_id>"}", headers={"Authorization": "Bearer ${apiKey}"})\nprint(response.json())` },
       { lang: "javascript", label: "JavaScript", code: `const response = await fetch("${baseUrl}/memory/${getMemoryId || "<memory_id>"}", { headers: { Authorization: "Bearer ${apiKey}" } });\nconst data = await response.json();\nconsole.log(data);` },
-      { lang: "node", label: "Node", code: `import mousebase\n\nconst client = new mousebase.Client({ apiKey: "${apiKey}" });\nconst memory = await client.getMemory("${getMemoryId || "<memory_id>"}");\nconsole.log(memory);` },
     ],
     update: [
       { lang: "curl", label: "cURL", code: `curl -X PATCH ${baseUrl}/memory/${updMemoryId || "<memory_id>"} \\\n  -H "Authorization: Bearer ${apiKey}" \\\n  -H "Content-Type: application/json" \\\n  -d '{"content": "${updContent || "Updated content."}"}'` },
       { lang: "python", label: "Python", code: `import httpx\n\nresponse = httpx.patch("${baseUrl}/memory/${updMemoryId || "<memory_id>"}", headers={"Authorization": "Bearer ${apiKey}"}, json={"content": "${updContent || "Updated content."}"})\nprint(response.json())` },
       { lang: "javascript", label: "JavaScript", code: `const response = await fetch("${baseUrl}/memory/${updMemoryId || "<memory_id>"}", { method: "PATCH", headers: { Authorization: "Bearer ${apiKey}", "Content-Type": "application/json" }, body: JSON.stringify({ content: "${updContent || "Updated content."}" }) });\nconst data = await response.json();\nconsole.log(data);` },
-      { lang: "node", label: "Node", code: `import mousebase\n\nconst client = new mousebase.Client({ apiKey: "${apiKey}" });\nconst memory = await client.updateMemory("${updMemoryId || "<memory_id>"}", { content: "${updContent || "Updated content."}" });\nconsole.log(memory);` },
     ],
     delete: [
       { lang: "curl", label: "cURL", code: `curl -X DELETE ${baseUrl}/memory/${delMemoryId || "<memory_id>"} \\\n  -H "Authorization: Bearer ${apiKey}"` },
       { lang: "python", label: "Python", code: `import httpx\n\nresponse = httpx.delete("${baseUrl}/memory/${delMemoryId || "<memory_id>"}", headers={"Authorization": "Bearer ${apiKey}"})\nprint(response.status_code)` },
       { lang: "javascript", label: "JavaScript", code: `await fetch("${baseUrl}/memory/${delMemoryId || "<memory_id>"}", { method: "DELETE", headers: { Authorization: "Bearer ${apiKey}" } });` },
-      { lang: "node", label: "Node", code: `import mousebase\n\nconst client = new mousebase.Client({ apiKey: "${apiKey}" });\nawait client.deleteMemory("${delMemoryId || "<memory_id>"}");` },
     ],
   };
 
   const currentExamples = examples[tab];
-  const [codeLang, setCodeLang] = useState(currentExamples[0].lang);
+  const activeExample = currentExamples.find((e) => e.lang === codeLang) ?? currentExamples[0];
 
   const handleCopyCode = () => {
-    const ex = currentExamples.find((e) => e.lang === codeLang);
-    if (ex) { navigator.clipboard.writeText(ex.code); setCopied(true); setTimeout(() => setCopied(false), 2000); }
+    if (activeExample) { navigator.clipboard.writeText(activeExample.code); setCopied(true); setTimeout(() => setCopied(false), 2000); }
   };
+
+  const handleTabChange = (t: Tab) => {
+    setTab(t);
+    setError("");
+  };
+
+  let responseContent: React.ReactNode = null;
+  const hasResponse = (tab === "remember" && remResult) || (tab === "search" && searchResult) || (tab === "get" && getResult) || (tab === "update" && updResult) || (tab === "delete" && delDone);
+
+  if (tab === "remember" && remResult) responseContent = <pre>{JSON.stringify(remResult, null, 2)}</pre>;
+  if (tab === "search" && searchResult) responseContent = <pre>{JSON.stringify(searchResult, null, 2)}</pre>;
+  if (tab === "get" && getResult) responseContent = <pre>{JSON.stringify(getResult, null, 2)}</pre>;
+  if (tab === "update" && updResult) responseContent = <pre>{JSON.stringify(updResult, null, 2)}</pre>;
+  if (tab === "delete" && delDone) responseContent = <div className="alert alert-success" style={{ margin: 0 }}>Memory deleted successfully (204 No Content).</div>;
 
   return (
     <div className="page" style={{ maxWidth: 1200 }}>
@@ -142,7 +156,7 @@ export default function Playground() {
         display: "flex", alignItems: "center", gap: 10,
         background: "var(--bg-card)", borderRadius: 12,
         border: "1px solid var(--border-default)", padding: "10px 16px",
-        marginBottom: 20,
+        marginBottom: 16,
       }}>
         <FiKey style={{ color: "var(--text-muted)", flexShrink: 0 }} />
         <input
@@ -163,9 +177,30 @@ export default function Playground() {
         )}
       </div>
 
+      <div style={{
+        display: "flex", alignItems: "center", gap: 8, marginBottom: 16,
+      }}>
+        <FiTerminal style={{ color: "var(--text-muted)", fontSize: 14, flexShrink: 0 }} />
+        <span style={{ fontSize: 13, fontWeight: 500, color: "var(--text-secondary)", marginRight: 4 }}>
+          Language:
+        </span>
+        {LANGUAGE_OPTIONS.map((opt) => (
+          <button key={opt.lang} onClick={() => setCodeLang(opt.lang)}
+            style={{
+              padding: "5px 14px", fontSize: 13, fontWeight: 500, borderRadius: 8,
+              border: `1px solid ${codeLang === opt.lang ? "var(--accent)" : "var(--border-input)"}`,
+              background: codeLang === opt.lang ? "rgba(245,197,66,0.08)" : "transparent",
+              color: codeLang === opt.lang ? "var(--accent)" : "var(--text-muted)",
+              cursor: "pointer", transition: "all 150ms ease",
+            }}>
+            {opt.label}
+          </button>
+        ))}
+      </div>
+
       <div className="tabs">
         {(["remember", "search", "get", "update", "delete"] as Tab[]).map((t) => (
-          <button key={t} onClick={() => { setTab(t); setCodeLang(currentExamples[0].lang); setError(""); }}
+          <button key={t} onClick={() => handleTabChange(t)}
             className={`tab${tab === t ? " active" : ""}`}>
             {tabIcons[t]}
             {t.charAt(0).toUpperCase() + t.slice(1)}
@@ -173,8 +208,8 @@ export default function Playground() {
         ))}
       </div>
 
-      <div className="playground-grid">
-        <div className="card" style={{ padding: 20 }}>
+      <div style={{ display: "flex", gap: 24, alignItems: "flex-start" }}>
+        <div className="card" style={{ padding: 20, flex: "0 0 420px", alignSelf: "flex-start" }}>
           <div className="section-title" style={{ marginBottom: 16, fontSize: 14 }}>Request</div>
 
           {tab === "remember" && (
@@ -250,44 +285,52 @@ export default function Playground() {
           )}
 
           {error && <div className="alert alert-error" style={{ marginTop: 12 }}>{error}</div>}
-
-          {remResult && tab === "remember" && (
-            <div className="response-block"><h3>Response</h3><pre>{JSON.stringify(remResult, null, 2)}</pre></div>
-          )}
-          {searchResult && tab === "search" && (
-            <div className="response-block"><h3>Response</h3><pre>{JSON.stringify(searchResult, null, 2)}</pre></div>
-          )}
-          {getResult && tab === "get" && (
-            <div className="response-block"><h3>Response</h3><pre>{JSON.stringify(getResult, null, 2)}</pre></div>
-          )}
-          {updResult && tab === "update" && (
-            <div className="response-block"><h3>Response</h3><pre>{JSON.stringify(updResult, null, 2)}</pre></div>
-          )}
-          {delDone && tab === "delete" && (
-            <div className="alert alert-success" style={{ marginTop: 12 }}>Memory deleted successfully (204 No Content).</div>
-          )}
         </div>
 
-        <div className="card" style={{ overflow: "hidden" }}>
-          <div className="card-header">
-            <h3>API Explorer</h3>
-          </div>
-
-          <div className="code-nav">
-            {currentExamples.map((ex) => (
-              <button key={ex.lang} onClick={() => setCodeLang(ex.lang)}
-                className={codeLang === ex.lang ? "active" : ""}>
-                {ex.label === "Node" ? <><FiPlay /> {ex.label}</> : ex.label}
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
+          <div className="card" style={{ overflow: "hidden" }}>
+            <div className="card-header">
+              <h3>API Explorer</h3>
+            </div>
+            <div className="code-nav">
+              {currentExamples.map((ex) => (
+                <button key={ex.lang} onClick={() => setCodeLang(ex.lang)}
+                  className={codeLang === ex.lang ? "active" : ""}>
+                  {ex.label}
+                </button>
+              ))}
+            </div>
+            <div className="code-block">
+              <button onClick={handleCopyCode} className="copy-btn" title="Copy code">
+                {copied ? "✓" : <FiCopy />}
               </button>
-            ))}
+              <pre><code>{activeExample?.code ?? ""}</code></pre>
+            </div>
           </div>
 
-          <div className="code-block">
-            <button onClick={handleCopyCode} className="copy-btn" title="Copy code">
-              {copied ? "✓" : <FiCopy />}
-            </button>
-            <pre><code>{currentExamples.find((e) => e.lang === codeLang)?.code ?? ""}</code></pre>
-          </div>
+          {hasResponse && (
+            <div className="card" style={{ overflow: "hidden" }}>
+              <div
+                onClick={() => setResponseOpen(!responseOpen)}
+                style={{
+                  padding: "12px 20px", display: "flex", alignItems: "center", justifyContent: "space-between",
+                  borderBottom: responseOpen ? "1px solid var(--border-default)" : "none",
+                  cursor: "pointer", userSelect: "none",
+                }}>
+                <span style={{ fontSize: 12, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--text-muted)" }}>
+                  Response
+                </span>
+                {responseOpen ? <FiChevronUp style={{ color: "var(--text-muted)" }} /> : <FiChevronDown style={{ color: "var(--text-muted)" }} />}
+              </div>
+              {responseOpen && (
+                <div style={{ padding: 16 }}>
+                  <div className="response-block" style={{ marginTop: 0 }}>
+                    {responseContent}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
