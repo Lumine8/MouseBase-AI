@@ -319,7 +319,7 @@ export default function Billing() {
                 <FiX size={14} /> Cancel Subscription
               </button>
             )}
-            {plans.filter((p) => p.id !== "FREE" && p.id !== "ENTERPRISE").map((plan) => {
+            {plans.filter((p) => p.id !== "FREE" && !p.id.startsWith("TEAM_") && p.id !== "ENTERPRISE").map((plan) => {
               if (plan.id === sub?.plan) return null;
               return (
                 <button
