@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="https://raw.githubusercontent.com/Lumine8/MouseBase-AI/main/frontend/public/assets/logo_mousebase.svg" alt="MouseBase" width="60" />
+</div>
+
 # Introduction
 
 MouseBase is a managed memory service for AI applications. It lets you store text memories and search them semantically — so your agents can recall relevant context at runtime.

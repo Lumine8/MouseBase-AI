@@ -1,4 +1,7 @@
-# MouseBase Python SDK
+<div align="center">
+  <img src="https://raw.githubusercontent.com/Lumine8/MouseBase-AI/main/frontend/public/assets/logo_mousebase.svg" alt="MouseBase" width="120" />
+  <h1>MouseBase Python SDK</h1>
+</div>
 
 [![PyPI version](https://img.shields.io/pypi/v/mousebase)](https://pypi.org/project/mousebase/)
 [![Python versions](https://img.shields.io/pypi/pyversions/mousebase)](https://pypi.org/project/mousebase/)
