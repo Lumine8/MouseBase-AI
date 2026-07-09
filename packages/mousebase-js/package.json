@@ -33,7 +33,7 @@
     }
   },
   "bin": {
-    "mousebase": "./bin/mousebase.js"
+    "mousebase": "bin/mousebase.js"
   },
   "files": [
     "dist",
@@ -59,7 +59,7 @@
   "author": "Sankar Gopan",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Lumine8/MouseBase-AI.git"
+    "url": "git+https://github.com/Lumine8/MouseBase-AI.git"
   },
   "dependencies": {
     "commander": "^15.0.0"
