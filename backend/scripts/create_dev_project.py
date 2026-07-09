@@ -73,7 +73,7 @@ async def main():
             project.api_key_id = api_key.key_id
             project.api_key_hash = hash_api_key(secret)
             project.api_key_encrypted = encrypt_api_key(fixed_key)
-            print(f"Updated existing project key.")
+            print("Updated existing project key.")
 
         await db.commit()
         await db.refresh(project)
