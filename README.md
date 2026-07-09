@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="frontend/public/assets/logo_mousebase.svg" alt="MouseBase" width="600" />
+  <img src="frontend/public/assets/logo_mousebase.svg" alt="MouseBase" width="120" />
   <br /><br />
   <p><strong>Persistent memory infrastructure for AI agents.</strong></p>
   <p>
