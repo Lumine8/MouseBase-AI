@@ -38,6 +38,12 @@ async function fetchJson<T>(path: string, method = "GET", body?: unknown): Promi
   const res = await fetch(`${BASE}${path}`, { method, headers, body: body ? JSON.stringify(body) : undefined });
   let data: any;
   try { data = await res.json(); } catch { data = {}; }
+  if (res.status === 401) {
+    localStorage.removeItem("mb_token");
+    localStorage.removeItem("mb_api_key");
+    window.location.href = "/login";
+    throw new Error("Unauthorized");
+  }
   if (!res.ok) throw new Error(data?.error?.message || data?.detail || "Request failed");
   return data as T;
 }
@@ -149,8 +155,12 @@ export default function Billing() {
             razorpay_signature: response.razorpay_signature,
             plan_id: planId,
           });
-          const s = await fetchJson<SubscriptionInfo>("/payments/subscription");
+          const [s, h] = await Promise.all([
+            fetchJson<SubscriptionInfo>("/payments/subscription"),
+            fetchJson<{ payments: PaymentRecord[] }>("/payments/history").catch(() => ({ payments: [] })),
+          ]);
           setSub(s);
+          setHistory(h.payments);
         },
         modal: { ondismiss: () => setUpgrading(null) },
       });
@@ -196,10 +206,14 @@ export default function Billing() {
             addon_type: addonType,
             quantity: 1,
           });
-          const s = await fetchJson<SubscriptionInfo>("/payments/subscription");
+          const [s, u, h] = await Promise.all([
+            fetchJson<SubscriptionInfo>("/payments/subscription"),
+            fetchJson<BillingUsage>("/dashboard/billing-usage").catch(() => null),
+            fetchJson<{ payments: PaymentRecord[] }>("/payments/history").catch(() => ({ payments: [] })),
+          ]);
           setSub(s);
-          const u = await fetchJson<BillingUsage>("/dashboard/billing-usage");
-          setUsage(u);
+          if (u) setUsage(u);
+          setHistory(h.payments);
         },
       });
       rzp.open();

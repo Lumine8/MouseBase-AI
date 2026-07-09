@@ -56,19 +56,21 @@ async def get_current_user_or_project(
     auth_service = AuthService(db)
     token = credentials.credentials
 
-    # Try JWT first
-    try:
-        from app.core.security import verify_access_token
+    is_jwt = token.startswith("eyJ")
 
-        user_id = verify_access_token(token)
-        result = await db.execute(select(User).where(User.id == user_id))
-        user = result.scalar_one_or_none()
-        if user is not None:
-            return user
-    except Exception:
-        pass
+    if is_jwt:
+        try:
+            from app.core.security import verify_access_token
 
-    # Fall back to API key
+            user_id = verify_access_token(token)
+            result = await db.execute(select(User).where(User.id == user_id))
+            user = result.scalar_one_or_none()
+            if user is not None:
+                return user
+        except Exception:
+            pass
+        raise InvalidTokenError()
+
     try:
         project = await auth_service.authenticate_api_key(token)
         result = await db.execute(select(User).where(User.id == project.owner_id))
