@@ -374,7 +374,7 @@ curl -X DELETE http://localhost:8000/api/v1/memory/mem_abc123 \\
   },
   "python-sdk": {
     title: "Python SDK",
-    body: `The official Python SDK provides a clean, typed interface to the MouseBase API.
+    body: `The official Python SDK provides a clean, fully-typed interface to the MouseBase API. It supports both synchronous and asynchronous usage.
 
 ## Installation
 
@@ -382,57 +382,215 @@ curl -X DELETE http://localhost:8000/api/v1/memory/mem_abc123 \\
 pip install mousebase
 \`\`\`
 
+Python 3.10+ is required.
+
 ## Quick Start
 
 \`\`\`python
-from mousebase import Client
+from mousebase import MouseBase
 
 # Initialize with API key
-client = Client(api_key="mb_live_...")
+client = MouseBase(api_key="mb_live_xxx")
 
 # Store a memory
-result = client.remember("The user prefers React over Vue.")
-print(result.id)
+result = client.remember(
+    content="User prefers dark mode in their IDE.",
+    metadata={"source": "preferences"}
+)
+print(f"Stored: {result.memory_id}")
 
 # Search semantically
-results = client.search("What framework does the user like?")
-for r in results:
-    print(f"{r.content} (score: {r.score})")
+results = client.search("What theme does the user like?", top_k=5)
+for r in results.results:
+    print(f"{r.content} (score: {r.score:.2f})")
 
-# Get a memory by ID
-memory = client.get_memory("mem_abc123")
-
-# Update a memory
-client.update_memory("mem_abc123", content="Updated content")
-
-# Delete a memory
-client.delete_memory("mem_abc123")
+# Get, update, delete
+memory = client.get("mem_abc123")
+client.update("mem_abc123", content="Updated content")
+client.delete("mem_abc123")
 \`\`\`
 
-## Environment Variables
+## Sync Client
 
-The SDK reads these environment variables:
+### Creating a Client
 
-- \`MOUSEBASE_API_KEY\` — Your API key
-- \`MOUSEBASE_BASE_URL\` — Server URL (default: \`http://localhost:8000\`)
+\`\`\`python
+from mousebase import MouseBase
 
-## API Reference
+# Pass API key directly
+client = MouseBase(api_key="mb_live_xxx")
 
-### \`Client(api_key=None, base_url=None)\`
+# Or use MOUSEBASE_API_KEY environment variable
+client = MouseBase()
 
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| \`api_key\` | \`MOUSEBASE_API_KEY\` env var | API key for authentication |
-| \`base_url\` | \`http://localhost:8000\` | Server base URL |
-
-### Methods
-
+# Custom server URL and timeout
+client = MouseBase(
+    api_key="mb_live_xxx",
+    base_url="https://api.mousebase.ai/v1",
+    timeout=60
+)
 \`\`\`
-remember(content, external_id=None, metadata={}) -> RememberResult
-search(query, top_k=10) -> list[SearchResult]
-get_memory(id) -> Memory
-update_memory(id, content=None, metadata=None, external_id=None) -> Memory
-delete_memory(id) -> None
+
+### remember()
+
+\`\`\`python
+result = client.remember(
+    content="The user completed onboarding.",
+    external_id="user_789",
+    metadata={"source": "onboarding", "step": 5}
+)
+# result.memory_id -> "mem_abc123"
+# result.created_at -> datetime
+\`\`\`
+
+### search()
+
+\`\`\`python
+results = client.search("What do I know about the user?", top_k=10)
+for r in results.results:
+    print(f"[{r.score:.2f}] {r.content}")
+\`\`\`
+
+### get()
+
+\`\`\`python
+memory = client.get("mem_abc123")
+print(memory.content)
+print(memory.metadata)
+print(memory.external_id)
+print(memory.created_at)
+\`\`\`
+
+### update()
+
+\`\`\`python
+memory = client.update(
+    memory_id="mem_abc123",
+    content="Updated text",
+    metadata={"edited": True},
+    external_id="new_id"
+)
+\`\`\`
+
+### delete()
+
+\`\`\`python
+client.delete("mem_abc123")  # Returns None on success
+\`\`\`
+
+## Project Management
+
+Projects isolate memories and each has its own API key.
+
+\`\`\`python
+# Create a project (returns the API key)
+project = client.projects.create(
+    name="My Chatbot",
+    description="Customer support memories"
+)
+print(project.api_key)  # "mb_live_..."
+
+# List all projects
+projects = client.projects.list()
+
+# Get a specific project
+project = client.projects.get("proj_abc123")
+
+# Update a project
+client.projects.update("proj_abc123", name="New Name")
+
+# Delete a project
+client.projects.delete("proj_abc123")
+
+# View or rotate the API key
+key = client.projects.view_key("proj_abc123")
+project = client.projects.rotate_key("proj_abc123")
+\`\`\`
+
+## Account Management
+
+\`\`\`python
+# Sign up
+auth = client.signup(
+    email="user@example.com",
+    password="securepass123",
+    full_name="Jane Doe"
+)
+print(auth.token)    # JWT token
+print(auth.user)     # UserResponse
+
+# Log in
+auth = client.login(email="user@example.com", password="securepass123")
+
+# Get current user
+user = client.me()
+print(user.email, user.full_name)
+\`\`\`
+
+## Async Client
+
+For async environments like FastAPI:
+
+\`\`\`python
+from mousebase import AsyncMouseBase
+
+async with AsyncMouseBase(api_key="mb_live_xxx") as client:
+    result = await client.remember("Async memory")
+    results = await client.search("test", top_k=5)
+    project = await client.projects.create(name="Async Project")
+\`\`\`
+
+All methods are identical to the sync client but use \`await\`.
+
+## Error Handling
+
+\`\`\`python
+from mousebase import (
+    MouseBaseError, MissingAPIKeyError,
+    AuthenticationError, ValidationError,
+    RateLimitError, InternalError
+)
+
+try:
+    result = client.remember("Hello")
+except MissingAPIKeyError:
+    print("Set MOUSEBASE_API_KEY")
+except AuthenticationError:
+    print("Invalid API key")
+except RateLimitError:
+    print("Too many requests")
+except MouseBaseError as e:
+    print(f"{e.code}: {e.message} (HTTP {e.status_code})")
+\`\`\`
+
+The SDK automatically retries on network errors, timeouts, and server errors (429, 500, 502, 503) with exponential backoff (up to 3 attempts).
+
+## Response Models
+
+| Model | Key Fields |
+|-------|------------|
+| RememberResponse | memory_id, created_at |
+| SearchResponse | results (list of SearchResult) |
+| SearchResult | id, content, score, metadata, external_id |
+| MemoryResponse | id, content, metadata, external_id, created_at, updated_at |
+| ProjectKeyResponse | id, name, api_key, status, created_at |
+| AuthResponse | token, user (UserResponse) |
+| UserResponse | id, email, full_name, email_verified, created_at |
+
+## Configuration
+
+| Env Variable | Default | Description |
+|--------------|---------|-------------|
+| MOUSEBASE_API_KEY | — | API key (required) |
+| MOUSEBASE_BASE_URL | https://api.mousebase.ai/v1 | Server URL |
+
+The SDK also auto-loads from a \`.env\` file if \`python-dotenv\` is installed.
+
+## Context Manager
+
+\`\`\`python
+with MouseBase(api_key="mb_live_xxx") as client:
+    client.remember("Auto-closed on exit")
 \`\`\``
   },
   "docker": {
