@@ -6,8 +6,7 @@ from app.dependencies.auth import get_current_project
 from app.models.project import Project
 from app.schemas.remember import RememberRequest, RememberResponse
 
-from app.services.gemini_embedding_service import GeminiEmbeddingService
-from app.services.memory_service import MemoryService
+from app.services.memory_service import remember
 
 router = APIRouter(
     prefix="/remember",
@@ -22,7 +21,7 @@ router = APIRouter(
     summary="Remember a memory for the authenticated project",
     description="Stores a new semantic memory for the authenticated project.",
 )
-async def remember(
+async def remember_endpoint(
     request: RememberRequest = Body(
         openapi_examples={
             "basic": {
@@ -48,7 +47,4 @@ async def remember(
     project: Project = Depends(get_current_project),
     db: AsyncSession = Depends(get_db),
 ) -> RememberResponse:
-    embedding_service = GeminiEmbeddingService()
-    memory_service = MemoryService(db=db, embedding_service=embedding_service)
-
-    return await memory_service.remember(project, request)
+    return await remember(project=project, request=request, db=db)

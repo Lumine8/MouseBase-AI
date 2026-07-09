@@ -21,8 +21,37 @@ from app.models.embedding import Embedding
 from app.core.config import settings
 from app.core.plan_enforcer import check_memory_limit
 from app.exceptions.memory import MemoryLimitError
+from app.services import create_embedding_service
 
 # from app.routers import memory
+
+
+async def remember(
+    project: Project,
+    request: RememberRequest,
+    db: AsyncSession,
+) -> RememberResponse:
+    embedding_service = create_embedding_service()
+    vector = await embedding_service.embed(request.content)
+
+    memory = Memory(
+        project=project,
+        content=request.content,
+        metadata_=request.metadata,
+        external_id=request.external_id,
+    )
+    embedding = Embedding(
+        memory=memory,
+        model=settings.EMBEDDING_MODEL,
+        dimensions=settings.EMBEDDING_DIMENSIONS,
+        vector=vector,
+    )
+    db.add(memory)
+    db.add(embedding)
+    await db.commit()
+    await db.refresh(memory)
+
+    return RememberResponse(memory_id=memory.id, created_at=memory.created_at)
 
 
 class MemoryService:

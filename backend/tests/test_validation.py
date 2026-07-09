@@ -12,7 +12,10 @@ async def test_empty_content(client):
         json={"content": ""},
     )
 
-    assert response.status_code == 422
+    assert response.status_code == 400
+
+    body = response.json()
+    assert body["error"]["code"] == "validation_error"
 
 
 @pytest.mark.asyncio
@@ -24,7 +27,10 @@ async def test_whitespace_content(client):
         json={"content": "     "},
     )
 
-    assert response.status_code == 422
+    assert response.status_code == 400
+
+    body = response.json()
+    assert body["error"]["code"] == "validation_error"
 
 
 @pytest.mark.asyncio
@@ -36,7 +42,7 @@ async def test_empty_update(client):
         json={"content": "Hello"},
     )
 
-    memory_id = create.json()["id"]
+    memory_id = create.json()["memory_id"]
 
     response = await client.patch(
         f"/api/v1/memory/{memory_id}",

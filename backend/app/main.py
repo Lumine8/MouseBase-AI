@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
@@ -30,6 +31,20 @@ async def api_exception_handler(request: Request, exc: APIException):
     return JSONResponse(
         status_code=exc.status_code,
         content={"error": {"code": exc.code, "message": exc.message}},
+    )
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    first_error = exc.errors()[0] if exc.errors() else {"msg": "Validation error"}
+    return JSONResponse(
+        status_code=400,
+        content={
+            "error": {
+                "code": "validation_error",
+                "message": first_error["msg"],
+            }
+        },
     )
 
 
