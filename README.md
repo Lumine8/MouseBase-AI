@@ -4,6 +4,7 @@
   <p><strong>Persistent memory infrastructure for AI agents.</strong></p>
   <p>
     <a href="https://pypi.org/project/mousebase/"><img src="https://img.shields.io/pypi/v/mousebase?style=flat-square&label=PyPI&color=f59e0b" alt="PyPI" /></a>
+    <a href="https://www.npmjs.com/package/mousebase"><img src="https://img.shields.io/npm/v/mousebase?style=flat-square&label=npm&color=d97706" alt="npm" /></a>
     <a href="https://pypi.org/project/mousebase/"><img src="https://img.shields.io/pypi/pyversions/mousebase?style=flat-square&label=Python&color=b45309" alt="Python" /></a>
     <a href="https://hub.docker.com/r/lumine8/mousebase"><img src="https://img.shields.io/docker/v/lumine8/mousebase?style=flat-square&label=Docker&color=fbbf24" alt="Docker" /></a>
     <a href="LICENSE"><img src="https://img.shields.io/badge/license-Proprietary-fde68a?style=flat-square" alt="License" /></a>
@@ -52,6 +53,68 @@ print(result.memory_id)
 results = client.search("What theme does the user want?")
 for r in results.results:
     print(f"{r.content} (score: {r.score})")
+```
+
+## TypeScript / JavaScript SDK
+
+```bash
+npm install mousebase
+```
+
+```typescript
+import { MouseBase } from "mousebase";
+
+const client = new MouseBase({
+  apiKey: process.env.MOUSEBASE_API_KEY!,
+});
+
+// Store a memory
+await client.remember({
+  content: "Alice prefers dark mode",
+});
+
+// Search semantically
+const results = await client.search({
+  query: "UI preferences",
+});
+console.log(results.results);
+```
+
+### Browser SDK
+
+```typescript
+import { MouseBaseBrowser } from "mousebase/browser";
+
+// Uses JWT auth — never exposes API keys in the browser
+const client = new MouseBaseBrowser({ token: "jwt_token_here" });
+await client.remember({ content: "Logged in user preference" });
+```
+
+### CLI
+
+```bash
+npx mousebase login
+npx mousebase remember "Alice likes dark mode"
+npx mousebase search "UI preferences"
+npx mousebase projects list
+```
+
+### Framework Adapters
+
+```typescript
+import { NextMouseBase } from "mousebase/adapters/nextjs";
+import { ExpressMouseBase } from "mousebase/adapters/express";
+import { NestMouseBase } from "mousebase/adapters/nestjs";
+import { CloudflareMouseBase } from "mousebase/adapters/cloudflare";
+```
+
+### AI Framework Integrations
+
+```typescript
+import { MouseBaseMemory } from "mousebase/integrations/langchain";
+import { MouseBaseMemoryStore } from "mousebase/integrations/llama-index";
+import { MouseBaseAgentMemory } from "mousebase/integrations/openai-agents";
+import { createMousebaseMcpServer } from "mousebase/integrations/mcp-server";
 ```
 
 ## Docker
@@ -154,15 +217,18 @@ Full documentation is available at the in-app `/docs` page, or in the [VitePress
 - [Search](docs/guide/search.md)
 - [Errors](docs/guide/errors.md)
 - [Python SDK](docs/guide/python-sdk.md)
+- [JavaScript SDK](docs/guide/js-sdk.md)
 - [FAQ](docs/guide/faq.md)
 
 ## Architecture
 
 ```
-┌─────────────┐     ┌──────────┐     ┌─────────────────┐
-│  Python SDK  │────▶│  FastAPI  │────▶│  PostgreSQL +   │
-│  / HTTP API  │     │  Server  │     │    pgvector     │
-└─────────────┘     └──────────┘     └─────────────────┘
+┌─────────────────┐     ┌──────────┐     ┌─────────────────┐
+│  Python SDK      │     │          │     │                 │
+│  TypeScript SDK  │────▶│  FastAPI  │────▶│  PostgreSQL +   │
+│  Browser SDK     │     │  Server  │     │    pgvector     │
+│  CLI / HTTP      │     │          │     │                 │
+└─────────────────┘     └──────────┘     └─────────────────┘
 ```
 
 ## Status

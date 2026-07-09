@@ -27,7 +27,8 @@ export default {
       {
         text: "SDK",
         items: [
-          { text: "Python SDK", link: "/guide/python-sdk" },
+      { text: "Python SDK", link: "/guide/python-sdk" },
+      { text: "JavaScript SDK", link: "/guide/js-sdk" },
         ],
       },
       {

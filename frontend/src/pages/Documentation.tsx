@@ -25,6 +25,18 @@ const groups = [
     ],
   },
   {
+    label: "JavaScript SDK",
+    items: [
+      { id: "js-installation", label: "Installation" },
+      { id: "js-quickstart", label: "Quick Start" },
+      { id: "js-server", label: "Server Client" },
+      { id: "js-browser", label: "Browser Client" },
+      { id: "js-projects", label: "Projects" },
+      { id: "js-auth", label: "Account Management" },
+      { id: "js-errors", label: "Error Handling" },
+    ],
+  },
+  {
     label: "Python SDK",
     items: [
       { id: "sdk-installation", label: "Installation" },
@@ -1358,6 +1370,442 @@ async def shutdown():
 async def remember(content: str):
     result = await app.state.mousebase.remember(content)
     return {"memory_id": result.memory_id}
+\`\`\``
+  },
+  "js-installation": {
+    title: "Installation",
+    body: `Install the JavaScript SDK via npm:
+
+\`\`\`bash
+npm install mousebase
+\`\`\`
+
+Requires Node.js 18+.
+
+## TypeScript Support
+
+The SDK includes TypeScript type definitions out of the box. No separate \`@types\` package needed.
+
+## Optional Integrations
+
+Additional adapters are available as separate sub-imports:
+
+\`\`\`typescript
+import { MouseBaseExpress } from "mousebase/express";
+import { MouseBaseFastify } from "mousebase/fastify";
+\`\`\`
+
+## Verify Installation
+
+\`\`\`typescript
+import { MouseBase } from "mousebase";
+console.log(MouseBase);
+// [class MouseBase]
+\`\`\``
+  },
+  "js-quickstart": {
+    title: "Quick Start",
+    body: `Get up and running in 60 seconds.
+
+\`\`\`typescript
+import { MouseBase } from "mousebase";
+
+// Create a client (uses MOUSEBASE_API_KEY env var or pass directly)
+const client = new MouseBase({ apiKey: "mb_live_xxx" });
+
+// Store a memory
+const result = await client.remember({
+  content: "User prefers dark mode in their IDE.",
+  metadata: { source: "preferences" }
+});
+console.log(\`Stored: \${result.memoryId}\`);
+
+// Search semantically
+const results = await client.search({
+  query: "What theme does the user like?",
+  topK: 5
+});
+for (const r of results.results) {
+  console.log(\`  [\${r.score.toFixed(2)}] \${r.content}\`);
+}
+
+// Retrieve, update, and delete
+const memory = await client.get("mem_abc123");
+await client.update("mem_abc123", { content: "Updated content" });
+await client.delete("mem_abc123");
+\`\`\`
+
+## Configuration
+
+| Env Variable | Default | Description |
+|--------------|---------|-------------|
+| \`MOUSEBASE_API_KEY\` | — | Your API key (required) |
+| \`MOUSEBASE_BASE_URL\` | \`https://api.mousebase.ai/v1\` | Custom server URL |
+
+The SDK also auto-loads from a \`.env\` file if \`dotenv\` is installed.`
+  },
+  "js-server": {
+    title: "Server Client",
+    body: `The \`MouseBase\` class is the primary client for server-side usage. It uses the Fetch API under the hood.
+
+## Creating a Client
+
+\`\`\`typescript
+import { MouseBase } from "mousebase";
+
+// Pass API key directly
+const client = new MouseBase({ apiKey: "mb_live_xxx" });
+
+// Use MOUSEBASE_API_KEY environment variable
+const client = new MouseBase();
+
+// Custom server URL and timeout
+const client = new MouseBase({
+  apiKey: "mb_live_xxx",
+  baseUrl: "https://api.mousebase.ai/v1",
+  timeout: 60_000
+});
+\`\`\`
+
+## Memory Operations
+
+### remember
+
+\`\`\`typescript
+const result = await client.remember({
+  content: "The user completed onboarding.",
+  externalId: "user_789",
+  metadata: { source: "onboarding", step: 5 }
+});
+// result.memoryId -> "mem_abc123"
+// result.createdAt -> Date
+\`\`\`
+
+### search
+
+\`\`\`typescript
+const results = await client.search({
+  query: "What do I know about the user?",
+  topK: 10
+});
+for (const r of results.results) {
+  console.log(\`[\${r.score.toFixed(2)}] \${r.content}\`);
+}
+\`\`\`
+
+### get
+
+\`\`\`typescript
+const memory = await client.get("mem_abc123");
+console.log(memory.content);
+console.log(memory.metadata);
+console.log(memory.externalId);
+console.log(memory.createdAt);
+\`\`\`
+
+### update
+
+\`\`\`typescript
+const memory = await client.update("mem_abc123", {
+  content: "Updated text",
+  metadata: { edited: true },
+  externalId: "new_id"
+});
+\`\`\`
+
+### delete
+
+\`\`\`typescript
+await client.delete("mem_abc123"); // Returns void on success
+\`\`\`
+
+## Project Management
+
+Access project management via \`client.projects\`:
+
+\`\`\`typescript
+// Create a project
+const project = await client.projects.create({
+  name: "My Chatbot",
+  description: "Memories for my chatbot"
+});
+console.log(project.apiKey); // "mb_live_..."
+
+// List projects
+const projects = await client.projects.list();
+for (const p of projects) {
+  console.log(\`\${p.name} (\${p.id})\`);
+}
+
+// Get a project
+const project = await client.projects.get("proj_abc123");
+
+// Update a project
+await client.projects.update("proj_abc123", { name: "New Name" });
+
+// Delete a project
+await client.projects.delete("proj_abc123");
+
+// View API key
+const key = await client.projects.viewKey("proj_abc123");
+console.log(key.apiKey); // Partially masked
+
+// Rotate API key
+const rotated = await client.projects.rotateKey("proj_abc123");
+console.log(rotated.apiKey); // New key
+\`\`\`
+
+## Full Method Reference
+
+| Method | Description |
+|--------|-------------|
+| \`client.remember(...)\` | Store a memory |
+| \`client.search(...)\` | Semantic search |
+| \`client.get(id)\` | Get a memory |
+| \`client.update(id, ...)\` | Update a memory |
+| \`client.delete(id)\` | Delete a memory |
+| \`client.projects.create(...)\` | Create project |
+| \`client.projects.list()\` | List projects |
+| \`client.projects.get(id)\` | Get project |
+| \`client.projects.update(id, ...)\` | Update project |
+| \`client.projects.delete(id)\` | Delete project |
+| \`client.projects.viewKey(id)\` | View API key |
+| \`client.projects.rotateKey(id)\` | Rotate API key |`
+  },
+  "js-browser": {
+    title: "Browser Client",
+    body: `For browser environments, use \`MouseBaseBrowser\` which authenticates with JWT tokens instead of API keys. Secret keys are never exposed in the browser.
+
+\`\`\`typescript
+import { MouseBaseBrowser } from "mousebase/browser";
+
+const client = new MouseBaseBrowser({
+  token: "jwt_token_here",
+  baseUrl: "https://api.mousebase.ai/v1"
+});
+\`\`\`
+
+## Supported Operations
+
+The browser client is limited to user-facing endpoints:
+
+\`\`\`typescript
+// Store a memory
+const result = await client.remember({
+  content: "User preference stored from browser",
+  externalId: "user_browser_123"
+});
+
+// Search memories
+const results = await client.search({
+  query: "user preferences",
+  topK: 5
+});
+
+// Get a memory
+const memory = await client.get("mem_abc123");
+
+// Account operations
+const auth = await client.signup({
+  email: "user@example.com",
+  password: "securepassword123",
+  fullName: "Jane Doe"
+});
+
+const auth = await client.login({
+  email: "user@example.com",
+  password: "securepassword123"
+});
+
+const user = await client.me();
+\`\`\`
+
+## Important Notes
+
+- Never use \`MouseBase\` (the server client) in the browser — it would expose your API key
+- \`MouseBaseBrowser\` uses JWT tokens obtained via \`signup\` or \`login\`
+- Project management endpoints are not available in the browser client
+- Token expiration is handled automatically where possible`
+  },
+  "js-projects": {
+    title: "Projects",
+    body: `Projects organize your memories under separate API keys. Access project management via \`client.projects\`.
+
+## Create a Project
+
+\`\`\`typescript
+const project = await client.projects.create({
+  name: "My Chatbot",
+  description: "Memories for my customer support chatbot"
+});
+console.log(project.apiKey); // "mb_live_..."
+\`\`\`
+
+## List Projects
+
+\`\`\`typescript
+const projects = await client.projects.list();
+for (const p of projects) {
+  console.log(\`\${p.name} (\${p.id}) — \${p.status}\`);
+}
+\`\`\`
+
+## Get a Project
+
+\`\`\`typescript
+const project = await client.projects.get("proj_abc123");
+console.log(project.name);
+console.log(project.description);
+console.log(project.status);
+\`\`\`
+
+## Update a Project
+
+\`\`\`typescript
+await client.projects.update("proj_abc123", {
+  name: "New Name",
+  description: "Updated description"
+});
+\`\`\`
+
+## Delete a Project
+
+\`\`\`typescript
+await client.projects.delete("proj_abc123"); // Irreversible
+\`\`\`
+
+## View API Key
+
+\`\`\`typescript
+const key = await client.projects.viewKey("proj_abc123");
+console.log(key.apiKey); // "mb_live_...xxxx" (partially masked)
+\`\`\`
+
+## Rotate API Key
+
+Generates a new key. The old key is immediately invalidated.
+
+\`\`\`typescript
+const project = await client.projects.rotateKey("proj_abc123");
+console.log(project.apiKey); // New key
+\`\`\``
+  },
+  "js-auth": {
+    title: "Account Management",
+    body: `The SDK supports user authentication — sign up, log in, and retrieve user info.
+
+## Sign Up
+
+Creates a new user account and returns a JWT token plus user details.
+
+\`\`\`typescript
+const auth = await client.signup({
+  email: "user@example.com",
+  password: "securepassword123",
+  fullName: "Jane Doe"
+});
+console.log(auth.token);        // JWT token
+console.log(auth.user.email);   // "user@example.com"
+console.log(auth.user.fullName); // "Jane Doe"
+\`\`\`
+
+## Log In
+
+\`\`\`typescript
+const auth = await client.login({
+  email: "user@example.com",
+  password: "securepassword123"
+});
+console.log(auth.token); // New JWT token
+\`\`\`
+
+## Get Current User
+
+\`\`\`typescript
+const user = await client.me();
+console.log(user.email);          // "user@example.com"
+console.log(user.fullName);       // "Jane Doe" or null
+console.log(user.emailVerified);  // true/false
+console.log(user.createdAt);      // Date
+\`\`\`
+
+## Auth Response Types
+
+\`\`\`typescript
+interface AuthResponse {
+  token: string;
+  user: UserResponse;
+}
+
+interface UserResponse {
+  id: string;
+  email: string;
+  fullName: string | null;
+  avatarUrl: string | null;
+  emailVerified: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+\`\`\``
+  },
+  "js-errors": {
+    title: "Error Handling",
+    body: `The SDK throws typed exceptions for every error condition. All exceptions extend \`MouseBaseError\`.
+
+## Error Classes
+
+| Error | HTTP | Trigger |
+|-------|------|---------|
+| \`MissingAPIKeyError\` | — | No API key provided |
+| \`ValidationError\` | 400/422 | Invalid request payload |
+| \`AuthenticationError\` | 401 | Invalid or expired API key |
+| \`RateLimitError\` | 429 | Too many requests |
+| \`InternalError\` | 500/502 | Server-side failure |
+| \`MouseBaseError\` | any | Base exception (catch-all) |
+
+## Handling Errors
+
+\`\`\`typescript
+import {
+  MouseBase,
+  MouseBaseError,
+  MissingAPIKeyError,
+  AuthenticationError,
+  ValidationError,
+  RateLimitError
+} from "mousebase";
+
+const client = new MouseBase({ apiKey: "mb_live_xxx" });
+
+try {
+  const result = await client.remember({ content: "Test memory" });
+} catch (error) {
+  if (error instanceof MissingAPIKeyError) {
+    console.log("Set MOUSEBASE_API_KEY");
+  } else if (error instanceof AuthenticationError) {
+    console.log("Invalid or expired API key");
+  } else if (error instanceof ValidationError) {
+    console.log(\`Validation failed: \${error.message}\`);
+  } else if (error instanceof RateLimitError) {
+    console.log("Slow down — rate limited");
+  } else if (error instanceof MouseBaseError) {
+    console.log(\`Error \${error.code}: \${error.message} (HTTP \${error.statusCode})\`);
+  }
+}
+\`\`\`
+
+## Error Properties
+
+\`\`\`typescript
+try {
+  await client.remember({ content: "test" });
+} catch (error) {
+  if (error instanceof MouseBaseError) {
+    error.code;        // string — error code like "invalid_api_key"
+    error.message;     // string — human-readable message
+    error.statusCode;  // number — HTTP status code (0 if N/A)
+  }
+}
 \`\`\``
   },
 };

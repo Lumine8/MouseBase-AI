@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
   FiArrowRight, FiSearch, FiDatabase, FiServer, FiLock, FiCode, FiGithub,
   FiTerminal, FiSave, FiBook, FiMessageCircle, FiCpu, FiHeadphones, FiHardDrive,
-  FiCheck, FiStar, FiZap, FiBriefcase, FiLayers
+  FiLayers
 } from "react-icons/fi";
 import PublicNav from "../components/PublicNav";
 
@@ -94,24 +94,6 @@ export default function Landing() {
     { icon: FiTerminal, step: "1", title: "Install", code: "pip install mousebase" },
     { icon: FiSave, step: "2", title: "Store", code: "client.remember(\"User prefers dark mode.\")" },
     { icon: FiSearch, step: "3", title: "Search", code: "client.search(\"What theme does the user like?\")" },
-  ];
-
-  const plans = [
-    {
-      name: "Free", price: "$0", period: "forever", icon: FiZap, features: [
-        "1,000 memories", "1 namespace", "7-day retention", "REST API access", "Community support"
-      ]
-    },
-    {
-      name: "Pro", price: "$19", period: "/month", icon: FiStar, featured: true, features: [
-        "100,000 memories", "10 namespaces", "90-day retention", "Priority support", "Metadata filtering"
-      ]
-    },
-    {
-      name: "Enterprise", price: "Custom", period: "", icon: FiBriefcase, features: [
-        "Unlimited memories", "Unlimited namespaces", "Custom retention", "Dedicated support", "On-premise deployment"
-      ]
-    },
   ];
 
   const docSections = [
@@ -301,70 +283,33 @@ export default function Landing() {
       </section>
 
       {/* Pricing */}
-      <section style={{ maxWidth: 960, margin: "0 auto", padding: "0 24px 100px", position: "relative", zIndex: 1 }}>
+      <section style={{ maxWidth: 400, margin: "0 auto", padding: "0 24px 100px", position: "relative", zIndex: 1 }}>
         <h2 style={{ fontSize: 32, fontWeight: 700, textAlign: "center", letterSpacing: "-0.03em", color: "var(--text-primary)", marginBottom: 16 }}>
-          Simple Pricing
+          Pricing
         </h2>
-        <p style={{ textAlign: "center", fontSize: 15, color: "var(--text-secondary)", marginBottom: 48, maxWidth: 420, marginLeft: "auto", marginRight: "auto" }}>
-          Start free, scale as you grow. No hidden fees.
-        </p>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20, alignItems: "start" }}>
-          {plans.map((p) => {
-            const Icon = p.icon;
-            return (
-              <div key={p.name} style={{
-                background: "var(--bg-card)", border: p.featured ? "1px solid var(--accent)" : "1px solid var(--border-default)",
-                borderRadius: 18, padding: 32, textAlign: "center",
-                transition: "all 180ms cubic-bezier(0.25,0.1,0.25,1)",
-                position: "relative", ...(p.featured ? { boxShadow: "0 0 30px rgba(245,197,66,0.08)" } : {})
-              }}
-                onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 4px 24px rgba(245,197,66,0.1)"; }}
-                onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = p.featured ? "0 0 30px rgba(245,197,66,0.08)" : "none"; }}
-              >
-                {p.featured && (
-                  <div style={{
-                    position: "absolute", top: -12, left: "50%", transform: "translateX(-50%)",
-                    background: "var(--accent)", color: "#090909", fontSize: 11, fontWeight: 600,
-                    padding: "4px 14px", borderRadius: 20
-                  }}>
-                    Most Popular
-                  </div>
-                )}
-                <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(245,197,66,0.1)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--accent)", fontSize: 18, margin: "0 auto 16px" }}>
-                  <Icon />
-                </div>
-                <h3 style={{ fontSize: 18, fontWeight: 600, color: "var(--text-primary)", marginBottom: 8 }}>{p.name}</h3>
-                <div style={{ marginBottom: 20 }}>
-                  <span style={{ fontSize: 36, fontWeight: 700, color: "var(--text-primary)" }}>{p.price}</span>
-                  {p.period && <span style={{ fontSize: 14, color: "var(--text-muted)", marginLeft: 4 }}>{p.period}</span>}
-                </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 10, textAlign: "left", marginBottom: 24 }}>
-                  {p.features.map((f) => (
-                    <div key={f} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--text-secondary)" }}>
-                      <FiCheck style={{ color: "var(--accent)", fontSize: 14, flexShrink: 0 }} />
-                      {f}
-                    </div>
-                  ))}
-                </div>
-                <button onClick={() => navigate("/login")} style={{
-                  width: "100%", background: p.featured ? "var(--accent)" : "transparent",
-                  color: p.featured ? "#090909" : "var(--text-primary)",
-                  border: p.featured ? "none" : "1px solid #2A2A2A",
-                  borderRadius: 12, padding: "10px 0", fontSize: 14, fontWeight: 600,
-                  cursor: "pointer", transition: "all 180ms cubic-bezier(0.25,0.1,0.25,1)"
-                }}
-                  onMouseEnter={(e) => {
-                    if (p.featured) { e.currentTarget.style.background = "var(--accent-hover)"; } else { e.currentTarget.style.background = "#151515"; e.currentTarget.style.borderColor = "var(--accent)"; e.currentTarget.style.color = "var(--accent)"; }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (p.featured) { e.currentTarget.style.background = "var(--accent)"; } else { e.currentTarget.style.background = "transparent"; e.currentTarget.style.borderColor = "#2A2A2A"; e.currentTarget.style.color = "var(--text-primary)"; }
-                  }}
-                >
-                  {p.name === "Enterprise" ? "Contact Sales" : "Get Started"}
-                </button>
-              </div>
-            );
-          })}
+        <div style={{
+          background: "var(--bg-card)", border: "1px solid var(--border-default)", borderRadius: 18,
+          padding: 48, textAlign: "center",
+          transition: "all 180ms cubic-bezier(0.25,0.1,0.25,1)"
+        }}
+          onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--accent)"; e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 4px 20px rgba(245,197,66,0.06)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border-default)"; e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
+        >
+          <span style={{ fontSize: 48 }}>🚧</span>
+          <h3 style={{ fontSize: 20, fontWeight: 600, color: "var(--text-primary)", marginTop: 16, marginBottom: 8 }}>Coming Soon</h3>
+          <p style={{ fontSize: 14, color: "var(--text-secondary)", lineHeight: 1.6 }}>
+            Pricing details are being finalized. <br />Sign up now to lock in early access pricing.
+          </p>
+          <button onClick={() => navigate("/login")} style={{
+            marginTop: 20, background: "var(--accent)", color: "#090909", border: "none",
+            borderRadius: 12, padding: "10px 24px", fontSize: 14, fontWeight: 600,
+            cursor: "pointer", transition: "all 180ms"
+          }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = "var(--accent-hover)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = "var(--accent)"; }}
+          >
+            Get Early Access
+          </button>
         </div>
       </section>
 

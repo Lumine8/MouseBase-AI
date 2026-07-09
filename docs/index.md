@@ -12,4 +12,5 @@ Store, search, and manage memory for your agents, chatbots, and AI products.
 
 - [Quickstart](/guide/quickstart) — get your first memory stored in 30 seconds
 - [Python SDK](/guide/python-sdk) — `pip install mousebase`
+- [JavaScript SDK](/guide/js-sdk) — `npm install mousebase`
 - [Authentication](/guide/authentication) — API keys and access

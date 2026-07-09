@@ -5,7 +5,12 @@
 
 [![PyPI version](https://img.shields.io/pypi/v/mousebase)](https://pypi.org/project/mousebase/)
 [![Python versions](https://img.shields.io/pypi/pyversions/mousebase)](https://pypi.org/project/mousebase/)
+[![npm version](https://img.shields.io/npm/v/mousebase)](https://www.npmjs.com/package/mousebase)
 [![License](https://img.shields.io/pypi/l/mousebase)](https://github.com/Lumine8/MouseBase-AI/blob/main/LICENSE)
+
+<p align="center">
+  <b>Python SDK</b> · <a href="https://www.npmjs.com/package/mousebase">TypeScript SDK →</a>
+</p>
 
 Official Python SDK for [MouseBase](https://mousebase.ai) — persistent memory infrastructure for AI applications.
 
