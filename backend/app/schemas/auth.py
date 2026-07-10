@@ -19,7 +19,17 @@ class LoginRequest(BaseModel):
 
 class AuthResponse(BaseModel):
     token: str
+    refresh_token: str
     user: "UserResponse"
+
+
+class RefreshRequest(BaseModel):
+    refresh_token: str
+
+
+class RefreshResponse(BaseModel):
+    token: str
+    refresh_token: str
 
 
 class UserResponse(BaseModel):
@@ -36,3 +46,22 @@ class UserResponse(BaseModel):
 
 class VerifyEmailRequest(BaseModel):
     token: str
+
+
+class ForgotPasswordRequest(BaseModel):
+    email: str
+
+
+class ResetPasswordRequest(BaseModel):
+    token: str
+    password: str = Field(..., min_length=8, max_length=128)
+
+
+class SessionResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    user_agent: str | None = None
+    ip_address: str | None = None
+    last_used_at: datetime
+    created_at: datetime

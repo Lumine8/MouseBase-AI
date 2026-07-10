@@ -44,6 +44,15 @@ class Settings(BaseSettings):
 
     SENTRY_DSN: str | None = None
 
+    SMTP_HOST: str = ""
+    SMTP_PORT: int = 587
+    SMTP_USERNAME: str = ""
+    SMTP_PASSWORD: str = ""
+    SMTP_FROM: str = "noreply@mousebase.dev"
+
+    JWT_REFRESH_EXPIRY_DAYS: int = 30
+    JWT_ACCESS_EXPIRY_MINUTES: int = 15
+
     model_config = SettingsConfigDict(
         env_file=BASE_DIR / ".env",
         extra="ignore",

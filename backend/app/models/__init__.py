@@ -1,5 +1,6 @@
 from .base import Base
 from .user import User
+from .session import RefreshToken, Session
 from .project import Project, ProjectStatus
 from .memory import Memory
 from .embedding import Embedding
@@ -21,4 +22,6 @@ __all__ = [
     "Payment",
     "WebhookEvent",
     "Usage",
+    "RefreshToken",
+    "Session",
 ]

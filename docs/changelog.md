@@ -60,6 +60,23 @@ All notable changes to the MouseBase project are documented here.
 - **Pricing.tsx**: Removed hardcoded `DEFAULT_PLANS`. Paid plans now show "Coming Soon" (determined by API price field)
 - **Footer.tsx**: Removed Careers link, removed Privacy section, updated GitHub/Twitter handles
 
+### `a0112dc` — Phase 0: security, logging, rate limiting, connection pooling, health endpoint
+- **SecurityHeadersMiddleware**: HSTS, X-Content-Type-Options, X-Frame-Options, X-XSS-Protection, Referrer-Policy, Permissions-Policy
+- **RequestIDMiddleware**: Unique `X-Request-ID` on every request, propagated through logs via `request.state`
+- **RequestTimingMiddleware**: `X-Response-Time-Ms` header on all responses
+- **structlog**: Structured JSON logging in production, console in dev. Context vars include `request_id`
+- **slowapi**: Rate limiting at 60 requests/minute per IP, disabled in development mode
+- **sentry-sdk**: Installed, initializes from `SENTRY_DSN` env var on startup (via lifespan)
+- **Connection pooling**: `pool_size=20`, `max_overflow=10`, `pool_pre_ping=True`, `pool_recycle=3600`
+- **Health endpoint**: `GET /health/` checks DB with `SELECT 1`, returns status + latency
+- **Graceful startup/shutdown**: FastAPI lifespan — initializes logging/Sentry/DB on boot, disposes engine on shutdown
+- **New files**: `core/middleware.py`, `core/log_config.py`, `db/check_db()` helper
+
+### `ad29b04` — Status page & refund policy cleanup
+### `969a45b` — SEO, RememberResponse simplification, SDK publish
+### `9adf31a` — Fix Twitter handle
+### `94329ca` — Pricing Coming Soon fallback
+### `4689edd` — Remove broken pages, fix settings/contact/about/pricing
 ### `8a43d19` — SEO, legal pages, skeleton loaders, SDK publishing
 - **Skeleton.tsx**: Created shimmer loading components (`SkeletonMetricsGrid`, `SkeletonProjectGrid`, `SkeletonLine`)
 - **Footer.tsx**: Full footer with Product, Resources, Company, Legal, Business columns
