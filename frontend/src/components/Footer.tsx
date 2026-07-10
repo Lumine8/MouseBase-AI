@@ -63,7 +63,7 @@ export default function Footer() {
         <span style={{ fontSize: 13, color: "var(--text-muted)" }}>MouseBase — Persistent Memory for AI Applications</span>
         <div style={{ display: "flex", gap: 16 }}>
           <a href="https://github.com/Lumine8/MouseBase-AI" target="_blank" rel="noopener noreferrer" style={linkStyle}>GitHub</a>
-          <a href="https://x.com/AtlasThinks" target="_blank" rel="noopener noreferrer" style={linkStyle}>Twitter</a>
+          <a href="https://x.com/AtlasThinksly" target="_blank" rel="noopener noreferrer" style={linkStyle}>Twitter</a>
         </div>
       </div>
     </footer>
