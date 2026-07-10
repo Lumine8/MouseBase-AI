@@ -26,7 +26,7 @@ export default function Footer() {
           <div style={{ fontWeight: 600, fontSize: 13, color: "var(--text-primary)", marginBottom: 16, textTransform: "uppercase", letterSpacing: "0.05em" }}>Resources</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             <Link to="/docs" style={linkStyle}>Documentation</Link>
-            <a href="https://github.com/anomalyco/MouseBase" target="_blank" rel="noopener noreferrer" style={linkStyle}>GitHub</a>
+            <a href="https://github.com/Lumine8/MouseBase-AI" target="_blank" rel="noopener noreferrer" style={linkStyle}>GitHub</a>
             <a href="https://pypi.org/project/mousebase/" target="_blank" rel="noopener noreferrer" style={linkStyle}>PyPI</a>
             <a href="https://www.npmjs.com/package/mousebase" target="_blank" rel="noopener noreferrer" style={linkStyle}>npm</a>
             <Link to="/blog" style={linkStyle}>Blog</Link>
@@ -37,7 +37,6 @@ export default function Footer() {
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             <Link to="/about" style={linkStyle}>About</Link>
             <Link to="/contact" style={linkStyle}>Contact</Link>
-            <Link to="/careers" style={linkStyle}>Careers</Link>
             <Link to="/trust" style={linkStyle}>Trust Center</Link>
           </div>
         </div>
@@ -54,11 +53,8 @@ export default function Footer() {
           </div>
         </div>
         <div>
-          <div style={{ fontWeight: 600, fontSize: 13, color: "var(--text-primary)", marginBottom: 16, textTransform: "uppercase", letterSpacing: "0.05em" }}>Privacy</div>
+          <div style={{ fontWeight: 600, fontSize: 13, color: "var(--text-primary)", marginBottom: 16, textTransform: "uppercase", letterSpacing: "0.05em" }}>Business</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            <Link to="/privacy/deletion" style={linkStyle}>Data Deletion Request</Link>
-            <Link to="/privacy/export" style={linkStyle}>Export My Data</Link>
-            <Link to="/privacy/retention" style={linkStyle}>Data Retention</Link>
             <Link to="/refund" style={linkStyle}>Refund Policy</Link>
           </div>
         </div>
@@ -66,8 +62,8 @@ export default function Footer() {
       <div style={{ borderTop: "1px solid var(--border-default)", paddingTop: 20, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
         <span style={{ fontSize: 13, color: "var(--text-muted)" }}>MouseBase — Persistent Memory for AI Applications</span>
         <div style={{ display: "flex", gap: 16 }}>
-          <a href="https://github.com/anomalyco/MouseBase" target="_blank" rel="noopener noreferrer" style={linkStyle}>GitHub</a>
-          <a href="https://x.com/mousebase" target="_blank" rel="noopener noreferrer" style={linkStyle}>Twitter</a>
+          <a href="https://github.com/Lumine8/MouseBase-AI" target="_blank" rel="noopener noreferrer" style={linkStyle}>GitHub</a>
+          <a href="https://x.com/AtlasThinksly" target="_blank" rel="noopener noreferrer" style={linkStyle}>Twitter</a>
         </div>
       </div>
     </footer>

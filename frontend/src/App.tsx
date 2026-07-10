@@ -20,9 +20,6 @@ import Changelog from "./pages/Changelog";
 import Roadmap from "./pages/Roadmap";
 import TrustCenter from "./pages/TrustCenter";
 import RefundPolicy from "./pages/RefundPolicy";
-import DataDeletion from "./pages/DataDeletion";
-import ExportData from "./pages/ExportData";
-import DataRetention from "./pages/DataRetention";
 import Privacy from "./pages/legal/Privacy";
 import Terms from "./pages/legal/Terms";
 import Cookies from "./pages/legal/Cookies";
@@ -32,7 +29,6 @@ import Security from "./pages/legal/Security";
 import Subprocessors from "./pages/legal/Subprocessors";
 import About from "./pages/company/About";
 import Contact from "./pages/company/Contact";
-import Careers from "./pages/company/Careers";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
 
@@ -94,7 +90,6 @@ export default function App() {
       <Route path="/refund" element={<RefundPolicy />} />
       <Route path="/about" element={<About />} />
       <Route path="/contact" element={<Contact />} />
-      <Route path="/careers" element={<Careers />} />
 
       {/* Legal */}
       <Route path="/legal/privacy" element={<Privacy />} />
@@ -104,11 +99,6 @@ export default function App() {
       <Route path="/legal/dpa" element={<DPA />} />
       <Route path="/legal/security" element={<Security />} />
       <Route path="/legal/subprocessors" element={<Subprocessors />} />
-
-      {/* Privacy tools */}
-      <Route path="/privacy/deletion" element={<DataDeletion />} />
-      <Route path="/privacy/export" element={<ExportData />} />
-      <Route path="/privacy/retention" element={<DataRetention />} />
 
       {/* Protected */}
       <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />

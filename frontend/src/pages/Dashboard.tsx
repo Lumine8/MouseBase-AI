@@ -22,9 +22,6 @@ import {
   FiPlus,
   FiSearch,
   FiStar,
-  FiTrash2,
-  FiDownload,
-  FiInfo,
 } from "react-icons/fi";
 import { SkeletonMetricsGrid, SkeletonProjectGrid, SkeletonLine } from "../components/Skeleton";
 
@@ -259,25 +256,6 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Privacy actions */}
-      <div style={{ marginTop: 32 }}>
-        <div className="page-header" style={{ marginBottom: 16 }}>
-          <div className="page-header-left">
-            <h1>Data & Privacy</h1>
-          </div>
-        </div>
-        <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-          <button onClick={() => navigate("/privacy/export")} className="btn-secondary" style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <FiDownload /> Export My Data
-          </button>
-          <button onClick={() => navigate("/privacy/deletion")} className="btn-secondary" style={{ display: "flex", alignItems: "center", gap: 8, color: "#ef4444" }}>
-            <FiTrash2 /> Request Deletion
-          </button>
-          <button onClick={() => navigate("/privacy/retention")} className="btn-secondary" style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <FiInfo /> Data Retention
-          </button>
-        </div>
-      </div>
     </div>
   );
 }

@@ -13,6 +13,10 @@ export default function Settings() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [keyInput, setKeyInput] = useState("");
   const [savedKey, setSavedKey] = useState(localStorage.getItem("mb_api_key") ?? "");
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const [exportDone, setExportDone] = useState(false);
 
   useEffect(() => {
     if (localStorage.getItem("mb_token")) {
@@ -48,6 +52,53 @@ export default function Settings() {
     localStorage.removeItem("mb_api_key");
     localStorage.removeItem("mb_token");
     navigate("/login");
+  };
+
+  const handleDeleteAccount = async () => {
+    setDeleting(true);
+    try {
+      const token = localStorage.getItem("mb_token");
+      await fetch("/api/v1/auth/delete", {
+        method: "DELETE",
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+    } catch {}
+    localStorage.removeItem("mb_token");
+    localStorage.removeItem("mb_api_key");
+    setDeleting(false);
+    setShowDeleteModal(false);
+    navigate("/");
+  };
+
+  const handleExport = async () => {
+    setExporting(true);
+    try {
+      const token = localStorage.getItem("mb_token") || localStorage.getItem("mb_api_key");
+      const res = await fetch("/api/v1/auth/export", {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      if (!res.ok) throw new Error("Export failed");
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `mousebase-export-${new Date().toISOString().split("T")[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      const memories = JSON.parse(localStorage.getItem("mb_memories") || "[]");
+      const blob = new Blob([JSON.stringify({ exported_at: new Date().toISOString(), memories }, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `mousebase-export-${new Date().toISOString().split("T")[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } finally {
+      setExporting(false);
+      setExportDone(true);
+      setTimeout(() => setExportDone(false), 3000);
+    }
   };
 
   return (
@@ -192,7 +243,16 @@ export default function Settings() {
               <div className="settings-row-label">Export Data</div>
               <div className="settings-row-desc">Download all your memories and project data</div>
             </div>
-            <button className="btn-secondary"><FiDownload /> Export</button>
+            <button onClick={handleExport} disabled={exporting} className="btn-secondary" style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <FiDownload /> {exporting ? "Exporting..." : exportDone ? "Exported!" : "Export"}
+            </button>
+          </div>
+          <div className="settings-row">
+            <div>
+              <div className="settings-row-label" style={{ color: "var(--red)" }}>Delete Account</div>
+              <div className="settings-row-desc">Permanently delete your account and all data</div>
+            </div>
+            <button onClick={() => setShowDeleteModal(true)} className="btn-danger"><FiTrash2 /> Delete</button>
           </div>
           <div className="settings-row">
             <div>
@@ -216,6 +276,29 @@ export default function Settings() {
         </p>
         <p className="about-version">MouseBase v0.1.0 &middot; API v1</p>
       </div>
+
+      {showDeleteModal && (
+        <div className="modal-overlay" onClick={() => !deleting && setShowDeleteModal(false)}>
+          <div className="modal" style={{ maxWidth: 440 }} onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Delete Account</h2>
+            </div>
+            <div style={{ padding: "0 0 20px" }}>
+              <p style={{ fontSize: 14, color: "var(--text-secondary)", lineHeight: 1.6 }}>
+                This will permanently delete your account and all associated data, including projects, memories, and API keys. <strong style={{ color: "var(--text-primary)" }}>This action cannot be undone.</strong>
+              </p>
+              <div style={{ display: "flex", gap: 8, marginTop: 20 }}>
+                <button onClick={() => setShowDeleteModal(false)} disabled={deleting} className="btn-secondary" style={{ flex: 1 }}>
+                  Cancel
+                </button>
+                <button onClick={handleDeleteAccount} disabled={deleting} className="btn-danger" style={{ flex: 1 }}>
+                  {deleting ? "Deleting..." : "Delete My Account"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
