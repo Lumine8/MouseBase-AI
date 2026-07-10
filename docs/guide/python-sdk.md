@@ -57,7 +57,7 @@ client = MouseBase()
 # Option 3: Custom server URL and timeout
 client = MouseBase(
     api_key="mb_live_xxx",
-    base_url="https://api.mousebase.dev/v1",
+    base_url="https://api.mousebase.dev/api/v1",
     timeout=60,
 )
 ```

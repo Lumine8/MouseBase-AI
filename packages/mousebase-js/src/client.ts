@@ -16,7 +16,7 @@ import {
 } from "./types";
 import { MissingApiKeyError, MouseBaseError, translateError } from "./errors";
 
-const DEFAULT_BASE_URL = "https://api.mousebase.dev/v1";
+const DEFAULT_BASE_URL = "https://api.mousebase.dev/api/v1";
 const DEFAULT_TIMEOUT = 30_000;
 
 export interface ProjectsClient {

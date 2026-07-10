@@ -9,7 +9,7 @@ Projects group memories and each has its own scoped API key.
 Returns all projects for the authenticated account.
 
 ```bash
-curl https://api.mousebase.dev/v1/projects/ \
+curl https://api.mousebase.dev/api/v1/projects/ \
   -H "Authorization: Bearer $MOUSEBASE_API_KEY"
 ```
 
@@ -27,7 +27,7 @@ Creates a new project and returns its API key.
 ```
 
 ```bash
-curl -X POST https://api.mousebase.dev/v1/projects/ \
+curl -X POST https://api.mousebase.dev/api/v1/projects/ \
   -H "Authorization: Bearer $MOUSEBASE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"name": "My Chatbot", "description": "Customer support memories"}'
@@ -59,7 +59,7 @@ curl -X POST https://api.mousebase.dev/v1/projects/ \
 Generates a new API key. The old key becomes invalid immediately.
 
 ```bash
-curl -X POST https://api.mousebase.dev/v1/projects/proj_abc123/api-key/rotate \
+curl -X POST https://api.mousebase.dev/api/v1/projects/proj_abc123/api-key/rotate \
   -H "Authorization: Bearer $MOUSEBASE_API_KEY"
 ```
 

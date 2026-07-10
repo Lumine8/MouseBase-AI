@@ -35,8 +35,8 @@ class SupportSystem:
                     "created_at": str(datetime.now()),
                 },
             )
-            print(f"Ticket created: {resp.memory_id} [{priority}]")
-            return resp.memory_id
+            print(f"Ticket created: {resp.id} [{priority}]")
+            return resp.id
         except MouseBaseError as e:
             print(f"Failed to create ticket: {e}")
             return None

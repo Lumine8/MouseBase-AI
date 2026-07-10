@@ -13,7 +13,7 @@ API keys follow the format `mb_live_{key_id}_{secret}`.
 ## Example
 
 ```bash
-curl -X POST https://api.mousebase.dev/v1/remember/ \
+curl -X POST https://api.mousebase.dev/api/v1/remember/ \
   -H "Authorization: Bearer mb_live_abc123_def456" \
   -H "Content-Type: application/json" \
   -d '{"content": "Hello world"}'

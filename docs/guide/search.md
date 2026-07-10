@@ -60,7 +60,7 @@ for (const r of results.results) {
 ### cURL
 
 ```bash
-curl -X POST https://api.mousebase.dev/v1/search/ \
+curl -X POST https://api.mousebase.dev/api/v1/search/ \
   -H "Authorization: Bearer $MOUSEBASE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"query": "user preferences", "top_k": 5}'

@@ -4,7 +4,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.dependencies import get_db
 from app.dependencies.auth import get_current_project
 from app.models.project import Project
-from app.schemas.remember import RememberRequest, RememberResponse
+from app.schemas.remember import RememberRequest
+from app.schemas.memory import MemoryResponse
 
 from app.services.memory_service import remember
 
@@ -16,7 +17,7 @@ router = APIRouter(
 
 @router.post(
     "/",
-    response_model=RememberResponse,
+    response_model=MemoryResponse,
     status_code=status.HTTP_201_CREATED,
     summary="Remember a memory for the authenticated project",
     description="Stores a new semantic memory for the authenticated project.",
@@ -46,5 +47,5 @@ async def remember_endpoint(
     ),
     project: Project = Depends(get_current_project),
     db: AsyncSession = Depends(get_db),
-) -> RememberResponse:
+) -> MemoryResponse:
     return await remember(project=project, request=request, db=db)

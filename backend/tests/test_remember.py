@@ -14,5 +14,9 @@ async def test_remember(client):
 
     body = response.json()
 
-    assert "memory_id" in body
+    assert "id" in body
+    assert "content" in body
+    assert "external_id" in body
+    assert "metadata" in body
     assert "created_at" in body
+    assert "updated_at" in body

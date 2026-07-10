@@ -203,7 +203,7 @@ export default function Landing() {
             <span style={{ fontSize: 12, color: "var(--text-muted)", marginLeft: 8, fontFamily: "'JetBrains Mono',monospace" }}>POST /memories</span>
           </div>
           <pre style={{ padding: 20, fontSize: 13, lineHeight: 1.8, margin: 0, color: "#e4e4e4", overflow: "auto" }}>
-<code style={{ fontFamily: "'JetBrains Mono',monospace" }}><span style={{ color: "#F5C542" }}>curl</span> -X POST https://api.mousebase.dev/v1/remember/ \<br/>
+<code style={{ fontFamily: "'JetBrains Mono',monospace" }}><span style={{ color: "#F5C542" }}>curl</span> -X POST https://api.mousebase.dev/api/v1/remember/ \<br/>
   <span style={{ color: "#F5C542" }}>-H</span> <span style={{ color: "#98C379" }}>"Authorization: Bearer mb_live_..."</span> \<br/>
   <span style={{ color: "#F5C542" }}>-H</span> <span style={{ color: "#98C379" }}>"Content-Type: application/json"</span> \<br/>
   <span style={{ color: "#F5C542" }}>-d</span> <span style={{ color: "#98C379" }}>{'{"user":"...","content":"User prefers dark mode."}'}</span></code>

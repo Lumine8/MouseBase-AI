@@ -5,7 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.project import Project
-from app.schemas.remember import RememberRequest, RememberResponse
+from app.schemas.remember import RememberRequest
 from app.services.embedding_service import EmbeddingService
 
 from app.exceptions.memory import MemoryNotFoundError
@@ -30,7 +30,7 @@ async def remember(
     project: Project,
     request: RememberRequest,
     db: AsyncSession,
-) -> RememberResponse:
+) -> MemoryResponse:
     embedding_service = create_embedding_service()
     vector = await embedding_service.embed(request.content)
 
@@ -51,7 +51,14 @@ async def remember(
     await db.commit()
     await db.refresh(memory)
 
-    return RememberResponse(memory_id=memory.id, created_at=memory.created_at)
+    return MemoryResponse(
+        id=memory.id,
+        external_id=memory.external_id,
+        content=memory.content,
+        metadata=memory.metadata_,
+        created_at=memory.created_at,
+        updated_at=memory.updated_at,
+    )
 
 
 class MemoryService:
@@ -63,7 +70,7 @@ class MemoryService:
 
     async def remember(
         self, project: Project, request: RememberRequest
-    ) -> RememberResponse:
+    ) -> MemoryResponse:
 
         if self.embedding_service is None:
             raise RuntimeError("Embedding service is not initialized.")
@@ -93,7 +100,7 @@ class MemoryService:
         await self.db.commit()
         await self.db.refresh(memory)
 
-        return RememberResponse(id=memory.id, created_at=memory.created_at)
+        return self._to_response(memory)
 
     async def _get_memory(self, memory_id: UUID, project: Project) -> Memory:
         stmt = select(Memory).where(

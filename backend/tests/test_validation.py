@@ -42,7 +42,7 @@ async def test_empty_update(client):
         json={"content": "Hello"},
     )
 
-    memory_id = create.json()["memory_id"]
+    memory_id = create.json()["id"]
 
     response = await client.patch(
         f"/api/v1/memory/{memory_id}",

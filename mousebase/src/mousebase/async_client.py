@@ -28,7 +28,7 @@ from mousebase.models import (
     UserResponse,
 )
 
-DEFAULT_BASE_URL = "https://api.mousebase.dev/v1"
+DEFAULT_BASE_URL = "https://api.mousebase.dev/api/v1"
 DEFAULT_TIMEOUT = 30
 
 

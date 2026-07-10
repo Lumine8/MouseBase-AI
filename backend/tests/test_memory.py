@@ -12,7 +12,7 @@ async def test_get_memory(client):
         json={"content": "Retrieve me"},
     )
 
-    memory_id = response.json()["memory_id"]
+    memory_id = response.json()["id"]
 
     response = await client.get(
         f"/api/v1/memory/{memory_id}",
@@ -32,7 +32,7 @@ async def test_update_memory(client):
         json={"content": "Old content"},
     )
 
-    memory_id = create.json()["memory_id"]
+    memory_id = create.json()["id"]
 
     response = await client.patch(
         f"/api/v1/memory/{memory_id}",
@@ -53,7 +53,7 @@ async def test_delete_memory(client):
         json={"content": "Delete me"},
     )
 
-    memory_id = create.json()["memory_id"]
+    memory_id = create.json()["id"]
 
     response = await client.delete(
         f"/api/v1/memory/{memory_id}",
@@ -72,7 +72,7 @@ async def test_deleted_memory_not_found(client):
         json={"content": "Delete me"},
     )
 
-    memory_id = create.json()["memory_id"]
+    memory_id = create.json()["id"]
 
     await client.delete(
         f"/api/v1/memory/{memory_id}",

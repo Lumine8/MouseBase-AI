@@ -25,7 +25,7 @@ def main():
 
         for note in notes:
             result = client.remember(content=note, metadata={"source": "notes_example"})
-            print(f"Stored: {result.memory_id} at {result.created_at}")
+            print(f"Stored: {result.id} at {result.created_at}")
 
         results = client.search(query="user onboarding metrics", top_k=3)
         print(f"\nSearch results ({len(results.results)}):")

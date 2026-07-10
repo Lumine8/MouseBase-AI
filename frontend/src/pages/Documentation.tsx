@@ -456,7 +456,7 @@ result = client.remember(
     external_id="user_123",
     metadata={"source": "chat", "importance": "high"}
 )
-print(f"Stored: {result.memory_id}")
+print(f"Stored: {result.id}")
 # Stored: mem_abc123
 \`\`\`
 
@@ -853,7 +853,7 @@ result = client.remember(
     content="User prefers dark mode in their IDE.",
     metadata={"source": "preferences"}
 )
-print(f"Stored: {result.memory_id}")
+print(f"Stored: {result.id}")
 
 # Search semantically
 results = client.search("What theme does the user like?", top_k=5)
@@ -874,7 +874,7 @@ client.close()
 | Env Variable | Default | Description |
 |--------------|---------|-------------|
 | \`MOUSEBASE_API_KEY\` | — | Your API key (required) |
-| \`MOUSEBASE_BASE_URL\` | \`https://api.mousebase.dev/v1\` | Custom server URL |
+| \`MOUSEBASE_BASE_URL\` | \`https://api.mousebase.dev/api/v1\` | Custom server URL |
 
 The SDK also auto-loads from a \`.env\` file if \`python-dotenv\` is installed.`
   },
@@ -896,7 +896,7 @@ client = MouseBase()
 # Custom server URL and timeout
 client = MouseBase(
     api_key="mb_live_xxx",
-    base_url="https://api.mousebase.dev/v1",
+    base_url="https://api.mousebase.dev/api/v1",
     timeout=60
 )
 \`\`\`
@@ -911,7 +911,7 @@ result = client.remember(
     external_id="user_789",
     metadata={"source": "onboarding", "step": 5}
 )
-# result.memory_id -> "mem_abc123"
+# result.id -> "mem_abc123"
 # result.created_at -> datetime
 \`\`\`
 
@@ -972,7 +972,7 @@ async def main():
     client = AsyncMouseBase(api_key="mb_live_xxx")
 
     result = await client.remember("Async memory")
-    print(f"Stored: {result.memory_id}")
+    print(f"Stored: {result.id}")
 
     results = await client.search("test", top_k=5)
     for r in results.results:
@@ -1201,8 +1201,12 @@ except MouseBaseError as e:
 
 \`\`\`
 RememberResponse:
-  memory_id:  str
-  created_at: datetime
+  id:           str
+  external_id:  str | None
+  content:      str
+  metadata:     dict
+  created_at:   datetime
+  updated_at:   datetime
 
 MemoryResponse:
   id:          str
@@ -1369,7 +1373,7 @@ async def shutdown():
 @app.post("/remember")
 async def remember(content: str):
     result = await app.state.mousebase.remember(content)
-    return {"memory_id": result.memory_id}
+    return {"memory_id": result.id}
 \`\`\``
   },
   "js-installation": {
@@ -1440,7 +1444,7 @@ await client.delete("mem_abc123");
 | Env Variable | Default | Description |
 |--------------|---------|-------------|
 | \`MOUSEBASE_API_KEY\` | — | Your API key (required) |
-| \`MOUSEBASE_BASE_URL\` | \`https://api.mousebase.dev/v1\` | Custom server URL |
+| \`MOUSEBASE_BASE_URL\` | \`https://api.mousebase.dev/api/v1\` | Custom server URL |
 
 The SDK also auto-loads from a \`.env\` file if \`dotenv\` is installed.`
   },
@@ -1462,7 +1466,7 @@ const client = new MouseBase();
 // Custom server URL and timeout
 const client = new MouseBase({
   apiKey: "mb_live_xxx",
-  baseUrl: "https://api.mousebase.dev/v1",
+  baseUrl: "https://api.mousebase.dev/api/v1",
   timeout: 60_000
 });
 \`\`\`
@@ -1581,7 +1585,7 @@ import { MouseBaseBrowser } from "mousebase/browser";
 
 const client = new MouseBaseBrowser({
   token: "jwt_token_here",
-  baseUrl: "https://api.mousebase.dev/v1"
+  baseUrl: "https://api.mousebase.dev/api/v1"
 });
 \`\`\`
 

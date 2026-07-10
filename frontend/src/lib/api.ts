@@ -87,7 +87,11 @@ export interface UpdateProjectRequest {
 
 export interface RememberResponse {
   id: string;
+  external_id: string | null;
+  content: string;
+  metadata: Record<string, unknown>;
   created_at: string;
+  updated_at: string;
 }
 
 export interface RememberRequest {
