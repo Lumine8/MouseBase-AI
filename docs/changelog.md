@@ -60,6 +60,22 @@ All notable changes to the MouseBase project are documented here.
 - **Pricing.tsx**: Removed hardcoded `DEFAULT_PLANS`. Paid plans now show "Coming Soon" (determined by API price field)
 - **Footer.tsx**: Removed Careers link, removed Privacy section, updated GitHub/Twitter handles
 
+### `cd3966d` — Phase 0: refresh tokens, email verification, password reset, session management, indexes
+- **Email service**: `ConsoleEmailSender` (dev) + `SMTPEmailSender` (prod). Configurable via `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `SMTP_FROM` env vars.
+- **JWT refresh tokens**: 15-minute access tokens (`JWT_ACCESS_EXPIRY_MINUTES`), 30-day refresh tokens (`JWT_REFRESH_EXPIRY_DAYS`). `POST /auth/refresh` exchanges refresh token for new access + refresh pair. One-time rotation — old refresh token is revoked on use.
+- **Email verification**: Signup generates verification token (24h expiry). `POST /auth/verify-email` verifies. `POST /auth/resend-verification` resends. Auto-verified in development.
+- **Password reset**: `POST /auth/forgot-password` sends 1-hour expiry link. `POST /auth/reset-password` accepts token + new password. Revokes all existing refresh tokens on reset.
+- **Session management**: `GET /auth/sessions` lists sessions (user agent, IP, last used). `DELETE /auth/sessions/{id}` revokes one. `DELETE /auth/sessions` revokes all.
+- **Models**: `RefreshToken` + `Session` tables with foreign keys to `users`.
+- **Database indexes**: 13 new indexes across users (email, created_at), projects (owner_id, owner_created), memories (project_id, created_at, project_created, external_id), embeddings (memory_id), usage (project_date), refresh_tokens (user_id, active), sessions (user_id).
+- **Secret rotation script**: `backend/scripts/rotate_secrets.py` — supports JWT secret, API key encryption key, webhook secret rotation.
+- **Security.py refactored**: Split token types (access/email/password_reset), added `hash_token()`, `create_email_token()`, `create_password_reset_token()`, `verify_email_token()`, `verify_password_reset_token()`.
+- **AuthResponse updated**: Now returns `refresh_token` alongside `token` and `user`.
+- **Auth router**: 11 endpoints total (signup, login, refresh, verify-email, resend-verification, forgot-password, reset-password, me, list-sessions, revoke-session, revoke-all-sessions).
+- **Config**: Added `SMTP_*`, `JWT_REFRESH_EXPIRY_DAYS`, `JWT_ACCESS_EXPIRY_MINUTES`, `SENTRY_DSN`.
+- **All READMEs updated**: root, PyPI, npm with new auth flows, session management, security headers, rate limiting, and infrastructure docs.
+- **Backend**: 13/13 tests pass.
+
 ### `a0112dc` — Phase 0: security, logging, rate limiting, connection pooling, health endpoint
 - **SecurityHeadersMiddleware**: HSTS, X-Content-Type-Options, X-Frame-Options, X-XSS-Protection, Referrer-Policy, Permissions-Policy
 - **RequestIDMiddleware**: Unique `X-Request-ID` on every request, propagated through logs via `request.state`

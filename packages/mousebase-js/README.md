@@ -40,6 +40,8 @@ import { MouseBaseBrowser } from "mousebase/browser";
 
 ## API
 
+### Memory Operations
+
 ```typescript
 // Remember
 await client.remember({ content: "text", externalId: "opt", metadata: {} });
@@ -51,17 +53,40 @@ await client.search({ query: "search text", top_k: 10 });
 await client.get("mem_abc123");
 await client.update("mem_abc123", { content: "updated" });
 await client.delete("mem_abc123");
+```
 
-// Projects
+### Auth (JWT)
+
+```typescript
+// Sign up — sends verification email
+const auth = await client.signup({ email: "...", password: "...", fullName: "..." });
+auth.token;         // Access token (15 min expiry)
+auth.refreshToken;  // Refresh token (30 day, one-time use)
+auth.user;          // { id, email, fullName, emailVerified, createdAt }
+
+// Log in
+const auth = await client.login({ email: "...", password: "..." });
+
+// Refresh access token
+const refreshed = await client.refresh({ refreshToken: auth.refreshToken });
+
+// Get current user
+const user = await client.me();
+
+// List active sessions
+const sessions = await client.listSessions();
+
+// Revoke all sessions (sign out everywhere)
+await client.revokeAllSessions();
+```
+
+### Projects
+
+```typescript
 await client.projects.create({ name: "My Project" });
 await client.projects.list();
 await client.projects.get("proj_abc123");
 await client.projects.rotateKey("proj_abc123");
-
-// Auth
-await client.signup("email", "password", "Name");
-await client.login("email", "password");
-await client.me();
 ```
 
 ## Framework Adapters

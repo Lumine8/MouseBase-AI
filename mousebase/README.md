@@ -193,23 +193,39 @@ project.api_key  # new "mb_live_..."
 ### Account Management
 
 ```python
-# Sign up (creates a new user account)
+# Sign up (creates a new user account, sends verification email)
 auth = client.signup(
     email="user@example.com",
     password="securepassword123",
     full_name="Jane Doe"
 )
-auth.token      # JWT token for authentication
-auth.user       # UserResponse object
+auth.token          # JWT access token (15 min expiry)
+auth.refresh_token  # Refresh token (30 day expiry, one-time use)
+auth.user           # UserResponse object
 
 # Log in
 auth = client.login(email="user@example.com", password="securepassword123")
+auth.token          # New access token
+auth.refresh_token  # New refresh token
 
 # Get current user info
 user = client.me()
-user.email       # "user@example.com"
-user.full_name   # "Jane Doe"
-user.created_at  # datetime
+user.email           # "user@example.com"
+user.full_name       # "Jane Doe"
+user.email_verified  # bool
+user.created_at      # datetime
+```
+
+### Token Refresh
+
+```python
+# Refresh your access token when it expires
+from mousebase import MouseBase
+
+client = MouseBase()
+new_token = client.refresh("your_refresh_token")
+# new_token.token         -> fresh access token
+# new_token.refresh_token -> new refresh token (old one is revoked)
 ```
 
 ### Context Manager
@@ -382,7 +398,7 @@ Same methods as `MouseBase`, all returning coroutines. Prefix each call with `aw
 | `ProjectKeyResponse` | `id: str`, `name: str`, `description: str`, `api_key: str`, `status: str`, `created_at: datetime` |
 | `ProjectResponse` | Same as `ProjectKeyResponse` but without `api_key` |
 | `ApiKeyResponse` | `project_id: str`, `api_key: str` |
-| `AuthResponse` | `token: str`, `user: UserResponse` |
+| `AuthResponse` | `token: str`, `refresh_token: str`, `user: UserResponse` |
 | `UserResponse` | `id: str`, `email: str`, `full_name: str`, `email_verified: bool`, `created_at: datetime` |
 
 ---
