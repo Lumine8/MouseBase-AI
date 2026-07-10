@@ -5,8 +5,8 @@ import SEO from "../components/SEO";
 import { SkeletonLine } from "../components/Skeleton";
 
 const checks = [
-  { label: "API", endpoint: "/api/v1/health/" },
-  { label: "Dashboard", endpoint: "/api/v1/auth/me" },
+  { label: "API", endpoint: "https://api.mousebase.dev/" },
+  { label: "API v1", endpoint: "https://api.mousebase.dev/api/v1/payments/plans" },
 ];
 
 export default function Status() {
@@ -17,7 +17,7 @@ export default function Status() {
   useEffect(() => {
     checks.forEach((c, i) => {
       const start = performance.now();
-      fetch(c.endpoint, { method: "HEAD", signal: AbortSignal.timeout(10_000) })
+      fetch(c.endpoint, { method: "GET", signal: AbortSignal.timeout(10_000) })
         .then((res) => {
           setResults((prev) => {
             const next = [...prev];
