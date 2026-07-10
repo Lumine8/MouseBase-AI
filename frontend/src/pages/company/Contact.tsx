@@ -4,7 +4,7 @@ import SEO from "../../components/SEO";
 
 const channels = [
   { label: "GitHub", value: "github.com/Lumine8/MouseBase-AI", href: "https://github.com/Lumine8/MouseBase-AI", desc: "Source code, issues, feature requests" },
-  { label: "Twitter", value: "@AtlasThinksly", href: "https://x.com/AtlasThinksly", desc: "Product updates & announcements" },
+  { label: "Twitter", value: "@AtlasThinks", href: "https://x.com/AtlasThinks", desc: "Product updates & announcements" },
   { label: "npm", value: "npmjs.com/package/mousebase", href: "https://www.npmjs.com/package/mousebase", desc: "JavaScript SDK" },
   { label: "PyPI", value: "pypi.org/project/mousebase", href: "https://pypi.org/project/mousebase", desc: "Python SDK" },
 ];
