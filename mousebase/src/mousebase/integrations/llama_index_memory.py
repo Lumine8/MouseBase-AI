@@ -66,7 +66,9 @@ class MouseBaseChatMemory:
 
     @staticmethod
     def _message_to_dict(message: Any) -> dict[str, Any]:
-        role = str(message.role.value if hasattr(message.role, "value") else message.role)
+        role = str(
+            message.role.value if hasattr(message.role, "value") else message.role
+        )
         content = message.content if hasattr(message, "content") else str(message)
         extra = dict(getattr(message, "additional_kwargs", {}) or {})
         metadata: dict[str, Any] = {"role": role, **extra}

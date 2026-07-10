@@ -16,7 +16,10 @@ def index_documents(client: MouseBase, docs: list[dict]) -> list[str]:
         try:
             resp = client.remember(
                 content=doc["content"],
-                metadata={"title": doc.get("title", ""), "source": doc.get("source", "")},
+                metadata={
+                    "title": doc.get("title", ""),
+                    "source": doc.get("source", ""),
+                },
             )
             ids.append(resp.memory_id)
             print(f"  indexed: {doc.get('title', 'untitled')} -> {resp.memory_id}")
@@ -60,9 +63,21 @@ def main():
         return
 
     documents = [
-        {"title": "Python Overview", "content": "Python is a high-level, interpreted programming language known for its readability and versatility.", "source": "wiki"},
-        {"title": "MouseBase SDK", "content": "MouseBase provides a simple API for storing and searching memories with semantic embeddings.", "source": "docs"},
-        {"title": "RAG Pattern", "content": "Retrieval-Augmented Generation combines a retriever with an LLM to ground responses in external knowledge.", "source": "guide"},
+        {
+            "title": "Python Overview",
+            "content": "Python is a high-level, interpreted programming language known for its readability and versatility.",
+            "source": "wiki",
+        },
+        {
+            "title": "MouseBase SDK",
+            "content": "MouseBase provides a simple API for storing and searching memories with semantic embeddings.",
+            "source": "docs",
+        },
+        {
+            "title": "RAG Pattern",
+            "content": "Retrieval-Augmented Generation combines a retriever with an LLM to ground responses in external knowledge.",
+            "source": "guide",
+        },
     ]
 
     with MouseBase(api_key=api_key) as client:

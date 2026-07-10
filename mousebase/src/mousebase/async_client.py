@@ -39,8 +39,12 @@ class _AsyncProjects:
     def __init__(self, client: AsyncMouseBase):
         self._client = client
 
-    async def create(self, name: str, description: str | None = None) -> ProjectKeyResponse:
-        body = await self._client._request("POST", "/projects", json={"name": name, "description": description})
+    async def create(
+        self, name: str, description: str | None = None
+    ) -> ProjectKeyResponse:
+        body = await self._client._request(
+            "POST", "/projects", json={"name": name, "description": description}
+        )
         return ProjectKeyResponse.model_validate(body)
 
     async def list(self) -> list[ProjectKeyResponse]:
@@ -51,8 +55,14 @@ class _AsyncProjects:
         body = await self._client._request("GET", f"/projects/{project_id}")
         return ProjectKeyResponse.model_validate(body)
 
-    async def update(self, project_id: str, name: str | None = None, description: str | None = None) -> ProjectResponse:
-        body = await self._client._request("PATCH", f"/projects/{project_id}", json={"name": name, "description": description})
+    async def update(
+        self, project_id: str, name: str | None = None, description: str | None = None
+    ) -> ProjectResponse:
+        body = await self._client._request(
+            "PATCH",
+            f"/projects/{project_id}",
+            json={"name": name, "description": description},
+        )
         return ProjectResponse.model_validate(body)
 
     async def delete(self, project_id: str) -> None:
@@ -83,6 +93,7 @@ def _try_load_dotenv() -> None:
     if env_path.exists():
         try:
             from dotenv import load_dotenv
+
             load_dotenv(env_path, override=False)
         except Exception:
             pass
@@ -103,7 +114,9 @@ class AsyncMouseBase:
             raise MissingAPIKeyError()
 
         self.api_key = api_key
-        self.base_url = (base_url or os.getenv("MOUSEBASE_BASE_URL")) or DEFAULT_BASE_URL
+        self.base_url = (
+            base_url or os.getenv("MOUSEBASE_BASE_URL")
+        ) or DEFAULT_BASE_URL
         self.timeout = timeout
 
         self._client = httpx.AsyncClient(
@@ -189,7 +202,9 @@ class AsyncMouseBase:
     async def delete(self, memory_id: str) -> None:
         await self._request("DELETE", f"/memory/{memory_id}")
 
-    async def signup(self, email: str, password: str, full_name: str | None = None) -> AuthResponse:
+    async def signup(
+        self, email: str, password: str, full_name: str | None = None
+    ) -> AuthResponse:
         body = {"email": email, "password": password}
         if full_name is not None:
             body["full_name"] = full_name
@@ -202,7 +217,9 @@ class AsyncMouseBase:
         return AuthResponse.model_validate(data)
 
     async def refresh(self, refresh_token: str) -> RefreshResponse:
-        data = await self._request("POST", "/auth/refresh", json={"refresh_token": refresh_token})
+        data = await self._request(
+            "POST", "/auth/refresh", json={"refresh_token": refresh_token}
+        )
         return RefreshResponse.model_validate(data)
 
     async def verify_email(self, token: str) -> MessageResponse:
@@ -214,11 +231,15 @@ class AsyncMouseBase:
         return MessageResponse.model_validate(data)
 
     async def forgot_password(self, email: str) -> MessageResponse:
-        data = await self._request("POST", "/auth/forgot-password", json={"email": email})
+        data = await self._request(
+            "POST", "/auth/forgot-password", json={"email": email}
+        )
         return MessageResponse.model_validate(data)
 
     async def reset_password(self, token: str, password: str) -> MessageResponse:
-        data = await self._request("POST", "/auth/reset-password", json={"token": token, "password": password})
+        data = await self._request(
+            "POST", "/auth/reset-password", json={"token": token, "password": password}
+        )
         return MessageResponse.model_validate(data)
 
     async def list_sessions(self) -> list[SessionResponse]:

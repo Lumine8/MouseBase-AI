@@ -57,11 +57,13 @@ class MouseBaseMemory:
             if meta.get("session_id") != self.session_id:
                 continue
             role = meta.get("role", "user")
-            messages.append({
-                "role": role,
-                "content": result.content,
-                "timestamp": meta.get("timestamp", ""),
-            })
+            messages.append(
+                {
+                    "role": role,
+                    "content": result.content,
+                    "timestamp": meta.get("timestamp", ""),
+                }
+            )
 
         messages.sort(key=lambda m: m.get("timestamp", ""))
 

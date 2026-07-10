@@ -19,7 +19,9 @@ class SupportSystem:
     def __init__(self, client: MouseBase):
         self.client = client
 
-    def create_ticket(self, user_id: str, issue: str, priority: str = "medium") -> Optional[str]:
+    def create_ticket(
+        self, user_id: str, issue: str, priority: str = "medium"
+    ) -> Optional[str]:
         if priority not in PRIORITIES:
             print(f"Invalid priority: {priority}")
             return None
@@ -63,13 +65,15 @@ class SupportSystem:
             results = []
             for r in response.results:
                 if r.metadata.get("type") == "support_ticket":
-                    results.append({
-                        "ticket_id": r.id,
-                        "issue": r.content,
-                        "priority": r.metadata.get("priority", "unknown"),
-                        "status": r.metadata.get("status", "unknown"),
-                        "score": r.score,
-                    })
+                    results.append(
+                        {
+                            "ticket_id": r.id,
+                            "issue": r.content,
+                            "priority": r.metadata.get("priority", "unknown"),
+                            "status": r.metadata.get("status", "unknown"),
+                            "score": r.score,
+                        }
+                    )
             return results
         except MouseBaseError as e:
             print(f"Search failed: {e}")
@@ -80,14 +84,19 @@ class SupportSystem:
             response = self.client.search(user_id, top_k=top_k)
             history = []
             for r in response.results:
-                if r.external_id == user_id or r.metadata.get("type") == "support_ticket":
-                    history.append({
-                        "content": r.content,
-                        "type": r.metadata.get("type", "unknown"),
-                        "status": r.metadata.get("status", ""),
-                        "timestamp": r.metadata.get("created_at", ""),
-                        "score": r.score,
-                    })
+                if (
+                    r.external_id == user_id
+                    or r.metadata.get("type") == "support_ticket"
+                ):
+                    history.append(
+                        {
+                            "content": r.content,
+                            "type": r.metadata.get("type", "unknown"),
+                            "status": r.metadata.get("status", ""),
+                            "timestamp": r.metadata.get("created_at", ""),
+                            "score": r.score,
+                        }
+                    )
             return history
         except MouseBaseError as e:
             print(f"Failed to fetch customer history: {e}")
@@ -103,15 +112,21 @@ def main():
     with MouseBase(api_key=api_key) as client:
         support = SupportSystem(client)
 
-        ticket_id = support.create_ticket("cust_42", "Login returns 500 error after password reset.", "high")
+        ticket_id = support.create_ticket(
+            "cust_42", "Login returns 500 error after password reset.", "high"
+        )
 
         print("\nSearching for similar issues...")
         similar = support.find_similar_issues("login error after reset")
         for s in similar:
-            print(f"  [{s['ticket_id'][:8]}] ({s['priority']}, {s['status']}) {s['issue'][:60]}")
+            print(
+                f"  [{s['ticket_id'][:8]}] ({s['priority']}, {s['status']}) {s['issue'][:60]}"
+            )
 
         if ticket_id:
-            support.resolve_ticket(ticket_id, "Cleared session cache and reset auth token.")
+            support.resolve_ticket(
+                ticket_id, "Cleared session cache and reset auth token."
+            )
 
 
 if __name__ == "__main__":

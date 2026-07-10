@@ -69,9 +69,7 @@ class MouseBaseAgentMemory:
     # OpenAI Agents SDK Session protocol
     # ------------------------------------------------------------------
 
-    async def get_items(
-        self, limit: int | None = None
-    ) -> list[dict[str, Any]]:
+    async def get_items(self, limit: int | None = None) -> list[dict[str, Any]]:
         """Retrieve conversation history for this session.
 
         Uses MouseBase semantic search with a high ``top_k`` and filters
@@ -99,11 +97,13 @@ class MouseBaseAgentMemory:
             meta = result.metadata or {}
             if meta.get("session_id") != self.session_id:
                 continue
-            messages.append({
-                "role": meta.get("role", "user"),
-                "content": result.content,
-                "_ts": meta.get("timestamp", ""),
-            })
+            messages.append(
+                {
+                    "role": meta.get("role", "user"),
+                    "content": result.content,
+                    "_ts": meta.get("timestamp", ""),
+                }
+            )
 
         messages.sort(key=lambda m: m["_ts"])
         for m in messages:
@@ -164,11 +164,13 @@ class MouseBaseAgentMemory:
             meta = result.metadata or {}
             if meta.get("session_id") != self.session_id:
                 continue
-            candidates.append((
-                result.id,
-                result.content,
-                meta.get("timestamp", ""),
-            ))
+            candidates.append(
+                (
+                    result.id,
+                    result.content,
+                    meta.get("timestamp", ""),
+                )
+            )
 
         if not candidates:
             return None
@@ -238,11 +240,13 @@ class MouseBaseAgentMemory:
             meta = result.metadata or {}
             if meta.get("session_id") != thread_id:
                 continue
-            messages.append({
-                "role": meta.get("role", "user"),
-                "content": result.content,
-                "_ts": meta.get("timestamp", ""),
-            })
+            messages.append(
+                {
+                    "role": meta.get("role", "user"),
+                    "content": result.content,
+                    "_ts": meta.get("timestamp", ""),
+                }
+            )
 
         messages.sort(key=lambda m: m["_ts"])
         for m in messages:
@@ -282,10 +286,12 @@ class MouseBaseAgentMemory:
             meta = result.metadata or {}
             if meta.get("session_id") != thread_id:
                 continue
-            results.append({
-                "role": meta.get("role", "user"),
-                "content": result.content,
-            })
+            results.append(
+                {
+                    "role": meta.get("role", "user"),
+                    "content": result.content,
+                }
+            )
 
         return results
 
@@ -313,8 +319,10 @@ class MouseBaseAgentMemory:
         for result in resp.results:
             meta = result.metadata or {}
             if meta.get("session_id") == session_id:
+
                 def _delete(mid=result.id):
                     client.delete(mid)
+
                 try:
                     await asyncio.to_thread(_delete)
                 except Exception:

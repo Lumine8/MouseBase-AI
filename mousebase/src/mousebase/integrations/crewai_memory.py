@@ -108,9 +108,7 @@ class MouseBaseMemory:
 
         client = self._lazy_client()
 
-        text_query = (
-            metadata_filter.pop("query", None) if metadata_filter else None
-        )
+        text_query = metadata_filter.pop("query", None) if metadata_filter else None
 
         if text_query:
             scope_part = f"{scope_prefix} " if scope_prefix else ""
@@ -180,16 +178,13 @@ class MouseBaseMemory:
                 ):
                     continue
                 if metadata_filter:
-                    if not all(
-                        meta.get(k) == v for k, v in metadata_filter.items()
-                    ):
+                    if not all(meta.get(k) == v for k, v in metadata_filter.items()):
                         continue
                 score = _cosine_similarity(query_embedding, emb)
                 if score < min_score:
                     continue
                 record = MemoryRecord(
-                    id=(hit.external_id or "").replace(f"{es}:", "")
-                    or hit.id,
+                    id=(hit.external_id or "").replace(f"{es}:", "") or hit.id,
                     content=hit.content,
                     scope=meta.pop("_scope", "/"),
                     categories=meta.pop("_categories", []),
@@ -328,8 +323,7 @@ class MouseBaseMemory:
                 break
             collected.append(
                 MemoryRecord(
-                    id=(hit.external_id or "").replace(f"{es}:", "")
-                    or hit.id,
+                    id=(hit.external_id or "").replace(f"{es}:", "") or hit.id,
                     content=hit.content,
                     scope=meta.pop("_scope", "/"),
                     categories=meta.pop("_categories", []),
@@ -347,12 +341,8 @@ class MouseBaseMemory:
         records = self.list_records(scope_prefix=scope, limit=1000)
         if not records:
             return ScopeInfo(path=scope)
-        categories = sorted(
-            {c for r in records for c in r.categories}
-        )
-        timestamps = [
-            r.created_at for r in records if r.created_at is not None
-        ]
+        categories = sorted({c for r in records for c in r.categories})
+        timestamps = [r.created_at for r in records if r.created_at is not None]
         return ScopeInfo(
             path=scope,
             record_count=len(records),
@@ -368,7 +358,7 @@ class MouseBaseMemory:
         for r in all_records:
             s = r.scope or "/"
             if s.startswith(parent) and s != parent:
-                remainder = s[len(parent):].strip("/")
+                remainder = s[len(parent) :].strip("/")
                 if "/" in remainder:
                     child = f"{parent.rstrip('/')}/{remainder.split('/')[0]}"
                 else:
@@ -376,13 +366,9 @@ class MouseBaseMemory:
                 scopes.add(child.rstrip("/") or "/")
         return sorted(scopes)[:limit] if (limit := 200) else sorted(scopes)
 
-    def list_categories(
-        self, scope_prefix: str | None = None
-    ) -> dict[str, int]:
+    def list_categories(self, scope_prefix: str | None = None) -> dict[str, int]:
         """List categories and their counts within a scope."""
-        records = self.list_records(
-            scope_prefix=scope_prefix, limit=5000
-        )
+        records = self.list_records(scope_prefix=scope_prefix, limit=5000)
         counts: dict[str, int] = {}
         for r in records:
             for c in r.categories:
@@ -392,14 +378,14 @@ class MouseBaseMemory:
     def count(self, scope_prefix: str | None = None) -> int:
         """Count records in scope (and subscopes)."""
         if scope_prefix:
-            return len(
-                self.list_records(scope_prefix=scope_prefix, limit=5000)
-            )
+            return len(self.list_records(scope_prefix=scope_prefix, limit=5000))
         client = self._lazy_client()
         response = client.search(self._external_id_prefix, top_k=1)
-        return response.results[0].metadata.get(
-            "_total", len(response.results)
-        ) if response.results else 0
+        return (
+            response.results[0].metadata.get("_total", len(response.results))
+            if response.results
+            else 0
+        )
 
     def reset(self, scope_prefix: str | None = None) -> None:
         """Reset (delete all) memories in scope."""
@@ -495,9 +481,7 @@ class MouseBaseMemory:
         ``score``.
         """
         client = self._lazy_client()
-        response = client.search(
-            f"{self._external_id_prefix} {query}", top_k=limit
-        )
+        response = client.search(f"{self._external_id_prefix} {query}", top_k=limit)
         return [
             {
                 "id": r.id,

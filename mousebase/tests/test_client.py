@@ -98,8 +98,12 @@ def test_error_codes(client: MouseBase, status, error_code, expected_exc):
 def test_retry_on_429_then_succeeds(client: MouseBase):
     route = respx.post(f"{BASE_URL}/remember/")
     route.side_effect = [
-        httpx.Response(429, json={"error": {"code": "rate_limited", "message": "Back off"}}),
-        httpx.Response(429, json={"error": {"code": "rate_limited", "message": "Back off"}}),
+        httpx.Response(
+            429, json={"error": {"code": "rate_limited", "message": "Back off"}}
+        ),
+        httpx.Response(
+            429, json={"error": {"code": "rate_limited", "message": "Back off"}}
+        ),
         httpx.Response(
             201,
             json={
@@ -170,6 +174,7 @@ def test_missing_api_key_async():
 @respx.mock
 def test_api_key_from_env():
     import os
+
     os.environ["MOUSEBASE_API_KEY"] = "from_env_key"
     c = MouseBase(base_url=BASE_URL, timeout=5)
     route = respx.post(f"{BASE_URL}/remember/").respond(
@@ -188,7 +193,9 @@ def test_api_key_from_env():
 
 @respx.mock
 def test_timeout_raises_clear_error(client: MouseBase):
-    respx.post(f"{BASE_URL}/remember/").mock(side_effect=httpx.TimeoutException("timed out"))
+    respx.post(f"{BASE_URL}/remember/").mock(
+        side_effect=httpx.TimeoutException("timed out")
+    )
     with pytest.raises(MouseBaseError, match="timed out"):
         client.remember(content="x")
 

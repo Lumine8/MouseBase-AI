@@ -45,11 +45,13 @@ class SessionMemory:
             messages = []
             for r in response.results:
                 if r.external_id == self.session_id:
-                    messages.append({
-                        "role": r.metadata.get("role", "unknown"),
-                        "content": r.content,
-                        "score": r.score,
-                    })
+                    messages.append(
+                        {
+                            "role": r.metadata.get("role", "unknown"),
+                            "content": r.content,
+                            "score": r.score,
+                        }
+                    )
             return messages
         except MouseBaseError as e:
             print(f"Failed to recall memories: {e}")
@@ -63,12 +65,17 @@ class SessionMemory:
             )
             conversation = []
             for r in response.results:
-                if r.external_id == self.session_id and r.metadata.get("role") in ("user", "assistant"):
-                    conversation.append({
-                        "role": r.metadata["role"],
-                        "content": r.content,
-                        "timestamp": r.metadata.get("timestamp", ""),
-                    })
+                if r.external_id == self.session_id and r.metadata.get("role") in (
+                    "user",
+                    "assistant",
+                ):
+                    conversation.append(
+                        {
+                            "role": r.metadata["role"],
+                            "content": r.content,
+                            "timestamp": r.metadata.get("timestamp", ""),
+                        }
+                    )
             conversation.sort(key=lambda m: m.get("timestamp", ""))
             return conversation
         except MouseBaseError as e:
@@ -103,7 +110,9 @@ class Agent:
 
     def get_session(self, session_id: str) -> SessionMemory:
         if session_id not in self.sessions:
-            self.sessions[session_id] = SessionMemory(self.client, session_id, self.name)
+            self.sessions[session_id] = SessionMemory(
+                self.client, session_id, self.name
+            )
         return self.sessions[session_id]
 
     def chat(self, session_id: str, user_message: str) -> str:

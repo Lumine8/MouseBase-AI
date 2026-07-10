@@ -18,12 +18,16 @@ class MissingAPIKeyError(MouseBaseError):
 
 
 class ValidationError(MouseBaseError):
-    def __init__(self, message: str, code: str = "validation_error", status_code: int = 400):
+    def __init__(
+        self, message: str, code: str = "validation_error", status_code: int = 400
+    ):
         super().__init__(message, code=code, status_code=status_code)
 
 
 class AuthenticationError(MouseBaseError):
-    def __init__(self, message: str, code: str = "invalid_api_key", status_code: int = 401):
+    def __init__(
+        self, message: str, code: str = "invalid_api_key", status_code: int = 401
+    ):
         super().__init__(message, code=code, status_code=status_code)
 
 
@@ -33,17 +37,26 @@ class ConflictError(MouseBaseError):
 
 
 class RateLimitError(MouseBaseError):
-    def __init__(self, message: str, code: str = "rate_limited", status_code: int = 429):
+    def __init__(
+        self, message: str, code: str = "rate_limited", status_code: int = 429
+    ):
         super().__init__(message, code=code, status_code=status_code)
 
 
 class EmbeddingProviderError(MouseBaseError):
-    def __init__(self, message: str, code: str = "embedding_provider_unavailable", status_code: int = 503):
+    def __init__(
+        self,
+        message: str,
+        code: str = "embedding_provider_unavailable",
+        status_code: int = 503,
+    ):
         super().__init__(message, code=code, status_code=status_code)
 
 
 class InternalError(MouseBaseError):
-    def __init__(self, message: str, code: str = "internal_error", status_code: int = 500):
+    def __init__(
+        self, message: str, code: str = "internal_error", status_code: int = 500
+    ):
         super().__init__(message, code=code, status_code=status_code)
 
 

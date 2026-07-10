@@ -14,7 +14,14 @@ from mousebase import MouseBase, MouseBaseError
 
 
 class Note:
-    def __init__(self, memory_id: str, title: str, body: str, tags: list[str], created_at: Optional[str] = None):
+    def __init__(
+        self,
+        memory_id: str,
+        title: str,
+        body: str,
+        tags: list[str],
+        created_at: Optional[str] = None,
+    ):
         self.memory_id = memory_id
         self.title = title
         self.body = body
@@ -40,7 +47,9 @@ class NotionApp:
     def __init__(self, client: MouseBase):
         self.client = client
 
-    def create_note(self, title: str, body: str, tags: list[str] | None = None) -> Optional[str]:
+    def create_note(
+        self, title: str, body: str, tags: list[str] | None = None
+    ) -> Optional[str]:
         try:
             resp = self.client.remember(
                 content=body,
@@ -65,7 +74,9 @@ class NotionApp:
             print(f"Search failed: {e}")
             return []
 
-    def update_note(self, memory_id: str, title: str | None = None, body: str | None = None) -> bool:
+    def update_note(
+        self, memory_id: str, title: str | None = None, body: str | None = None
+    ) -> bool:
         try:
             metadata = {}
             if title is not None:
@@ -96,9 +107,19 @@ def main():
     with MouseBase(api_key=api_key) as client:
         app = NotionApp(client)
 
-        app.create_note("AI Research", "Transformers have revolutionized NLP with attention mechanisms.", tags=["ai", "nlp"])
-        app.create_note("Shopping List", "Milk, eggs, bread, and avocados.", tags=["personal"])
-        app.create_note("Meeting Notes", "Q3 roadmap: focus on semantic search performance.", tags=["work", "meetings"])
+        app.create_note(
+            "AI Research",
+            "Transformers have revolutionized NLP with attention mechanisms.",
+            tags=["ai", "nlp"],
+        )
+        app.create_note(
+            "Shopping List", "Milk, eggs, bread, and avocados.", tags=["personal"]
+        )
+        app.create_note(
+            "Meeting Notes",
+            "Q3 roadmap: focus on semantic search performance.",
+            tags=["work", "meetings"],
+        )
 
         print("\nSearching for 'transformer attention'...")
         for note in app.search_notes("transformer attention"):
