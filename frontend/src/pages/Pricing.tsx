@@ -26,7 +26,9 @@ export default function Pricing() {
     const load = async () => {
       try {
         const p = await fetchJson<Plan[]>("/payments/plans");
-        if (p && p.length > 0) setPlans(p);
+        if (p && p.length > 0) {
+          setPlans(p.some((x) => x.price > 0) ? p : null);
+        }
       } catch {} finally {
         setLoading(false);
       }
