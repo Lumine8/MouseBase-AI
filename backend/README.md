@@ -1,35 +1,54 @@
-# MouseBase Python SDK
+# MouseBase Backend
+
+FastAPI server powering the MouseBase memory API.
 
 ## Quick Start
 
-### Sync
+### Prerequisites
 
-```python
-from mousebase import MouseBase
+- Python 3.12+
+- PostgreSQL 16+ with pgvector extension
+- An embedding provider API key (Gemini or OpenAI)
 
-client = MouseBase(api_key="mb_live_xxx")
-memory = client.remember("Sankar likes Python.")
-results = client.search("favorite language")
+### Setup
+
+```bash
+python -m venv .venv
+.venv\Scripts\activate
+pip install -e ".[dev]"
+
+# Copy and configure environment
+copy .env.example .env
+# Edit .env with your database URL and API keys
+
+# Run migrations
+alembic upgrade head
+
+# Start the server
+uvicorn app.main:app --reload
 ```
 
-### Async
+### Docker
 
-```python
-from mousebase import AsyncMouseBase
-
-async with AsyncMouseBase(api_key="mb_live_xxx") as client:
-    memory = await client.remember("Hello")
-    results = await client.search("favorite language")
+```bash
+docker compose up --build
 ```
 
-## Core Methods
+The API will be available at `http://localhost:8000`.
 
-- `remember(content, external_id=None, metadata=None)`
-- `search(query, top_k=10)`
-- `get_memory(memory_id)`
-- `update_memory(memory_id, content=None, external_id=None, metadata=None)`
-- `delete_memory(memory_id)`
+## Configuration
 
-`delete_memory()` returns `True` on success.
+Environment variables (see `.env.example`):
 
-`list_memories()` is reserved for a future list endpoint and currently raises `NotImplementedError`.
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `DATABASE_URL` | — | PostgreSQL connection string |
+| `SECRET_KEY` | — | JWT signing secret |
+| `GEMINI_API_KEY` | — | Google Gemini embedding key |
+| `OPENAI_API_KEY` | — | OpenAI embedding key |
+| `REDIS_URL` | `redis://localhost:6379/0` | Rate limiting store |
+| `FRONTEND_URL` | `http://localhost:5173` | CORS allowed origin |
+
+## API
+
+The server exposes a REST API at `/api/v1/`. See the OpenAPI docs at `/docs` when running.

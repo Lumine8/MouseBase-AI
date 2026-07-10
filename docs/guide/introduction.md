@@ -10,7 +10,7 @@ MouseBase is a managed memory service for AI applications. It lets you store tex
 
 - **No infrastructure to manage** — embeddings, vector storage, and search are handled for you
 - **Simple API** — one endpoint to remember, one to search
-- **Works with any stack** — Python SDK, REST API, JavaScript SDK (coming soon)
+- **Works with any stack** — Python SDK, TypeScript SDK, REST API
 - **Semantic search out of the box** — powered by Gemini or OpenAI embeddings
 
 ## How it works

@@ -84,7 +84,7 @@ const client = new MouseBase();
 // Option 3: Custom base URL and timeout
 const client = new MouseBase({
   apiKey: "mb_live_xxx",
-  baseUrl: "https://api.mousebase.ai/v1",
+  baseUrl: "https://api.mousebase.dev/v1",
   timeout: 60_000, // milliseconds (default: 30_000)
 });
 ```
@@ -92,7 +92,7 @@ const client = new MouseBase({
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `apiKey` | `string` | `process.env.MOUSEBASE_API_KEY` | API key |
-| `baseUrl` | `string` | `process.env.MOUSEBASE_BASE_URL` or `https://api.mousebase.ai/v1` | API base URL |
+| `baseUrl` | `string` | `process.env.MOUSEBASE_BASE_URL` or `https://api.mousebase.dev/v1` | API base URL |
 | `timeout` | `number` | `30_000` | Request timeout in milliseconds |
 
 ### Environment Variables

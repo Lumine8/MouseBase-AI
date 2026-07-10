@@ -50,7 +50,7 @@ print(result.memory_id, result.created_at)
 ## cURL
 
 ```bash
-curl -X POST https://api.mousebase.ai/v1/remember/ \
+curl -X POST https://api.mousebase.dev/v1/remember/ \
   -H "Authorization: Bearer $MOUSEBASE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"content": "User clicked settings", "metadata": {"source": "clickstream"}}'

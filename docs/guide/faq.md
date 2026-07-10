@@ -14,7 +14,7 @@ MouseBase supports both Gemini and OpenAI embeddings. The active model is config
 
 ## Is there a JavaScript SDK?
 
-Coming soon.
+Yes. Install with `npm install mousebase`. See the [JavaScript SDK guide](/guide/js-sdk).
 
 ## Do you offer self-hosting?
 

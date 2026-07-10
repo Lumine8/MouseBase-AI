@@ -874,7 +874,7 @@ client.close()
 | Env Variable | Default | Description |
 |--------------|---------|-------------|
 | \`MOUSEBASE_API_KEY\` | — | Your API key (required) |
-| \`MOUSEBASE_BASE_URL\` | \`https://api.mousebase.ai/v1\` | Custom server URL |
+| \`MOUSEBASE_BASE_URL\` | \`https://api.mousebase.dev/v1\` | Custom server URL |
 
 The SDK also auto-loads from a \`.env\` file if \`python-dotenv\` is installed.`
   },
@@ -896,7 +896,7 @@ client = MouseBase()
 # Custom server URL and timeout
 client = MouseBase(
     api_key="mb_live_xxx",
-    base_url="https://api.mousebase.ai/v1",
+    base_url="https://api.mousebase.dev/v1",
     timeout=60
 )
 \`\`\`
@@ -1440,7 +1440,7 @@ await client.delete("mem_abc123");
 | Env Variable | Default | Description |
 |--------------|---------|-------------|
 | \`MOUSEBASE_API_KEY\` | — | Your API key (required) |
-| \`MOUSEBASE_BASE_URL\` | \`https://api.mousebase.ai/v1\` | Custom server URL |
+| \`MOUSEBASE_BASE_URL\` | \`https://api.mousebase.dev/v1\` | Custom server URL |
 
 The SDK also auto-loads from a \`.env\` file if \`dotenv\` is installed.`
   },
@@ -1462,7 +1462,7 @@ const client = new MouseBase();
 // Custom server URL and timeout
 const client = new MouseBase({
   apiKey: "mb_live_xxx",
-  baseUrl: "https://api.mousebase.ai/v1",
+  baseUrl: "https://api.mousebase.dev/v1",
   timeout: 60_000
 });
 \`\`\`
@@ -1581,7 +1581,7 @@ import { MouseBaseBrowser } from "mousebase/browser";
 
 const client = new MouseBaseBrowser({
   token: "jwt_token_here",
-  baseUrl: "https://api.mousebase.ai/v1"
+  baseUrl: "https://api.mousebase.dev/v1"
 });
 \`\`\`
 

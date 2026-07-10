@@ -9,7 +9,7 @@ import type {
 } from "./types";
 import { MouseBaseError, translateError } from "./errors";
 
-const DEFAULT_BASE_URL = "https://api.mousebase.ai/v1";
+const DEFAULT_BASE_URL = "https://api.mousebase.dev/v1";
 const DEFAULT_TIMEOUT = 30_000;
 
 export class MouseBaseBrowser {

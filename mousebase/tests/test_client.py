@@ -15,7 +15,7 @@ from mousebase import (
     ValidationError,
 )
 
-BASE_URL = "https://api.mousebase.ai/v1"
+BASE_URL = "https://api.mousebase.dev/v1"
 API_KEY = "mb_live_test_key_abc123"
 
 

@@ -1,7 +1,7 @@
 import type { RememberOptions, RememberResponse, SearchOptions, SearchResponse, MemoryResponse, UpdateOptions } from "../types.js";
 import { MouseBaseError, translateError } from "../errors.js";
 
-const DEFAULT_BASE_URL = "https://api.mousebase.ai/v1";
+const DEFAULT_BASE_URL = "https://api.mousebase.dev/v1";
 const DEFAULT_TIMEOUT = 30_000;
 
 export interface CloudflareEnv {

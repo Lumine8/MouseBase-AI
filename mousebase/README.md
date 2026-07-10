@@ -325,7 +325,7 @@ Retry strategy: exponential backoff (1s → 2s → 4s → max 10s), up to 3 atte
 | Variable | Default | Description |
 |---|---|---|
 | `MOUSEBASE_API_KEY` | — | Your API key (required if not passed directly) |
-| `MOUSEBASE_BASE_URL` | `https://api.mousebase.ai/v1` | Custom server URL |
+| `MOUSEBASE_BASE_URL` | `https://api.mousebase.dev/v1` | Custom server URL |
 
 ### Client Constructor
 
