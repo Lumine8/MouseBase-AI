@@ -473,7 +473,7 @@ class MouseBaseMemory:
             external_id=self._external_id_prefix,
             metadata=meta,
         )
-        return resp.id
+        return resp.memory_id
 
     def query(
         self,

@@ -22,7 +22,11 @@ import {
   FiPlus,
   FiSearch,
   FiStar,
+  FiTrash2,
+  FiDownload,
+  FiInfo,
 } from "react-icons/fi";
+import { SkeletonMetricsGrid, SkeletonProjectGrid, SkeletonLine } from "../components/Skeleton";
 
 function formatNum(n: number): string {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
@@ -49,24 +53,20 @@ export default function Dashboard() {
 
   useEffect(() => {
     const load = async () => {
-      try {
-        if (localStorage.getItem("mb_token")) {
-          const u = await auth.me();
-          setUser(u);
-        }
-        const [p, m, a, s] = await Promise.all([
-          api.projects.list(),
-          dashboard.metrics(),
-          dashboard.analytics(),
-          payments.getSubscription().catch(() => null),
-        ]);
-        setProjects(p);
-        setMetrics(m);
-        setAnalytics(a);
-        setSubscription(s);
-      } catch {} finally {
-        setLoading(false);
+      if (localStorage.getItem("mb_token")) {
+        auth.me().then(setUser).catch(() => {});
       }
+      const results = await Promise.allSettled([
+        api.projects.list(),
+        dashboard.metrics(),
+        dashboard.analytics(),
+        payments.getSubscription(),
+      ]);
+      if (results[0].status === "fulfilled") setProjects(results[0].value);
+      if (results[1].status === "fulfilled") setMetrics(results[1].value);
+      if (results[2].status === "fulfilled") setAnalytics(results[2].value);
+      if (results[3].status === "fulfilled") setSubscription(results[3].value);
+      setLoading(false);
     };
     load();
   }, []);
@@ -113,24 +113,26 @@ export default function Dashboard() {
       <div className="page-header">
         <div className="page-header-left">
           <h1>Welcome{user?.full_name ? `, ${user.full_name}` : " back"}.</h1>
-          <p>{projects.length} project{projects.length !== 1 ? "s" : ""}</p>
+          {loading ? <SkeletonLine width="120px" /> : <p>{projects.length} project{projects.length !== 1 ? "s" : ""}</p>}
         </div>
       </div>
 
-      <div className="metrics-grid">
-        {metricCards.map((m) => {
-          const Icon = m.icon;
-          return (
-            <div key={m.label} className="metric-card">
-              <div className="metric-card-header">
-                <div className={`metric-card-icon ${m.color}`}><Icon /></div>
+      {loading ? <SkeletonMetricsGrid /> : (
+        <div className="metrics-grid">
+          {metricCards.map((m) => {
+            const Icon = m.icon;
+            return (
+              <div key={m.label} className="metric-card">
+                <div className="metric-card-header">
+                  <div className={`metric-card-icon ${m.color}`}><Icon /></div>
+                </div>
+                <div className="metric-card-value">{m.value}</div>
+                <div className="metric-card-label">{m.label}</div>
               </div>
-              <div className="metric-card-value">{m.value}</div>
-              <div className="metric-card-label">{m.label}</div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
 
       {planLimits.length > 0 && (
         <div style={{ marginTop: 32 }}>
@@ -216,7 +218,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {!loading && projects.length > 0 && (
+      {loading ? <SkeletonProjectGrid /> : projects.length > 0 ? (
         <div style={{ marginTop: 32 }}>
           <div className="page-header" style={{ marginBottom: 16 }}>
             <div className="page-header-left">
@@ -240,9 +242,7 @@ export default function Dashboard() {
             ))}
           </div>
         </div>
-      )}
-
-      {!loading && projects.length === 0 && (
+      ) : (
         <div style={{ marginTop: 32 }}>
           <div className="empty-state">
             <div className="empty-state-icon"><FiDatabase /></div>
@@ -258,6 +258,26 @@ export default function Dashboard() {
           </div>
         </div>
       )}
+
+      {/* Privacy actions */}
+      <div style={{ marginTop: 32 }}>
+        <div className="page-header" style={{ marginBottom: 16 }}>
+          <div className="page-header-left">
+            <h1>Data & Privacy</h1>
+          </div>
+        </div>
+        <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+          <button onClick={() => navigate("/privacy/export")} className="btn-secondary" style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <FiDownload /> Export My Data
+          </button>
+          <button onClick={() => navigate("/privacy/deletion")} className="btn-secondary" style={{ display: "flex", alignItems: "center", gap: 8, color: "#ef4444" }}>
+            <FiTrash2 /> Request Deletion
+          </button>
+          <button onClick={() => navigate("/privacy/retention")} className="btn-secondary" style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <FiInfo /> Data Retention
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

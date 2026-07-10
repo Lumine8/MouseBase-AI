@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { FiCopy, FiCheck, FiExternalLink } from "react-icons/fi";
 import { auth, projects, Project } from "../lib/api";
 import PublicNav from "../components/PublicNav";
+import SEO from "../components/SEO";
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -63,6 +64,11 @@ export default function Signup() {
 
   return (
     <div className="login-page" style={{ flexDirection: "column" }}>
+      <SEO
+        title="Create Account"
+        description="Sign up for MouseBase — persistent memory for AI agents. Get your API key and start building in minutes."
+        path="/signup"
+      />
       <PublicNav />
       <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", width: "100%" }}>
       <div className="login-box">

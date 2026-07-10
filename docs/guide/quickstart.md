@@ -4,7 +4,7 @@ Get your first memory stored in 30 seconds.
 
 ## 1. Get an API key
 
-Sign up at [app.mousebase.ai](https://app.mousebase.ai) and create a project. Copy the API key.
+Sign up at [app.mousebase.dev](https://app.mousebase.dev) and create a project. Copy the API key.
 
 ## 2. Install the SDK
 

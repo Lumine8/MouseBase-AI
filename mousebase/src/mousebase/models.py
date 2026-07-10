@@ -6,12 +6,8 @@ from pydantic import BaseModel, Field
 
 
 class RememberResponse(BaseModel):
-    id: str
-    external_id: str | None = None
-    content: str
-    metadata: dict[str, Any] = Field(default_factory=dict)
+    memory_id: str
     created_at: datetime
-    updated_at: datetime
 
 
 class SearchResult(BaseModel):

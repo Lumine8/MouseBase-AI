@@ -52,7 +52,7 @@ class NotionApp:
                 },
             )
             print(f"Created note: {title}")
-            return resp.id
+            return resp.memory_id
         except MouseBaseError as e:
             print(f"Failed to create note: {e}")
             return None

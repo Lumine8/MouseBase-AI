@@ -6,6 +6,8 @@ import {
   FiLayers
 } from "react-icons/fi";
 import PublicNav from "../components/PublicNav";
+import Footer from "../components/Footer";
+import SEO from "../components/SEO";
 
 export default function Landing() {
   const navigate = useNavigate();
@@ -110,8 +112,30 @@ export default function Landing() {
     { icon: FiHardDrive, title: "AI Agent", desc: "Give your agent persistent memory across long-running tasks, tool calls, and multi-turn reasoning." },
   ];
 
+  const softwareSchema = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "MouseBase",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Linux, macOS, Windows",
+    "description": "Persistent memory infrastructure for AI agents. Store, search, and retrieve semantic memories with a simple API.",
+    "url": "https://mousebase.dev",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD",
+      "description": "Free tier available"
+    }
+  };
+
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg-base)", position: "relative", overflow: "hidden" }}>
+      <SEO
+        title="Persistent Memory for AI Agents"
+        description="MouseBase gives your AI agents persistent memory. Store, search, and retrieve long-term context with a simple API. Python SDK, REST API, and self-hosted."
+        path="/"
+        jsonLd={softwareSchema}
+      />
       {/* Animated BG */}
       <canvas ref={canvasRef} style={{ position: "fixed", inset: 0, zIndex: 0, pointerEvents: "none" }} />
 
@@ -146,7 +170,7 @@ export default function Landing() {
 
         {/* Install snippet */}
         <div style={{
-          marginTop: 24, width: "100%", maxWidth: 380,
+          marginTop: 24, width: "100%", maxWidth: 420,
           background: "#000", border: "1px solid var(--border-default)",
           borderRadius: 12, overflow: "hidden", textAlign: "left",
           boxShadow: "0 8px 32px rgba(0,0,0,0.4)"
@@ -157,8 +181,11 @@ export default function Landing() {
             <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#27C93F" }} />
             <span style={{ fontSize: 11, color: "var(--text-muted)", marginLeft: 6, fontFamily: "'JetBrains Mono',monospace" }}>terminal</span>
           </div>
-          <pre style={{ padding: "12px 16px", fontSize: 13, lineHeight: 1.6, margin: 0, color: "#e4e4e4" }}>
+          <pre style={{ padding: "12px 16px", fontSize: 13, lineHeight: 1.8, margin: 0, color: "#e4e4e4" }}>
             <code style={{ fontFamily: "'JetBrains Mono',monospace" }}><span style={{ color: "#98C379" }}>$</span> pip install mousebase</code>
+          </pre>
+          <pre style={{ padding: "0 16px 12px", fontSize: 13, lineHeight: 1.8, margin: 0, color: "#e4e4e4", borderTop: "1px solid var(--border-default)" }}>
+            <code style={{ fontFamily: "'JetBrains Mono',monospace" }}><span style={{ color: "#98C379" }}>$</span> npm install mousebase</code>
           </pre>
         </div>
 
@@ -404,20 +431,7 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer style={{
-        borderTop: "1px solid var(--border-default)", padding: "24px 28px",
-        display: "flex", alignItems: "center", justifyContent: "space-between",
-        maxWidth: 1100, margin: "0 auto", flexWrap: "wrap", gap: 16,
-        position: "relative", zIndex: 1, fontSize: 13, color: "var(--text-muted)"
-      }}>
-        <span>MouseBase — Persistent Memory for AI Applications</span>
-        <div style={{ display: "flex", gap: 20 }}>
-          <a href="/docs" style={{ color: "var(--text-muted)", textDecoration: "none" }}>Documentation</a>
-          <a href="https://github.com/anomalyco/MouseBase" target="_blank" rel="noopener noreferrer" style={{ color: "var(--text-muted)", textDecoration: "none" }}>GitHub</a>
-          <a href="https://pypi.org/project/mousebase/" target="_blank" rel="noopener noreferrer" style={{ color: "var(--text-muted)", textDecoration: "none" }}>PyPI</a>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

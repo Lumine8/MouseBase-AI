@@ -13,6 +13,26 @@ import Settings from "./pages/Settings";
 import Landing from "./pages/Landing";
 import Pricing from "./pages/Pricing";
 import Billing from "./pages/Billing";
+import NotFound from "./pages/NotFound";
+import Blog from "./pages/Blog";
+import Status from "./pages/Status";
+import Changelog from "./pages/Changelog";
+import Roadmap from "./pages/Roadmap";
+import TrustCenter from "./pages/TrustCenter";
+import RefundPolicy from "./pages/RefundPolicy";
+import DataDeletion from "./pages/DataDeletion";
+import ExportData from "./pages/ExportData";
+import DataRetention from "./pages/DataRetention";
+import Privacy from "./pages/legal/Privacy";
+import Terms from "./pages/legal/Terms";
+import Cookies from "./pages/legal/Cookies";
+import AUP from "./pages/legal/AUP";
+import DPA from "./pages/legal/DPA";
+import Security from "./pages/legal/Security";
+import Subprocessors from "./pages/legal/Subprocessors";
+import About from "./pages/company/About";
+import Contact from "./pages/company/Contact";
+import Careers from "./pages/company/Careers";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
 
@@ -59,21 +79,49 @@ function GuestRoute({ children }: { children: React.ReactNode }) {
 export default function App() {
   return (
     <Routes>
+      {/* Public */}
       <Route path="/" element={<Landing />} />
       <Route path="/pricing" element={<Pricing />} />
       <Route path="/login" element={<GuestRoute><Login /></GuestRoute>} />
       <Route path="/signup" element={<GuestRoute><Signup /></GuestRoute>} />
+      <Route path="/docs" element={<Documentation />} />
+      <Route path="/docs/:section" element={<Documentation />} />
+      <Route path="/blog" element={<Blog />} />
+      <Route path="/status" element={<Status />} />
+      <Route path="/changelog" element={<Changelog />} />
+      <Route path="/roadmap" element={<Roadmap />} />
+      <Route path="/trust" element={<TrustCenter />} />
+      <Route path="/refund" element={<RefundPolicy />} />
+      <Route path="/about" element={<About />} />
+      <Route path="/contact" element={<Contact />} />
+      <Route path="/careers" element={<Careers />} />
+
+      {/* Legal */}
+      <Route path="/legal/privacy" element={<Privacy />} />
+      <Route path="/legal/terms" element={<Terms />} />
+      <Route path="/legal/cookies" element={<Cookies />} />
+      <Route path="/legal/aup" element={<AUP />} />
+      <Route path="/legal/dpa" element={<DPA />} />
+      <Route path="/legal/security" element={<Security />} />
+      <Route path="/legal/subprocessors" element={<Subprocessors />} />
+
+      {/* Privacy tools */}
+      <Route path="/privacy/deletion" element={<DataDeletion />} />
+      <Route path="/privacy/export" element={<ExportData />} />
+      <Route path="/privacy/retention" element={<DataRetention />} />
+
+      {/* Protected */}
       <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
       <Route path="/projects" element={<ProtectedRoute><Projects /></ProtectedRoute>} />
       <Route path="/projects/:id" element={<ProtectedRoute><ProjectDetail /></ProtectedRoute>} />
       <Route path="/playground" element={<ProtectedRoute><Playground /></ProtectedRoute>} />
       <Route path="/search" element={<ProtectedRoute><SearchPage /></ProtectedRoute>} />
-      <Route path="/docs" element={<Documentation />} />
-      <Route path="/docs/:section" element={<Documentation />} />
       <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
       <Route path="/billing" element={<ProtectedRoute><Billing /></ProtectedRoute>} />
       <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-      <Route path="*" element={<Navigate to={hasAuth() ? "/dashboard" : "/"} replace />} />
+
+      {/* 404 */}
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 }

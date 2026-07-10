@@ -37,18 +37,13 @@ def test_remember_success(client: MouseBase):
     route = respx.post(f"{BASE_URL}/remember/").respond(
         201,
         json={
-            "id": "550e8400-e29b-41d4-a716-446655440000",
-            "external_id": None,
-            "content": "Hello world",
-            "metadata": {},
+            "memory_id": "550e8400-e29b-41d4-a716-446655440000",
             "created_at": "2026-07-09T12:00:00Z",
-            "updated_at": "2026-07-09T12:00:00Z",
         },
     )
     result = client.remember(content="Hello world")
     assert route.called
-    assert result.id == "550e8400-e29b-41d4-a716-446655440000"
-    assert result.content == "Hello world"
+    assert result.memory_id == "550e8400-e29b-41d4-a716-446655440000"
     assert result.created_at == datetime(2026, 7, 9, 12, 0, 0, tzinfo=timezone.utc)
 
 
@@ -57,12 +52,8 @@ def test_remember_with_metadata(client: MouseBase):
     route = respx.post(f"{BASE_URL}/remember/").respond(
         201,
         json={
-            "id": "550e8400-e29b-41d4-a716-446655440000",
-            "external_id": "ext_1",
-            "content": "Hello",
-            "metadata": {"source": "test"},
+            "memory_id": "550e8400-e29b-41d4-a716-446655440000",
             "created_at": "2026-07-09T12:00:00Z",
-            "updated_at": "2026-07-09T12:00:00Z",
         },
     )
     client.remember(content="Hello", external_id="ext_1", metadata={"source": "test"})
@@ -110,17 +101,13 @@ def test_retry_on_429_then_succeeds(client: MouseBase):
         httpx.Response(
             201,
             json={
-                "id": "550e8400-e29b-41d4-a716-446655440000",
-                "external_id": None,
-                "content": "x",
-                "metadata": {},
+                "memory_id": "550e8400-e29b-41d4-a716-446655440000",
                 "created_at": "2026-07-09T12:00:00Z",
-                "updated_at": "2026-07-09T12:00:00Z",
             },
         ),
     ]
     result = client.remember(content="x")
-    assert result.id == "550e8400-e29b-41d4-a716-446655440000"
+    assert result.memory_id == "550e8400-e29b-41d4-a716-446655440000"
     assert route.call_count == 3
 
 
@@ -155,17 +142,13 @@ def test_retry_on_network_error(client: MouseBase):
         httpx.Response(
             201,
             json={
-                "id": "550e8400-e29b-41d4-a716-446655440000",
-                "external_id": None,
-                "content": "x",
-                "metadata": {},
+                "memory_id": "550e8400-e29b-41d4-a716-446655440000",
                 "created_at": "2026-07-09T12:00:00Z",
-                "updated_at": "2026-07-09T12:00:00Z",
             },
         ),
     ]
     result = client.remember(content="x")
-    assert result.id == "550e8400-e29b-41d4-a716-446655440000"
+    assert result.memory_id == "550e8400-e29b-41d4-a716-446655440000"
     assert route.call_count == 2
 
 
@@ -190,12 +173,8 @@ def test_api_key_from_env():
     route = respx.post(f"{BASE_URL}/remember/").respond(
         201,
         json={
-            "id": "550e8400-e29b-41d4-a716-446655440000",
-            "external_id": None,
-            "content": "x",
-            "metadata": {},
+            "memory_id": "550e8400-e29b-41d4-a716-446655440000",
             "created_at": "2026-07-09T12:00:00Z",
-            "updated_at": "2026-07-09T12:00:00Z",
         },
     )
     c.remember(content="x")
@@ -221,16 +200,12 @@ def test_context_manager_closes_client():
         respx.post(f"{BASE_URL}/remember/").respond(
             201,
             json={
-                "id": "550e8400-e29b-41d4-a716-446655440000",
-                "external_id": None,
-                "content": "x",
-                "metadata": {},
+                "memory_id": "550e8400-e29b-41d4-a716-446655440000",
                 "created_at": "2026-07-09T12:00:00Z",
-                "updated_at": "2026-07-09T12:00:00Z",
             },
         )
         result = c.remember(content="x")
-        assert result.id is not None
+        assert result.memory_id is not None
     assert c._client.is_closed
 
 
@@ -315,17 +290,13 @@ async def test_async_remember(async_client: AsyncMouseBase):
     route = respx.post(f"{BASE_URL}/remember/").respond(
         201,
         json={
-            "id": "550e8400-e29b-41d4-a716-446655440000",
-            "external_id": None,
-            "content": "Hello",
-            "metadata": {},
+            "memory_id": "550e8400-e29b-41d4-a716-446655440000",
             "created_at": "2026-07-09T12:00:00Z",
-            "updated_at": "2026-07-09T12:00:00Z",
         },
     )
     result = await async_client.remember(content="Hello")
     assert route.called
-    assert result.id == "550e8400-e29b-41d4-a716-446655440000"
+    assert result.memory_id == "550e8400-e29b-41d4-a716-446655440000"
 
 
 @pytest.mark.asyncio
@@ -335,14 +306,10 @@ async def test_async_context_manager():
         respx.post(f"{BASE_URL}/remember/").respond(
             201,
             json={
-                "id": "550e8400-e29b-41d4-a716-446655440000",
-                "external_id": None,
-                "content": "x",
-                "metadata": {},
+                "memory_id": "550e8400-e29b-41d4-a716-446655440000",
                 "created_at": "2026-07-09T12:00:00Z",
-                "updated_at": "2026-07-09T12:00:00Z",
             },
         )
         result = await c.remember(content="x")
-        assert result.id is not None
+        assert result.memory_id is not None
     assert c._client.is_closed

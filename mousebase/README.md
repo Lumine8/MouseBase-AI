@@ -12,7 +12,7 @@
   <b>Python SDK</b> · <a href="https://www.npmjs.com/package/mousebase">TypeScript SDK →</a>
 </p>
 
-Official Python SDK for [MouseBase](https://mousebase.ai) — persistent memory infrastructure for AI applications.
+Official Python SDK for [MouseBase](https://mousebase.dev) — persistent memory infrastructure for AI applications.
 
 Store, retrieve, and semantically search memories using vector embeddings. Works with any LLM or AI agent.
 

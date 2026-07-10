@@ -1,5 +1,6 @@
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import PublicNav from "../components/PublicNav";
+import SEO from "../components/SEO";
 
 const groups = [
   {
@@ -456,7 +457,7 @@ result = client.remember(
     external_id="user_123",
     metadata={"source": "chat", "importance": "high"}
 )
-print(f"Stored: {result.id}")
+print(f"Stored: {result.memory_id}")
 # Stored: mem_abc123
 \`\`\`
 
@@ -853,7 +854,7 @@ result = client.remember(
     content="User prefers dark mode in their IDE.",
     metadata={"source": "preferences"}
 )
-print(f"Stored: {result.id}")
+print(f"Stored: {result.memory_id}")
 
 # Search semantically
 results = client.search("What theme does the user like?", top_k=5)
@@ -911,7 +912,7 @@ result = client.remember(
     external_id="user_789",
     metadata={"source": "onboarding", "step": 5}
 )
-# result.id -> "mem_abc123"
+# result.memory_id -> "mem_abc123"
 # result.created_at -> datetime
 \`\`\`
 
@@ -972,7 +973,7 @@ async def main():
     client = AsyncMouseBase(api_key="mb_live_xxx")
 
     result = await client.remember("Async memory")
-    print(f"Stored: {result.id}")
+    print(f"Stored: {result.memory_id}")
 
     results = await client.search("test", top_k=5)
     for r in results.results:
@@ -1201,12 +1202,8 @@ except MouseBaseError as e:
 
 \`\`\`
 RememberResponse:
-  id:           str
-  external_id:  str | None
-  content:      str
-  metadata:     dict
-  created_at:   datetime
-  updated_at:   datetime
+  memory_id:  str
+  created_at: datetime
 
 MemoryResponse:
   id:          str
@@ -1373,7 +1370,7 @@ async def shutdown():
 @app.post("/remember")
 async def remember(content: str):
     result = await app.state.mousebase.remember(content)
-    return {"memory_id": result.id}
+    return {"memory_id": result.memory_id}
 \`\`\``
   },
   "js-installation": {
@@ -1823,8 +1820,31 @@ export default function Documentation() {
   const active = section && flat.some((s) => s.id === section) ? section : "getting-started";
   const page = content[active];
 
+  const docTitle = page ? page.title : "Documentation";
+  const isFaq = active === "faq";
+
+  const faqSchema = isFaq ? {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      { "@type": "Question", "name": "What is MouseBase?", "acceptedAnswer": { "@type": "Answer", "text": "MouseBase is persistent memory infrastructure for AI agents. It lets you store, retrieve, and semantically search memories using vector embeddings." } },
+      { "@type": "Question", "name": "How is it different from a database?", "acceptedAnswer": { "@type": "Answer", "text": "Unlike a traditional database that matches exact keywords, MouseBase uses semantic search powered by vector embeddings. It finds memories by meaning, not exact matches." } },
+      { "@type": "Question", "name": "What embedding provider do you use?", "acceptedAnswer": { "@type": "Answer", "text": "MouseBase supports both Google Gemini and OpenAI embeddings. Configure either via environment variables." } },
+      { "@type": "Question", "name": "Can I self-host?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. MouseBase is designed for self-hosting. The Docker image includes everything you need." } },
+      { "@type": "Question", "name": "What database do you use?", "acceptedAnswer": { "@type": "Answer", "text": "PostgreSQL with the pgvector extension. This gives you the reliability of PostgreSQL with vector search capabilities." } },
+      { "@type": "Question", "name": "Do you have a Python SDK?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Install with pip install mousebase." } },
+      { "@type": "Question", "name": "Where can I get help?", "acceptedAnswer": { "@type": "Answer", "text": "Open an issue on GitHub or check the documentation." } }
+    ]
+  } : undefined;
+
   return (
     <div>
+      <SEO
+        title={docTitle}
+        description={`MouseBase documentation — ${page ? page.body.split("\n")[0].replace(/[#*`]/g, "").trim() : "Learn how to use MouseBase persistent memory for AI agents."}`}
+        path={active === "getting-started" ? "/docs" : `/docs/${active}`}
+        jsonLd={faqSchema}
+      />
       {!inApp && <PublicNav />}
       <div className="page doc-layout" style={{ paddingTop: inApp ? 0 : 80 }}>
       <aside className="doc-sidebar">

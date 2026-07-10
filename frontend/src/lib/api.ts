@@ -11,6 +11,8 @@ class ApiError extends Error {
   }
 }
 
+const TIMEOUT_MS = 10_000;
+
 async function request<T>(
   method: string,
   path: string,
@@ -37,11 +39,16 @@ async function request<T>(
     }
   }
 
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+
   const res = await fetch(`${BASE_URL}${path}`, {
     method,
     headers,
     body: body ? JSON.stringify(body) : undefined,
+    signal: controller.signal,
   });
+  clearTimeout(timer);
 
   if (res.status === 204) {
     return undefined as T;
@@ -86,12 +93,8 @@ export interface UpdateProjectRequest {
 }
 
 export interface RememberResponse {
-  id: string;
-  external_id: string | null;
-  content: string;
-  metadata: Record<string, unknown>;
+  memory_id: string;
   created_at: string;
-  updated_at: string;
 }
 
 export interface RememberRequest {

@@ -32,7 +32,7 @@ export class MouseBaseCrewMemory {
         timestamp: new Date().toISOString(),
       },
     });
-    return res.id;
+    return res.memory_id;
   }
 
   async search(query: string, limit?: number): Promise<Array<{ id: string; content: string; metadata: Record<string, unknown>; score: number }>> {

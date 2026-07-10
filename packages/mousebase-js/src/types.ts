@@ -5,12 +5,8 @@ export interface RememberOptions {
 }
 
 export interface RememberResponse {
-  id: string;
-  external_id: string | null;
-  content: string;
-  metadata: Record<string, unknown>;
+  memory_id: string;
   created_at: string;
-  updated_at: string;
 }
 
 export interface SearchOptions {

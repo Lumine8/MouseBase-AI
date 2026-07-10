@@ -18,8 +18,8 @@ def index_documents(client: MouseBase, docs: list[dict]) -> list[str]:
                 content=doc["content"],
                 metadata={"title": doc.get("title", ""), "source": doc.get("source", "")},
             )
-            ids.append(resp.id)
-            print(f"  indexed: {doc.get('title', 'untitled')} -> {resp.id}")
+            ids.append(resp.memory_id)
+            print(f"  indexed: {doc.get('title', 'untitled')} -> {resp.memory_id}")
         except MouseBaseError as e:
             print(f"  failed to index '{doc.get('title', 'untitle d')}': {e}")
     return ids

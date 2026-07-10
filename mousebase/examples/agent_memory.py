@@ -31,7 +31,7 @@ class SessionMemory:
                     "timestamp": str(datetime.now()),
                 },
             )
-            return resp.id
+            return resp.memory_id
         except MouseBaseError as e:
             print(f"Failed to store memory: {e}")
             return None
