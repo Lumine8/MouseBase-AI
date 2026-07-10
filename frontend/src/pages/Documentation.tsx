@@ -258,15 +258,17 @@ Open an issue on GitHub or check the documentation.`
   },
   "authentication": {
     title: "Authentication",
-    body: `All API requests require authentication via an API key.
+    body: `MouseBase supports two authentication methods: **API keys** (for project-scoped access) and **JWT tokens** (for user account access).
 
-## API Key Format
+## API Key Auth
+
+API keys are used for project-scoped operations. They follow the format \`mb_live_{key_id}_{secret}\`.
 
 \`\`\`
-mb_live_<key_id>_<secret>
+Authorization: Bearer mb_live_<key_id>_<secret>
 \`\`\`
 
-## Python
+### Python
 
 \`\`\`python
 from mousebase import MouseBase
@@ -278,13 +280,11 @@ client = MouseBase(api_key="mb_live_abc123_def456")
 client = MouseBase()
 \`\`\`
 
-## JavaScript
+### JavaScript
 
 \`\`\`javascript
 const API_KEY = "mb_live_abc123_def456";
-const BASE_URL = "http://localhost:8000";
-
-const response = await fetch(\`\${BASE_URL}/api/v1/remember/\`, {
+const response = await fetch("https://api.mousebase.dev/api/v1/remember/", {
   method: "POST",
   headers: {
     "Authorization": \`Bearer \${API_KEY}\`,
@@ -294,13 +294,84 @@ const response = await fetch(\`\${BASE_URL}/api/v1/remember/\`, {
 });
 \`\`\`
 
-## cURL
+### cURL
 
 \`\`\`bash
-curl -X POST http://localhost:8000/api/v1/remember/ \\
+curl -X POST https://api.mousebase.dev/api/v1/remember/ \\
   -H "Authorization: Bearer mb_live_abc123_def456" \\
   -H "Content-Type: application/json" \\
   -d '{"content": "Hello, world!"}'
+\`\`\`
+
+## JWT Auth (User Accounts)
+
+JWT tokens are used for user-level operations like signup, login, and account management.
+
+### Access & Refresh Tokens
+
+On login or signup, the API returns both an access token and a refresh token:
+
+\`\`\`json
+{
+  "token": "eyJ...",
+  "refresh_token": "abc123...",
+  "user": { ... }
+}
+\`\`\`
+
+| Token | Expiry | Usage |
+|-------|--------|-------|
+| \`token\` | 15 minutes | Bearer token for API requests |
+| \`refresh_token\` | 30 days | One-time use to get a new token pair |
+
+### Refreshing Tokens
+
+\`\`\`bash
+curl -X POST https://api.mousebase.dev/api/v1/auth/refresh \\
+  -H "Content-Type: application/json" \\
+  -d '{"refresh_token": "your_refresh_token"}'
+\`\`\`
+
+Returns a new access token + new refresh token. The old refresh token is revoked.
+
+### Email Verification
+
+On signup, a verification email is sent. Verify your email:
+
+\`\`\`bash
+curl -X POST https://api.mousebase.dev/api/v1/auth/verify-email \\
+  -H "Content-Type: application/json" \\
+  -d '{"token": "verification_token"}'
+\`\`\`
+
+### Password Reset
+
+\`\`\`bash
+# Request a reset link
+curl -X POST https://api.mousebase.dev/api/v1/auth/forgot-password \\
+  -H "Content-Type: application/json" \\
+  -d '{"email": "user@example.com"}'
+
+# Reset password with token
+curl -X POST https://api.mousebase.dev/api/v1/auth/reset-password \\
+  -H "Content-Type: application/json" \\
+  -d '{"token": "reset_token", "password": "new_password"}'
+\`\`\`
+
+### Session Management
+
+\`\`\`bash
+# List active sessions
+curl -X GET https://api.mousebase.dev/api/v1/auth/sessions \\
+  -H "Authorization: Bearer eyJ..."
+
+# Revoke a specific session
+curl -X DELETE https://api.mousebase.dev/api/v1/auth/sessions/{session_id} \\
+  -H "Authorization: Bearer eyJ..."
+
+# Revoke all sessions (sign out everywhere)
+curl -X DELETE https://api.mousebase.dev/api/v1/auth/sessions \\
+  -H "Authorization: Bearer eyJ..."
 \`\`\`
 
 ## Environment Variable
@@ -1009,6 +1080,7 @@ All methods match the sync client:
 | \`await client.delete(id)\` | Delete a memory |
 | \`await client.signup(...)\` | Create account |
 | \`await client.login(...)\` | Log in |
+| \`await client.refresh(...)\` | Refresh access token |
 | \`await client.me()\` | Get current user |
 | \`await client.projects.create(...)\` | Create project |
 | \`await client.projects.list()\` | List projects |
@@ -1079,11 +1151,11 @@ print(project.api_key)  # New key
   },
   "sdk-auth": {
     title: "Account Management",
-    body: `The SDK supports user authentication — sign up, log in, and retrieve user info.
+    body: `The SDK supports user authentication — sign up, log in, token refresh, and session management.
 
 ## Sign Up
 
-Creates a new user account and returns a JWT token plus user details.
+Creates a new user account. A verification email is sent. Returns a JWT access token, refresh token, and user details.
 
 \`\`\`python
 auth = client.signup(
@@ -1091,16 +1163,31 @@ auth = client.signup(
     password="securepassword123",
     full_name="Jane Doe"
 )
-print(auth.token)        # JWT token for API authentication
-print(auth.user.email)   # "user@example.com"
-print(auth.user.full_name)  # "Jane Doe"
+print(auth.token)          # JWT access token (15 min expiry)
+print(auth.refresh_token)  # Refresh token (30 day expiry, one-time use)
+print(auth.user.email)     # "user@example.com"
+print(auth.user.full_name) # "Jane Doe"
 \`\`\`
 
 ## Log In
 
 \`\`\`python
 auth = client.login(email="user@example.com", password="securepassword123")
-print(auth.token)  # New JWT token
+print(auth.token)          # New access token
+print(auth.refresh_token)  # New refresh token
+\`\`\`
+
+## Refresh Token
+
+When your access token expires, use the refresh token to get a new pair:
+
+\`\`\`python
+from mousebase import MouseBase
+
+client = MouseBase()
+result = client.refresh("your_refresh_token")
+print(result.token)          # New access token
+print(result.refresh_token)  # New refresh token (old one revoked)
 \`\`\`
 
 ## Get Current User
@@ -1116,8 +1203,9 @@ print(user.created_at)     # datetime
 ## Auth Response Model
 
 \`\`\`python
-auth.token  # str — JWT token
-auth.user   # UserResponse — user details
+auth.token          # str — JWT access token (15 min)
+auth.refresh_token  # str — Refresh token (30 day, one-time use)
+auth.user           # UserResponse — user details
 
 # UserResponse fields:
 # .id             str
@@ -1570,6 +1658,10 @@ console.log(rotated.apiKey); // New key
 | \`client.projects.get(id)\` | Get project |
 | \`client.projects.update(id, ...)\` | Update project |
 | \`client.projects.delete(id)\` | Delete project |
+| \`client.signup(...)\` | Create account |
+| \`client.login(...)\` | Log in |
+| \`client.refresh(...)\` | Refresh access token |
+| \`client.me()\` | Get current user |
 | \`client.projects.viewKey(id)\` | View API key |
 | \`client.projects.rotateKey(id)\` | Rotate API key |`
   },
@@ -1693,11 +1785,11 @@ console.log(project.apiKey); // New key
   },
   "js-auth": {
     title: "Account Management",
-    body: `The SDK supports user authentication — sign up, log in, and retrieve user info.
+    body: `The SDK supports user authentication — sign up, log in, token refresh, and session management.
 
 ## Sign Up
 
-Creates a new user account and returns a JWT token plus user details.
+Creates a new user account. A verification email is sent. Returns a JWT access token, refresh token, and user details.
 
 \`\`\`typescript
 const auth = await client.signup({
@@ -1705,8 +1797,9 @@ const auth = await client.signup({
   password: "securepassword123",
   fullName: "Jane Doe"
 });
-console.log(auth.token);        // JWT token
-console.log(auth.user.email);   // "user@example.com"
+console.log(auth.token);         // JWT access token (15 min expiry)
+console.log(auth.refreshToken);  // Refresh token (30 day, one-time use)
+console.log(auth.user.email);    // "user@example.com"
 console.log(auth.user.fullName); // "Jane Doe"
 \`\`\`
 
@@ -1717,7 +1810,16 @@ const auth = await client.login({
   email: "user@example.com",
   password: "securepassword123"
 });
-console.log(auth.token); // New JWT token
+console.log(auth.token);         // New access token
+console.log(auth.refreshToken);  // New refresh token
+\`\`\`
+
+## Refresh Token
+
+\`\`\`typescript
+const refreshed = await client.refresh({ refreshToken: auth.refreshToken });
+console.log(refreshed.token);         // New access token
+console.log(refreshed.refreshToken);  // New refresh token (old one revoked)
 \`\`\`
 
 ## Get Current User
