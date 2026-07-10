@@ -10,7 +10,7 @@ keywords = ["mousebase", "memory", "ai", "sdk", "httpx"]
 
 dependencies = [
     "fastapi",
-    "uvicorn",
+    "uvicorn[standard]",
     "httpx>=0.28.1",
     "pydantic>=2.0",
     "sqlalchemy",
@@ -26,6 +26,9 @@ dependencies = [
     "redis>=5.0.0",
     "jinja2",
     "razorpay>=1.4.0",
+    "sentry-sdk>=2.0.0",
+    "slowapi>=0.1.9",
+    "structlog>=24.0.0",
 ]
 
 [project.optional-dependencies]

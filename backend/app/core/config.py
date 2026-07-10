@@ -38,9 +38,11 @@ class Settings(BaseSettings):
 
     API_KEY_ENCRYPTION_KEY: str = ""
 
-    RAZORPAY_KEY_ID: str = "rzp_test_TB2VM5X7PpcyWj"
-    RAZORPAY_KEY_SECRET: str = "dBl2qXe0Lfya1XzNt2cHmJbN"
-    RAZORPAY_WEBHOOK_SECRET: str = "whsec_XXXXXXXXXXXXXXXXXXXXXXXXXXX"
+    RAZORPAY_KEY_ID: str = ""
+    RAZORPAY_KEY_SECRET: str = ""
+    RAZORPAY_WEBHOOK_SECRET: str = ""
+
+    SENTRY_DSN: str | None = None
 
     model_config = SettingsConfigDict(
         env_file=BASE_DIR / ".env",
