@@ -114,7 +114,7 @@ class AuthService:
         result = await self.db.execute(
             select(RefreshToken).where(
                 RefreshToken.token_hash == token_hash,
-                RefreshToken.revoked == False,
+                not RefreshToken.revoked,
                 RefreshToken.expires_at > datetime.now(timezone.utc),
             )
         )
@@ -180,7 +180,7 @@ class AuthService:
         await self.db.execute(
             select(RefreshToken).where(
                 RefreshToken.user_id == user_id,
-                RefreshToken.revoked == False,
+                not RefreshToken.revoked,
             )
         )
         await self.db.commit()
@@ -213,7 +213,7 @@ class AuthService:
         result = await self.db.execute(
             select(RefreshToken).where(
                 RefreshToken.user_id == user_id,
-                RefreshToken.revoked == False,
+                not RefreshToken.revoked,
             )
         )
         tokens = result.scalars().all()

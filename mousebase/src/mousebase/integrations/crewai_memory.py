@@ -255,7 +255,6 @@ class MouseBaseMemory:
 
     def update(self, record: Any) -> None:
         """Update an existing record."""
-        from crewai.memory.storage.backend import MemoryRecord
 
         client = self._lazy_client()
         es = self._external_id_prefix

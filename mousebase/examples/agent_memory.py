@@ -121,7 +121,6 @@ class Agent:
         memory.remember("user", user_message)
 
         context = memory.recall(user_message, top_k=3)
-        history = memory.get_conversation_history(top_k=10)
 
         reply = f"[{self.name}] Received: '{user_message}'"
         if context:

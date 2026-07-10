@@ -18,9 +18,7 @@ Requires .env file with current secrets in the backend directory.
 """
 
 import argparse
-import os
 import secrets
-import sys
 from pathlib import Path
 
 ENV_PATH = Path(__file__).resolve().parent.parent / ".env"
