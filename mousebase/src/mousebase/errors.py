@@ -27,6 +27,11 @@ class AuthenticationError(MouseBaseError):
         super().__init__(message, code=code, status_code=status_code)
 
 
+class ConflictError(MouseBaseError):
+    def __init__(self, message: str, code: str = "conflict", status_code: int = 409):
+        super().__init__(message, code=code, status_code=status_code)
+
+
 class RateLimitError(MouseBaseError):
     def __init__(self, message: str, code: str = "rate_limited", status_code: int = 429):
         super().__init__(message, code=code, status_code=status_code)
@@ -45,6 +50,7 @@ class InternalError(MouseBaseError):
 _ERROR_MAP: dict[int, type[MouseBaseError]] = {
     400: ValidationError,
     401: AuthenticationError,
+    409: ConflictError,
     429: RateLimitError,
     500: InternalError,
     502: InternalError,

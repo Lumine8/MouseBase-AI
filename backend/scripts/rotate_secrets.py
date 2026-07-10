@@ -23,7 +23,6 @@ import secrets
 import sys
 from pathlib import Path
 
-
 ENV_PATH = Path(__file__).resolve().parent.parent / ".env"
 
 
@@ -94,8 +93,12 @@ def check_expiry() -> None:
     encryption_key = env.get("API_KEY_ENCRYPTION_KEY", "")
 
     print("Secret Rotation Status:")
-    print(f"  JWT_SECRET:              {'set' if jwt_secret else 'MISSING'} ({len(jwt_secret)} chars)")
-    print(f"  API_KEY_ENCRYPTION_KEY:  {'set' if encryption_key else 'MISSING'} ({len(encryption_key)} chars)")
+    print(
+        f"  JWT_SECRET:              {'set' if jwt_secret else 'MISSING'} ({len(jwt_secret)} chars)"
+    )
+    print(
+        f"  API_KEY_ENCRYPTION_KEY:  {'set' if encryption_key else 'MISSING'} ({len(encryption_key)} chars)"
+    )
 
     last_rotation = env.get("LAST_SECRET_ROTATION", "unknown")
     print(f"  Last rotation:            {last_rotation}")
@@ -113,7 +116,9 @@ def main() -> None:
         choices=["jwt", "encryption-key", "webhook-secret", "check"],
         help="Which secret to rotate or check",
     )
-    parser.add_argument("value", nargs="?", help="New value for webhook-secret (optional)")
+    parser.add_argument(
+        "value", nargs="?", help="New value for webhook-secret (optional)"
+    )
     args = parser.parse_args()
 
     if args.action == "jwt":

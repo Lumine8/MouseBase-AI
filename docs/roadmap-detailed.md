@@ -179,6 +179,9 @@ Support importing from external sources:
 - [x] Password reset (forgot + reset endpoints, 1-hour expiry)
 - [x] Session management (list, revoke single, revoke all)
 - [x] Database indexes (13 new indexes across all tables)
+- [x] Python SDK full auth methods (refresh, verify-email, password-reset, sessions)
+- [x] JS SDK full auth methods (refresh, verify-email, password-reset, sessions)
+- [x] JS browser client signup/login + full auth methods
 
 ### Phase 0 — Still To Do
 - [ ] Secret rotation (automated schedule for JWT + API keys)

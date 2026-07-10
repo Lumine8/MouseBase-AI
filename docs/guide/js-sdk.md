@@ -234,14 +234,41 @@ import { MouseBase } from "mousebase";
 
 const client = new MouseBase({ apiKey: "mb_live_xxx" });
 
-// Sign up (creates a user account)
+// Sign up (creates a user account, sends verification email)
 const auth = await client.signup("user@example.com", "securepassword123", "Jane Doe");
-console.log(auth.token);   // JWT for browser client
+console.log(auth.token);           // JWT for browser client
+console.log(auth.refresh_token);   // For refreshing expired tokens
 console.log(auth.user.email);
-console.log(auth.user.full_name);
 
 // Log in to an existing account
 const auth = await client.login("user@example.com", "securepassword123");
+
+// Refresh an expired access token
+const refreshed = await client.refresh(auth.refresh_token);
+console.log(refreshed.token);            // New access token
+console.log(refreshed.refresh_token);     // New refresh token (old one revoked)
+
+// Verify email (use token from verification email)
+await client.verifyEmail("verify_token_from_email");
+
+// Resend verification email
+await client.resendVerification();
+
+// Password reset flow
+await client.forgotPassword("user@example.com");
+await client.resetPassword("reset_token", "new_secure_password");
+
+// List active sessions
+const sessions = await client.listSessions();
+for (const s of sessions) {
+  console.log(s.id, s.user_agent, s.last_used_at);
+}
+
+// Revoke a specific session
+await client.revokeSession(sessions[0].id);
+
+// Revoke all sessions (sign out everywhere)
+await client.revokeAllSessions();
 
 // Get the currently authenticated user
 const user = await client.me();
@@ -673,8 +700,16 @@ const prompt = `Context:\n${context}\n\nAnswer the question based on the context
 | `get(memoryId)` | `Promise<MemoryResponse>` | Get a memory by ID |
 | `update(memoryId, options)` | `Promise<MemoryResponse>` | Update a memory |
 | `delete(memoryId)` | `Promise<void>` | Delete a memory |
-| `signup(email, password, fullName?)` | `Promise<AuthResponse>` | Create user account |
+| `signup(email, password, fullName?)` | `Promise<AuthResponse>` | Create user account (sends verification email) |
 | `login(email, password)` | `Promise<AuthResponse>` | Log in |
+| `refresh(refreshToken)` | `Promise<RefreshResponse>` | Refresh expired access token |
+| `verifyEmail(token)` | `Promise<MessageResponse>` | Verify email address |
+| `resendVerification()` | `Promise<MessageResponse>` | Resend verification email |
+| `forgotPassword(email)` | `Promise<MessageResponse>` | Request password reset |
+| `resetPassword(token, password)` | `Promise<MessageResponse>` | Reset password with token |
+| `listSessions()` | `Promise<SessionResponse[]>` | List active sessions |
+| `revokeSession(sessionId)` | `Promise<MessageResponse>` | Revoke a specific session |
+| `revokeAllSessions()` | `Promise<MessageResponse>` | Revoke all sessions |
 | `me()` | `Promise<UserResponse>` | Get current user |
 
 ### `client.projects`
@@ -693,12 +728,22 @@ const prompt = `Context:\n${context}\n\nAnswer the question based on the context
 
 | Method | Returns | Description |
 |--------|---------|-------------|
+| `signup(email, password, fullName?)` | `Promise<AuthResponse>` | Create account (updates stored token) |
+| `login(email, password)` | `Promise<AuthResponse>` | Log in (updates stored token) |
 | `remember(options)` | `Promise<RememberResponse>` | Store a memory |
 | `search(options)` | `Promise<SearchResponse>` | Semantic search |
 | `get(memoryId)` | `Promise<MemoryResponse>` | Get a memory by ID |
 | `update(memoryId, options)` | `Promise<MemoryResponse>` | Update a memory |
 | `delete(memoryId)` | `Promise<void>` | Delete a memory |
-| `me()` | `Promise<Partial<UserResponse>>` | Get current user |
+| `refresh(refreshToken)` | `Promise<RefreshResponse>` | Refresh token (updates stored token) |
+| `verifyEmail(token)` | `Promise<MessageResponse>` | Verify email address |
+| `resendVerification()` | `Promise<MessageResponse>` | Resend verification email |
+| `forgotPassword(email)` | `Promise<MessageResponse>` | Request password reset |
+| `resetPassword(token, password)` | `Promise<MessageResponse>` | Reset password with token |
+| `listSessions()` | `Promise<SessionResponse[]>` | List active sessions |
+| `revokeSession(sessionId)` | `Promise<MessageResponse>` | Revoke a specific session |
+| `revokeAllSessions()` | `Promise<MessageResponse>` | Revoke all sessions |
+| `me()` | `Promise<UserResponse>` | Get current user |
 
 ### Exceptions
 
@@ -708,6 +753,7 @@ const prompt = `Context:\n${context}\n\nAnswer the question based on the context
 | `MissingApiKeyError` | `MouseBaseError` |
 | `ValidationError` | `MouseBaseError` |
 | `AuthenticationError` | `MouseBaseError` |
+| `ConflictError` | `MouseBaseError` |
 | `RateLimitError` | `MouseBaseError` |
 | `InternalError` | `MouseBaseError` |
 

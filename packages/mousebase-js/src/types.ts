@@ -84,7 +84,25 @@ export interface UserResponse {
 
 export interface AuthResponse {
   token: string;
+  refresh_token: string;
   user: UserResponse;
+}
+
+export interface RefreshResponse {
+  token: string;
+  refresh_token: string;
+}
+
+export interface SessionResponse {
+  id: string;
+  user_agent: string | null;
+  ip_address: string | null;
+  last_used_at: string;
+  created_at: string;
+}
+
+export interface MessageResponse {
+  message: string;
 }
 
 export interface ClientConfig {

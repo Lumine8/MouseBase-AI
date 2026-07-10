@@ -14,6 +14,7 @@ async def check_db() -> bool:
     try:
         async with AsyncSessionLocal() as session:
             from sqlalchemy import text
+
             await session.execute(text("SELECT 1"))
         return True
     except Exception:

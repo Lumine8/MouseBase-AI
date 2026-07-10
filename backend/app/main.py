@@ -14,7 +14,11 @@ from sqlalchemy import text
 
 from app.core.config import settings
 from app.core.log_config import get_logger, setup_logging
-from app.core.middleware import RequestIDMiddleware, RequestTimingMiddleware, SecurityHeadersMiddleware
+from app.core.middleware import (
+    RequestIDMiddleware,
+    RequestTimingMiddleware,
+    SecurityHeadersMiddleware,
+)
 from app.db.database import AsyncSessionLocal
 from app.db.dependencies import check_db
 
@@ -40,7 +44,9 @@ limiter = Limiter(
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     setup_logging()
-    logger.info("starting up", service="MouseBase Memory API", environment=settings.ENVIRONMENT)
+    logger.info(
+        "starting up", service="MouseBase Memory API", environment=settings.ENVIRONMENT
+    )
 
     if settings.SENTRY_DSN:
         sentry_sdk.init(

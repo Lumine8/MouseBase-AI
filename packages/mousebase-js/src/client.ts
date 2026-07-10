@@ -1,17 +1,20 @@
 import {
+  type AuthResponse,
+  type ApiKeyResponse,
   type ClientConfig,
+  type MessageResponse,
+  type MemoryResponse,
+  type ProjectCreateOptions,
+  type ProjectKeyResponse,
+  type ProjectResponse,
+  type ProjectUpdateOptions,
+  type RefreshResponse,
   type RememberOptions,
   type RememberResponse,
   type SearchOptions,
   type SearchResponse,
-  type MemoryResponse,
+  type SessionResponse,
   type UpdateOptions,
-  type ProjectCreateOptions,
-  type ProjectUpdateOptions,
-  type ProjectKeyResponse,
-  type ProjectResponse,
-  type ApiKeyResponse,
-  type AuthResponse,
   type UserResponse,
 } from "./types";
 import { MissingApiKeyError, MouseBaseError, translateError } from "./errors";
@@ -162,6 +165,38 @@ export class MouseBase {
 
   async login(email: string, password: string): Promise<AuthResponse> {
     return this._request("POST", "/auth/login", { email, password });
+  }
+
+  async refresh(refreshToken: string): Promise<RefreshResponse> {
+    return this._request("POST", "/auth/refresh", { refresh_token: refreshToken });
+  }
+
+  async verifyEmail(token: string): Promise<MessageResponse> {
+    return this._request("POST", "/auth/verify-email", { token });
+  }
+
+  async resendVerification(): Promise<MessageResponse> {
+    return this._request("POST", "/auth/resend-verification");
+  }
+
+  async forgotPassword(email: string): Promise<MessageResponse> {
+    return this._request("POST", "/auth/forgot-password", { email });
+  }
+
+  async resetPassword(token: string, password: string): Promise<MessageResponse> {
+    return this._request("POST", "/auth/reset-password", { token, password });
+  }
+
+  async listSessions(): Promise<SessionResponse[]> {
+    return this._request("GET", "/auth/sessions");
+  }
+
+  async revokeSession(sessionId: string): Promise<MessageResponse> {
+    return this._request("DELETE", `/auth/sessions/${sessionId}`);
+  }
+
+  async revokeAllSessions(): Promise<MessageResponse> {
+    return this._request("DELETE", "/auth/sessions");
   }
 
   async me(): Promise<UserResponse> {

@@ -87,9 +87,7 @@ class AuthService:
         )
 
     async def login(self, request: LoginRequest) -> AuthResponse:
-        result = await self.db.execute(
-            select(User).where(User.email == request.email)
-        )
+        result = await self.db.execute(select(User).where(User.email == request.email))
         user = result.scalar_one_or_none()
 
         if user is None or not password_hash.verify(
@@ -157,9 +155,7 @@ class AuthService:
         await self._send_verification_email(user)
 
     async def forgot_password(self, request: ForgotPasswordRequest) -> None:
-        result = await self.db.execute(
-            select(User).where(User.email == request.email)
-        )
+        result = await self.db.execute(select(User).where(User.email == request.email))
         user = result.scalar_one_or_none()
         if user is None:
             return
@@ -200,18 +196,14 @@ class AuthService:
 
     async def revoke_session(self, user_id: UUID, session_id: UUID) -> None:
         result = await self.db.execute(
-            select(Session).where(
-                Session.id == session_id, Session.user_id == user_id
-            )
+            select(Session).where(Session.id == session_id, Session.user_id == user_id)
         )
         session = result.scalar_one_or_none()
         if session is None:
             return
 
         await self.db.execute(
-            select(RefreshToken).where(
-                RefreshToken.id == session.refresh_token_id
-            )
+            select(RefreshToken).where(RefreshToken.id == session.refresh_token_id)
         )
 
         await self.db.delete(session)
@@ -273,9 +265,7 @@ class AuthService:
             f"This link expires in 24 hours.",
         )
 
-    async def _store_refresh_token(
-        self, user_id: UUID, refresh_token_str: str
-    ) -> None:
+    async def _store_refresh_token(self, user_id: UUID, refresh_token_str: str) -> None:
         token_hash = hash_token(refresh_token_str)
         expires_at = datetime.now(timezone.utc) + timedelta(
             days=settings.JWT_REFRESH_EXPIRY_DAYS

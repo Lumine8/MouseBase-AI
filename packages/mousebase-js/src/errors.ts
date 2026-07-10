@@ -31,6 +31,13 @@ export class ValidationError extends MouseBaseError {
   }
 }
 
+export class ConflictError extends MouseBaseError {
+  constructor(message: string = "Resource conflict") {
+    super(message, "conflict", 409);
+    this.name = "ConflictError";
+  }
+}
+
 export class RateLimitError extends MouseBaseError {
   constructor(message: string = "Too many requests") {
     super(message, "rate_limit_error", 429);
@@ -50,6 +57,8 @@ export function translateError(status: number, body: any): MouseBaseError {
   switch (status) {
     case 401:
       return new AuthenticationError(message);
+    case 409:
+      return new ConflictError(message);
     case 422:
     case 400:
       return new ValidationError(message);

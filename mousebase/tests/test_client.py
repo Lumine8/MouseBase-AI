@@ -6,6 +6,7 @@ import respx
 from mousebase import (
     AsyncMouseBase,
     AuthenticationError,
+    ConflictError,
     EmbeddingProviderError,
     InternalError,
     MissingAPIKeyError,
@@ -71,6 +72,7 @@ def test_remember_with_metadata(client: MouseBase):
     [
         (400, "validation_error", ValidationError),
         (401, "invalid_api_key", AuthenticationError),
+        (409, "email_already_exists", ConflictError),
         (429, "rate_limited", RateLimitError),
         (500, "internal_error", InternalError),
         (502, "internal_error", InternalError),

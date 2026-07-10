@@ -64,4 +64,22 @@ class UserResponse(BaseModel):
 
 class AuthResponse(BaseModel):
     token: str
+    refresh_token: str
     user: UserResponse
+
+
+class RefreshResponse(BaseModel):
+    token: str
+    refresh_token: str
+
+
+class SessionResponse(BaseModel):
+    id: str
+    user_agent: str | None = None
+    ip_address: str | None = None
+    last_used_at: datetime
+    created_at: datetime
+
+
+class MessageResponse(BaseModel):
+    message: str

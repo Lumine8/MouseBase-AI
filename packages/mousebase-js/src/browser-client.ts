@@ -1,10 +1,15 @@
 import type {
+  AuthResponse,
+  MessageResponse,
   RememberOptions,
   RememberResponse,
   SearchOptions,
   SearchResponse,
   MemoryResponse,
   UpdateOptions,
+  RefreshResponse,
+  SessionResponse,
+  UserResponse,
   BrowserClientConfig,
 } from "./types";
 import { MouseBaseError, translateError } from "./errors";
@@ -100,7 +105,55 @@ export class MouseBaseBrowser {
     await this._request("DELETE", `/memory/${memoryId}`);
   }
 
-  async me(): Promise<{ id: string; email: string; full_name: string | null }> {
+  async signup(email: string, password: string, fullName?: string): Promise<AuthResponse> {
+    const body: Record<string, unknown> = { email, password };
+    if (fullName) body.full_name = fullName;
+    const result = await this._request<AuthResponse>("POST", "/auth/signup", body);
+    this._token = result.token;
+    return result;
+  }
+
+  async login(email: string, password: string): Promise<AuthResponse> {
+    const result = await this._request<AuthResponse>("POST", "/auth/login", { email, password });
+    this._token = result.token;
+    return result;
+  }
+
+  async refresh(refreshToken: string): Promise<RefreshResponse> {
+    const result = await this._request<RefreshResponse>("POST", "/auth/refresh", { refresh_token: refreshToken });
+    this._token = result.token;
+    return result;
+  }
+
+  async verifyEmail(token: string): Promise<MessageResponse> {
+    return this._request("POST", "/auth/verify-email", { token });
+  }
+
+  async resendVerification(): Promise<MessageResponse> {
+    return this._request("POST", "/auth/resend-verification");
+  }
+
+  async forgotPassword(email: string): Promise<MessageResponse> {
+    return this._request("POST", "/auth/forgot-password", { email });
+  }
+
+  async resetPassword(token: string, password: string): Promise<MessageResponse> {
+    return this._request("POST", "/auth/reset-password", { token, password });
+  }
+
+  async listSessions(): Promise<SessionResponse[]> {
+    return this._request("GET", "/auth/sessions");
+  }
+
+  async revokeSession(sessionId: string): Promise<MessageResponse> {
+    return this._request("DELETE", `/auth/sessions/${sessionId}`);
+  }
+
+  async revokeAllSessions(): Promise<MessageResponse> {
+    return this._request("DELETE", "/auth/sessions");
+  }
+
+  async me(): Promise<UserResponse> {
     return this._request("GET", "/auth/me");
   }
 }

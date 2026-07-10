@@ -21,10 +21,13 @@ from mousebase.models import (
     ApiKeyResponse,
     AuthResponse,
     MemoryResponse,
+    MessageResponse,
     ProjectKeyResponse,
     ProjectResponse,
+    RefreshResponse,
     RememberResponse,
     SearchResponse,
+    SessionResponse,
     UserResponse,
 )
 
@@ -197,6 +200,38 @@ class MouseBase:
         body = {"email": email, "password": password}
         data = self._request("POST", "/auth/login", json=body)
         return AuthResponse.model_validate(data)
+
+    def refresh(self, refresh_token: str) -> RefreshResponse:
+        data = self._request("POST", "/auth/refresh", json={"refresh_token": refresh_token})
+        return RefreshResponse.model_validate(data)
+
+    def verify_email(self, token: str) -> MessageResponse:
+        data = self._request("POST", "/auth/verify-email", json={"token": token})
+        return MessageResponse.model_validate(data)
+
+    def resend_verification(self) -> MessageResponse:
+        data = self._request("POST", "/auth/resend-verification")
+        return MessageResponse.model_validate(data)
+
+    def forgot_password(self, email: str) -> MessageResponse:
+        data = self._request("POST", "/auth/forgot-password", json={"email": email})
+        return MessageResponse.model_validate(data)
+
+    def reset_password(self, token: str, password: str) -> MessageResponse:
+        data = self._request("POST", "/auth/reset-password", json={"token": token, "password": password})
+        return MessageResponse.model_validate(data)
+
+    def list_sessions(self) -> list[SessionResponse]:
+        data = self._request("GET", "/auth/sessions")
+        return [SessionResponse.model_validate(s) for s in data]
+
+    def revoke_session(self, session_id: str) -> MessageResponse:
+        data = self._request("DELETE", f"/auth/sessions/{session_id}")
+        return MessageResponse.model_validate(data)
+
+    def revoke_all_sessions(self) -> MessageResponse:
+        data = self._request("DELETE", "/auth/sessions")
+        return MessageResponse.model_validate(data)
 
     def me(self) -> UserResponse:
         data = self._request("GET", "/auth/me")

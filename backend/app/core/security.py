@@ -64,7 +64,9 @@ def verify_api_key(secret: str, hashed_secret: str) -> bool:
 
 
 def create_access_token(user_id: UUID) -> str:
-    expire = datetime.now(timezone.utc) + timedelta(minutes=settings.JWT_ACCESS_EXPIRY_MINUTES)
+    expire = datetime.now(timezone.utc) + timedelta(
+        minutes=settings.JWT_ACCESS_EXPIRY_MINUTES
+    )
     payload = {
         "sub": str(user_id),
         "exp": expire,
@@ -109,10 +111,12 @@ def verify_access_token(token: str) -> UUID:
         payload = jwt.decode(token, settings.JWT_SECRET, algorithms=["HS256"])
         if payload.get("type", "access") not in ("access",):
             from app.exceptions.auth import InvalidTokenError
+
             raise InvalidTokenError()
         return UUID(payload["sub"])
     except (jwt.ExpiredSignatureError, jwt.InvalidTokenError, ValueError):
         from app.exceptions.auth import InvalidTokenError
+
         raise InvalidTokenError()
 
 
@@ -121,10 +125,12 @@ def verify_email_token(token: str) -> UUID:
         payload = jwt.decode(token, settings.JWT_SECRET, algorithms=["HS256"])
         if payload.get("type") != "email":
             from app.exceptions.auth import InvalidTokenError
+
             raise InvalidTokenError()
         return UUID(payload["sub"])
     except (jwt.ExpiredSignatureError, jwt.InvalidTokenError, ValueError):
         from app.exceptions.auth import InvalidTokenError
+
         raise InvalidTokenError()
 
 
@@ -133,8 +139,10 @@ def verify_password_reset_token(token: str) -> UUID:
         payload = jwt.decode(token, settings.JWT_SECRET, algorithms=["HS256"])
         if payload.get("type") != "password_reset":
             from app.exceptions.auth import InvalidTokenError
+
             raise InvalidTokenError()
         return UUID(payload["sub"])
     except (jwt.ExpiredSignatureError, jwt.InvalidTokenError, ValueError):
         from app.exceptions.auth import InvalidTokenError
+
         raise InvalidTokenError()

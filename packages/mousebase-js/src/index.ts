@@ -4,6 +4,7 @@ export {
   MouseBaseError,
   MissingApiKeyError,
   AuthenticationError,
+  ConflictError,
   ValidationError,
   RateLimitError,
   InternalError,
@@ -26,4 +27,7 @@ export type {
   ApiKeyResponse,
   UserResponse,
   AuthResponse,
+  RefreshResponse,
+  SessionResponse,
+  MessageResponse,
 } from "./types";

@@ -176,18 +176,44 @@ print(project.api_key)  # New key
 ### Account Management
 
 ```python
-# Sign up (creates a user account)
+# Sign up (creates a user account, sends verification email)
 auth = client.signup(
     email="user@example.com",
     password="securepassword123",
     full_name="Jane Doe"
 )
-print(auth.token)   # JWT for subsequent requests
+print(auth.token)            # JWT for subsequent requests
+print(auth.refresh_token)     # For refreshing expired tokens
 print(auth.user.email)
-print(auth.user.full_name)
 
 # Log in to an existing account
 auth = client.login(email="user@example.com", password="securepassword123")
+
+# Refresh an expired access token
+refreshed = client.refresh(auth.refresh_token)
+print(refreshed.token)        # New access token
+print(refreshed.refresh_token) # New refresh token (old one revoked)
+
+# Verify email (use token from verification email)
+client.verify_email(token="verify_token_from_email")
+
+# Resend verification email
+client.resend_verification()
+
+# Password reset flow
+client.forgot_password(email="user@example.com")
+client.reset_password(token="reset_token_from_email", password="new_secure_password")
+
+# List active sessions
+sessions = client.list_sessions()
+for s in sessions:
+    print(s.id, s.user_agent, s.last_used_at)
+
+# Revoke a specific session
+client.revoke_session(session_id=sessions[0].id)
+
+# Revoke all sessions (sign out everywhere)
+client.revoke_all_sessions()
 
 # Get the currently authenticated user
 user = client.me()
@@ -229,6 +255,8 @@ async def main():
 
         # Account management
         auth = await client.login(email="user@example.com", password="...")
+        refreshed = await client.refresh(auth.refresh_token)
+        sessions = await client.list_sessions()
         user = await client.me()
 
 asyncio.run(main())
@@ -248,7 +276,8 @@ Every SDK error is a subclass of `MouseBaseError`.
 |-----------|-------------|---------|
 | `MissingAPIKeyError` | — | No API key provided or found in env |
 | `ValidationError` | 400 / 422 | Invalid request payload |
-| `AuthenticationError` | 401 | Invalid or expired API key |
+| `AuthenticationError` | 401 | Invalid or expired API key / token |
+| `ConflictError` | 409 | Resource conflict (e.g. email already exists) |
 | `RateLimitError` | 429 | Too many requests |
 | `InternalError` | 500 / 502 | Server-side failure |
 | `EmbeddingProviderError` | 503 | Embedding service unavailable |
@@ -260,7 +289,7 @@ Every SDK error is a subclass of `MouseBaseError`.
 from mousebase import (
     MouseBase, MouseBaseError,
     MissingAPIKeyError, AuthenticationError,
-    ValidationError, RateLimitError
+    ConflictError, ValidationError, RateLimitError
 )
 
 client = MouseBase(api_key="mb_live_xxx")
@@ -439,8 +468,16 @@ def find_similar_issues(description: str) -> list[tuple[str, float]]:
 | `get(memory_id)` | `MemoryResponse` | Get a memory by ID |
 | `update(memory_id, content, metadata, external_id)` | `MemoryResponse` | Update a memory |
 | `delete(memory_id)` | `None` | Delete a memory |
-| `signup(email, password, full_name)` | `AuthResponse` | Create user account |
+| `signup(email, password, full_name)` | `AuthResponse` | Create user account (sends verification email) |
 | `login(email, password)` | `AuthResponse` | Log in |
+| `refresh(refresh_token)` | `RefreshResponse` | Refresh expired access token |
+| `verify_email(token)` | `MessageResponse` | Verify email address |
+| `resend_verification()` | `MessageResponse` | Resend verification email |
+| `forgot_password(email)` | `MessageResponse` | Request password reset |
+| `reset_password(token, password)` | `MessageResponse` | Reset password with token |
+| `list_sessions()` | `list[SessionResponse]` | List active sessions |
+| `revoke_session(session_id)` | `MessageResponse` | Revoke a specific session |
+| `revoke_all_sessions()` | `MessageResponse` | Revoke all sessions |
 | `me()` | `UserResponse` | Get current user |
 | `close()` | `None` | Close HTTP session |
 

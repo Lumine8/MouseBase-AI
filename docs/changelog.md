@@ -2,6 +2,21 @@
 
 All notable changes to the MouseBase project are documented here.
 
+### 2025-07-10 — Full auth methods in Python + JS SDKs
+
+- **Python SDK** (`mousebase`):
+  - Added `refresh_token` to `AuthResponse` model
+  - Added `RefreshResponse`, `SessionResponse`, `MessageResponse` models
+  - Added 8 new auth methods: `refresh()`, `verify_email()`, `resend_verification()`, `forgot_password()`, `reset_password()`, `list_sessions()`, `revoke_session()`, `revoke_all_sessions()`
+  - Added `ConflictError` for 409 responses
+- **JavaScript SDK** (`mousebase-js`):
+  - Added `refresh_token` to `AuthResponse` interface
+  - Added `RefreshResponse`, `SessionResponse`, `MessageResponse` interfaces
+  - Added 8 new auth methods to `MouseBase`: `refresh()`, `verifyEmail()`, `resendVerification()`, `forgotPassword()`, `resetPassword()`, `listSessions()`, `revokeSession()`, `revokeAllSessions()`
+  - Added `signup()`, `login()`, and all auth methods to `MouseBaseBrowser` (updates internal token)
+  - Added `ConflictError` for 409 responses
+- **Docs**: Updated VitePress `introduction.md`, `errors.md`, `python-sdk.md`, `js-sdk.md` with all auth endpoints, error codes, and method tables
+
 ---
 
 ## Table of Contents
