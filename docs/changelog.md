@@ -2,6 +2,26 @@
 
 All notable changes to the MouseBase project are documented here.
 
+### 2025-07-14 — Memory Explorer (UI + Backend)
+
+- **Memory Explorer UI** (`/projects/:id/memories`):
+  - Paginated table with search, filters (external_id, metadata, date range), column visibility toggle
+  - Memory inspector modal with details, edit, JSON view, embedding info
+  - Bulk selection with batch delete, export (JSON/CSV/NDJSON), move to project, add metadata
+  - Per-project analytics stats bar (total, storage, avg length, today)
+  - Activity timeline view with Remember/Search/Patch/Delete event log
+- **Backend** — 7 new endpoints:
+  - `GET /projects/{id}/memories` — paginated list with filters
+  - `GET /projects/{id}/memories/stats` — project analytics
+  - `GET /projects/{id}/memories/timeline` — activity log
+  - `POST /projects/{id}/memories/batch-delete`
+  - `POST /projects/{id}/memories/export`
+  - `POST /projects/{id}/memories/move`
+  - `POST /projects/{id}/memories/batch-add-metadata`
+- **Activity logging**: Automatic tracking of remember, search, patch, delete, batch-delete, batch-add-metadata events
+- **Embedding info**: Memory detail responses now include `embedding_model` and `embedding_dimensions`
+- **Docs**: Updated roadmap, README, and introduction docs
+
 ### 2025-07-10 — Full auth methods in Python + JS SDKs
 
 - **Python SDK** (`mousebase`):

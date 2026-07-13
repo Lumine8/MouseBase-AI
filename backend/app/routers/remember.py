@@ -6,6 +6,7 @@ from app.dependencies.auth import get_current_project
 from app.models.project import Project
 from app.schemas.remember import RememberRequest
 from app.schemas.memory import MemoryResponse
+from app.services.activity_service import ActivityService
 
 from app.services.memory_service import remember
 
@@ -48,4 +49,12 @@ async def remember_endpoint(
     project: Project = Depends(get_current_project),
     db: AsyncSession = Depends(get_db),
 ) -> MemoryResponse:
-    return await remember(project=project, request=request, db=db)
+    result = await remember(project=project, request=request, db=db)
+    activity = ActivityService(db)
+    await activity.log(
+        project_id=project.id,
+        action="remember",
+        memory_id=result.id,
+        details={"content_preview": request.content[:100] if request.content else None},
+    )
+    return result

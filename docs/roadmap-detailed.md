@@ -31,6 +31,37 @@
 
 ---
 
+## Phase 0.5 — Memory Explorer (Priority)
+
+A full-featured UI to browse, inspect, filter, and manage stored memories — akin to Supabase Table Editor + Notion Database.
+
+### Features
+
+- [x] **Memory list** — paginated table of all memories in a project with columns: Content, External ID, Created, Updated
+- [x] **Search & filter** — filter by content, external ID, metadata fields, date range, embedding model
+- [x] **Memory inspector** — click a memory to view full detail: ID, content, external_id, metadata (formatted JSON), embedding dimensions, created/updated timestamps, similarity history
+- [x] **Table customization** — show/hide/reorder columns (Airtable-style)
+- [x] **JSON view** — raw JSON representation of any memory
+- [x] **Bulk operations** — select multiple memories → delete, export, move to another project, add metadata
+- [x] **Export** — JSON, CSV, NDJSON (reduces vendor lock-in)
+- [x] **Analytics** — per-project stats: total memories, storage size, avg memory length, top external IDs, top metadata keys, memories created today, searches today
+- [x] **Timeline** — activity feed showing Remember/Search/Patch/Delete events with timestamps (serves as audit log)
+
+### Backend Changes Needed
+
+- [x] `GET /projects/{id}/memories` — paginated list with filters (external_id, metadata, date range, content search, model)
+- [x] `POST /projects/{id}/memories/batch-delete`
+- [x] `POST /projects/{id}/memories/export` — JSON/CSV/NDJSON
+- [x] `POST /projects/{id}/memories/move` — move to another project
+- [x] `POST /projects/{id}/memories/batch-add-metadata`
+- [x] `GET /projects/{id}/memories/stats` — project-level analytics
+- [x] `GET /projects/{id}/memories/timeline` — activity log
+- [x] Activity logging wired into: remember, search, patch, delete, batch-delete, batch-add-metadata
+
+**Estimated effort**: ~14–23 hours (backend ~2–3h, frontend ~10–16h, testing ~2–4h)
+
+---
+
 ## Phase 1 — Memory Types
 
 Replace the uniform `{content, metadata}` model with typed memories:
@@ -194,5 +225,8 @@ Support importing from external sources:
 - **Tags**: None generated, empty `metadata`
 - **Relationships**: None
 - **Bulk import**: None
+
+### Product — Done
+- **Memory Explorer**: Paginated list, search/filter, inspector, bulk ops, export (JSON/CSV/NDJSON), column customization, per-project analytics, activity timeline
 
 > This roadmap is the difference between a vector store and an AI memory operating system.

@@ -29,6 +29,7 @@ from app.routers.projects import router as projects_router
 from app.routers.auth import router as auth_router
 from app.routers.dashboard import router as dashboard_router
 from app.routers.payments import router as payments_router
+from app.routers.explorer import router as explorer_router
 
 from app.exceptions.base import APIException
 
@@ -129,6 +130,7 @@ app.include_router(memory_router, prefix="/api/v1")
 app.include_router(projects_router, prefix="/api/v1")
 app.include_router(dashboard_router, prefix="/api/v1")
 app.include_router(payments_router, prefix="/api/v1")
+app.include_router(explorer_router, prefix="/api/v1")
 
 
 @app.get("/")

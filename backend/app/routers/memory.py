@@ -8,6 +8,7 @@ from app.dependencies.auth import get_current_project
 from app.models.project import Project
 
 from app.services.memory_service import MemoryService
+from app.services.activity_service import ActivityService
 
 from app.schemas.memory import MemoryResponse
 from app.schemas.update import UpdateMemoryRequest
@@ -71,7 +72,22 @@ async def update_memory(
         embedding_service=GeminiEmbeddingService(),
     )
 
-    return await memory_service.update_memory(memory_id, project, request)
+    result = await memory_service.update_memory(memory_id, project, request)
+    activity = ActivityService(db)
+    changed = []
+    if request.content is not None:
+        changed.append("content")
+    if request.metadata is not None:
+        changed.append("metadata")
+    if request.external_id is not None:
+        changed.append("external_id")
+    await activity.log(
+        project_id=project.id,
+        action="patch",
+        memory_id=memory_id,
+        details={"changed_fields": changed},
+    )
+    return result
 
 
 @router.delete(
@@ -87,3 +103,9 @@ async def delete_memory(
 ) -> None:
     memory_service = MemoryService(db=db)
     await memory_service.delete_memory(memory_id, project)
+    activity = ActivityService(db)
+    await activity.log(
+        project_id=project.id,
+        action="delete",
+        memory_id=memory_id,
+    )

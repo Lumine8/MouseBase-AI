@@ -68,12 +68,19 @@ export default function ProjectDetail() {
 
       <div className="card" style={{ padding: 24 }}>
         <div style={{ marginBottom: 24 }}>
-          <h1 style={{ fontSize: 24, fontWeight: 700, letterSpacing: "-0.03em", color: "var(--text-primary)" }}>
-            {project.name}
-          </h1>
-          {project.description && (
-            <p style={{ marginTop: 4, color: "var(--text-secondary)", fontSize: 14 }}>{project.description}</p>
-          )}
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+            <div>
+              <h1 style={{ fontSize: 24, fontWeight: 700, letterSpacing: "-0.03em", color: "var(--text-primary)" }}>
+                {project.name}
+              </h1>
+              {project.description && (
+                <p style={{ marginTop: 4, color: "var(--text-secondary)", fontSize: 14 }}>{project.description}</p>
+              )}
+            </div>
+            <button onClick={() => navigate(`/projects/${project.id}/memories`)} className="btn-primary" style={{ fontSize: 13, padding: "8px 18px" }}>
+              View Memories
+            </button>
+          </div>
         </div>
 
         <div className="section-title">Edit Project</div>

@@ -5,6 +5,7 @@ from app.db.dependencies import get_db
 from app.dependencies.auth import get_current_project
 from app.models.project import Project
 from app.schemas.search import SearchRequest, SearchResponse
+from app.services.activity_service import ActivityService
 
 from app.services.gemini_embedding_service import GeminiEmbeddingService
 from app.services.search_service import SearchService
@@ -49,4 +50,11 @@ async def search(
     embedding_service = GeminiEmbeddingService()
     search_service = SearchService(db=db, embedding_service=embedding_service)
 
-    return await search_service.search(project, request)
+    result = await search_service.search(project, request)
+    activity = ActivityService(db)
+    await activity.log(
+        project_id=project.id,
+        action="search",
+        details={"query": request.query[:200], "top_k": request.top_k},
+    )
+    return result

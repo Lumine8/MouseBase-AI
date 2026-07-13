@@ -116,6 +116,17 @@ All endpoints are available at `https://api.mousebase.dev/api/v1`.
 | `PATCH` | `/{memory_id}` | Update a memory |
 | `DELETE` | `/{memory_id}` | Delete a memory |
 
+### Memory Explorer
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/projects/{id}/memories` | Paginated list with filters |
+| `GET` | `/projects/{id}/memories/stats` | Per-project analytics |
+| `POST` | `/projects/{id}/memories/batch-delete` | Delete multiple memories |
+| `POST` | `/projects/{id}/memories/export` | Export as JSON/CSV/NDJSON |
+| `POST` | `/projects/{id}/memories/move` | Move to another project |
+| `POST` | `/projects/{id}/memories/batch-add-metadata` | Bulk metadata update |
+
 ### Account & Auth
 
 | Method | Endpoint | Description |

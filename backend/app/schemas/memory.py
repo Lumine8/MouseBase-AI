@@ -24,3 +24,9 @@ class MemoryResponse(BaseModel):
     updated_at: datetime = Field(
         ..., description="Timestamp when the memory was last updated"
     )
+    embedding_model: str | None = Field(
+        default=None, description="Model used to generate the embedding"
+    )
+    embedding_dimensions: int | None = Field(
+        default=None, description="Number of dimensions in the embedding vector"
+    )

@@ -110,6 +110,8 @@ export interface Memory {
   metadata: Record<string, unknown>;
   created_at: string;
   updated_at: string;
+  embedding_model?: string;
+  embedding_dimensions?: number;
 }
 
 export interface UpdateMemoryRequest {
@@ -290,6 +292,57 @@ export const payments = {
     request<SubscriptionInfo>("POST", "/payments/cancel-addon", { addon_type: addonType, quantity }),
 };
 
+export interface MemoryListItem {
+  id: string;
+  external_id: string | null;
+  content: string;
+  metadata: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+  embedding_model?: string;
+  embedding_dimensions?: number;
+}
+
+export interface MemoryListResponse {
+  memories: MemoryListItem[];
+  total: number;
+  page: number;
+  per_page: number;
+  total_pages: number;
+}
+
+export interface MemoryStats {
+  total_memories: number;
+  storage_bytes: number;
+  avg_memory_length: number;
+  top_external_ids: { external_id: string; count: number }[];
+  top_metadata_keys: { key: string; count: number }[];
+  memories_created_today: number;
+  searches_today: number;
+}
+
+export interface BatchExportResponse {
+  memories: Record<string, unknown>[];
+  format: string;
+  count: number;
+}
+
+export interface TimelineEntry {
+  id: string;
+  action: string;
+  memory_id: string | null;
+  details: Record<string, unknown>;
+  created_at: string;
+}
+
+export interface TimelineResponse {
+  entries: TimelineEntry[];
+  total: number;
+  page: number;
+  per_page: number;
+  total_pages: number;
+}
+
 export const api = {
   projects: {
     list: () =>
@@ -319,5 +372,26 @@ export const api = {
       request<Memory>("PATCH", `/memory/${id}`, data, apiKey ?? null, true),
     delete: (id: string, apiKey?: string) =>
       request<void>("DELETE", `/memory/${id}`, undefined, apiKey ?? null, true),
+  },
+
+  explorer: {
+    list: (projectId: string, params?: Record<string, string | number>) => {
+      const qs = params ? "?" + new URLSearchParams(
+        Object.entries(params).filter(([_, v]) => v !== undefined && v !== null && v !== "").map(([k, v]) => [k, String(v)])
+      ).toString() : "";
+      return request<MemoryListResponse>("GET", `/projects/${projectId}/memories${qs}`);
+    },
+    stats: (projectId: string) =>
+      request<MemoryStats>("GET", `/projects/${projectId}/memories/stats`),
+    batchDelete: (projectId: string, memoryIds: string[]) =>
+      request<{ deleted: number }>("POST", `/projects/${projectId}/memories/batch-delete`, { memory_ids: memoryIds }),
+    export: (projectId: string, memoryIds: string[], format: string = "json") =>
+      request<BatchExportResponse>("POST", `/projects/${projectId}/memories/export`, { memory_ids: memoryIds, format }),
+    move: (projectId: string, memoryIds: string[], targetProjectId: string) =>
+      request<{ moved: number }>("POST", `/projects/${projectId}/memories/move`, { memory_ids: memoryIds, target_project_id: targetProjectId }),
+    batchAddMetadata: (projectId: string, memoryIds: string[], metadata: Record<string, unknown>) =>
+      request<{ updated: number }>("POST", `/projects/${projectId}/memories/batch-add-metadata`, { memory_ids: memoryIds, metadata }),
+    timeline: (projectId: string, page: number = 1, perPage: number = 50) =>
+      request<TimelineResponse>("GET", `/projects/${projectId}/memories/timeline?page=${page}&per_page=${perPage}`),
   },
 };

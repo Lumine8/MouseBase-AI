@@ -30,6 +30,15 @@ MouseBase is a managed memory service for AI applications. It lets you store tex
 - `PATCH /memory/{id}` — update a memory
 - `DELETE /memory/{id}` — delete a memory
 
+### Memory Explorer (UI)
+- **Memory list** — paginated table of all memories in a project
+- **Search & filter** — filter by content, external ID, metadata, date range
+- **Memory inspector** — click a memory to view full details, metadata, and JSON
+- **Bulk operations** — select multiple memories to delete, export, or move
+- **Export** — JSON, CSV, NDJSON
+- **Column customization** — show/hide columns like Airtable
+- **Per-project analytics** — total memories, storage, avg length, top external IDs
+
 ### Account & Authentication
 - `POST /auth/signup` — create account (sends verification email)
 - `POST /auth/login` — log in (returns access + refresh tokens)
