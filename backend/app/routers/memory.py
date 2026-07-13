@@ -101,11 +101,11 @@ async def delete_memory(
     project: Project = Depends(get_current_project),
     db: AsyncSession = Depends(get_db),
 ) -> None:
-    memory_service = MemoryService(db=db)
-    await memory_service.delete_memory(memory_id, project)
     activity = ActivityService(db)
     await activity.log(
         project_id=project.id,
         action="delete",
         memory_id=memory_id,
     )
+    memory_service = MemoryService(db=db)
+    await memory_service.delete_memory(memory_id, project)
