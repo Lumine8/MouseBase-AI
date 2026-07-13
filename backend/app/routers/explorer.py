@@ -121,9 +121,7 @@ async def batch_delete(
     project = await project_service._get_owned_project(current_user.id, project_id)
 
     memory_service = MemoryService(db=db)
-    deleted = await memory_service.batch_delete_memories(
-        request.memory_ids, project
-    )
+    deleted = await memory_service.batch_delete_memories(request.memory_ids, project)
 
     activity = ActivityService(db)
     await activity.log(

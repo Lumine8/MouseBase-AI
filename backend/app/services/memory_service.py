@@ -18,7 +18,9 @@ from app.models.memory import Memory
 from app.schemas.memory import MemoryResponse
 from app.schemas.update import UpdateMemoryRequest
 from app.schemas.explorer import (
-    MemoryListItem, MemoryListResponse, MemoryStatsResponse,
+    MemoryListItem,
+    MemoryListResponse,
+    MemoryStatsResponse,
 )
 from app.models.embedding import Embedding
 from app.models.usage import Usage
@@ -207,9 +209,7 @@ class MemoryService:
         if external_id:
             base_query = base_query.where(Memory.external_id == external_id)
         if content_search:
-            base_query = base_query.where(
-                Memory.content.ilike(f"%{content_search}%")
-            )
+            base_query = base_query.where(Memory.content.ilike(f"%{content_search}%"))
         if date_from:
             try:
                 dt_from = datetime.fromisoformat(date_from)
@@ -228,9 +228,7 @@ class MemoryService:
                 pass
         if metadata_filter and ":" in metadata_filter:
             key, value = metadata_filter.split(":", 1)
-            base_query = base_query.where(
-                Memory.metadata_[key].as_string() == value
-            )
+            base_query = base_query.where(Memory.metadata_[key].as_string() == value)
 
         count_query = select(func.count()).select_from(base_query.subquery())
         total_result = await self.db.execute(count_query)
@@ -318,10 +316,7 @@ class MemoryService:
             .order_by(func.count(Memory.id).desc())
             .limit(10)
         )
-        top_ids = [
-            {"external_id": row[0], "count": row[1]}
-            for row in top_ext_ids
-        ]
+        top_ids = [{"external_id": row[0], "count": row[1]} for row in top_ext_ids]
 
         top_meta = await self.db.execute(
             select(

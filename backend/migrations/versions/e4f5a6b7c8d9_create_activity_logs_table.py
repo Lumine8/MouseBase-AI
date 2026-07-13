@@ -31,12 +31,8 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(["memory_id"], ["memories.id"], ondelete="SET NULL"),
         sa.PrimaryKeyConstraint("id"),
     )
-    op.create_index(
-        "ix_activity_logs_project_id", "activity_logs", ["project_id"]
-    )
-    op.create_index(
-        "ix_activity_logs_created_at", "activity_logs", ["created_at"]
-    )
+    op.create_index("ix_activity_logs_project_id", "activity_logs", ["project_id"])
+    op.create_index("ix_activity_logs_created_at", "activity_logs", ["created_at"])
 
 
 def downgrade() -> None:
