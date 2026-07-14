@@ -114,7 +114,7 @@ class AuthService:
         result = await self.db.execute(
             select(RefreshToken).where(
                 RefreshToken.token_hash == token_hash,
-                not RefreshToken.revoked,
+                RefreshToken.revoked.is_(False),
                 RefreshToken.expires_at > datetime.now(timezone.utc),
             )
         )
@@ -180,7 +180,7 @@ class AuthService:
         await self.db.execute(
             select(RefreshToken).where(
                 RefreshToken.user_id == user_id,
-                not RefreshToken.revoked,
+                RefreshToken.revoked.is_(False),
             )
         )
         await self.db.commit()
@@ -202,9 +202,12 @@ class AuthService:
         if session is None:
             return
 
-        await self.db.execute(
+        rt_result = await self.db.execute(
             select(RefreshToken).where(RefreshToken.id == session.refresh_token_id)
         )
+        refresh_token = rt_result.scalar_one_or_none()
+        if refresh_token:
+            refresh_token.revoked = True
 
         await self.db.delete(session)
         await self.db.commit()
@@ -213,7 +216,7 @@ class AuthService:
         result = await self.db.execute(
             select(RefreshToken).where(
                 RefreshToken.user_id == user_id,
-                not RefreshToken.revoked,
+                RefreshToken.revoked.is_(False),
             )
         )
         tokens = result.scalars().all()

@@ -31,11 +31,28 @@ htmlcov/
 # Windows
 Thumbs.db
 
+# Logs
+*.log
+backend/uvicorn_err.txt
+backend/uvicorn_out.txt
+
+# Runtime
+*.pid
+*.seed
+*.pid.lock
+
 # Node
 node_modules/
 frontend/dist/
 frontend/tsconfig.tsbuildinfo
+packages/*/dist/
+packages/*/tsconfig.tsbuildinfo
 
 # Python build artifacts
 *.egg-info/
 dist/
+
+# Coverage
+.coverage
+coverage/
+htmlcov/

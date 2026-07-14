@@ -7,8 +7,8 @@ from app.models.project import Project
 from app.schemas.search import SearchRequest, SearchResponse
 from app.services.activity_service import ActivityService
 
-from app.services.gemini_embedding_service import GeminiEmbeddingService
 from app.services.search_service import SearchService
+from app.services import create_embedding_service
 
 router = APIRouter(
     prefix="/search",
@@ -47,7 +47,7 @@ async def search(
     project: Project = Depends(get_current_project),
     db: AsyncSession = Depends(get_db),
 ) -> SearchResponse:
-    embedding_service = GeminiEmbeddingService()
+    embedding_service = create_embedding_service()
     search_service = SearchService(db=db, embedding_service=embedding_service)
 
     result = await search_service.search(project, request)

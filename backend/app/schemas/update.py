@@ -23,7 +23,7 @@ class UpdateMemoryRequest(BaseModel):
     @classmethod
     def validate_content(cls, v):
         if v is None:
-            raise ValueError("Content cannot be None.")
+            return v
 
         value = v.strip()
         if not value:

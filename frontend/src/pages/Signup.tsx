@@ -38,6 +38,7 @@ export default function Signup() {
         full_name: fullName.trim() || null,
       });
       localStorage.setItem("mb_token", res.token);
+      localStorage.setItem("mb_refresh_token", res.refresh_token);
 
       const project: Project = await projects.create({ name: "demo-project" });
       localStorage.setItem("mb_api_key", project.api_key!);

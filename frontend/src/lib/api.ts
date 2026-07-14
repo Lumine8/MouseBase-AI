@@ -54,6 +54,41 @@ async function request<T>(
     return undefined as T;
   }
 
+  if (res.status === 401 && !useApiKey && !path.includes("/auth/login") && !path.includes("/auth/signup") && !path.includes("/auth/refresh")) {
+    const refreshToken = localStorage.getItem("mb_refresh_token");
+    if (refreshToken) {
+      try {
+        const refreshRes = await fetch(`${BASE_URL}/auth/refresh`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ refresh_token: refreshToken }),
+        });
+        if (refreshRes.ok) {
+          const refreshData = await refreshRes.json();
+          localStorage.setItem("mb_token", refreshData.token);
+          localStorage.setItem("mb_refresh_token", refreshData.refresh_token);
+
+          headers["Authorization"] = `Bearer ${refreshData.token}`;
+          const retryRes = await fetch(`${BASE_URL}${path}`, {
+            method,
+            headers,
+            body: body ? JSON.stringify(body) : undefined,
+          });
+          if (retryRes.status === 204) return undefined as T;
+          const retryData = await retryRes.json();
+          if (!retryRes.ok) {
+            const err = retryData?.error ?? {};
+            throw new ApiError(retryRes.status, err.code ?? "unknown_error", err.message ?? "An unexpected error occurred");
+          }
+          return retryData as T;
+        } else {
+          localStorage.removeItem("mb_token");
+          localStorage.removeItem("mb_refresh_token");
+        }
+      } catch {}
+    }
+  }
+
   const data = await res.json();
 
   if (!res.ok) {
@@ -149,6 +184,7 @@ export interface UserResponse {
 
 export interface AuthResponse {
   token: string;
+  refresh_token: string;
   user: UserResponse;
 }
 
@@ -163,11 +199,22 @@ export interface LoginRequest {
   password: string;
 }
 
+export interface RefreshRequest {
+  refresh_token: string;
+}
+
+export interface RefreshResponse {
+  token: string;
+  refresh_token: string;
+}
+
 export const auth = {
   signup: (data: SignupRequest) =>
     request<AuthResponse>("POST", "/auth/signup", data),
   login: (data: LoginRequest) =>
     request<AuthResponse>("POST", "/auth/login", data),
+  refresh: (refreshToken: string) =>
+    request<RefreshResponse>("POST", "/auth/refresh", { refresh_token: refreshToken }),
   me: () =>
     request<UserResponse>("GET", "/auth/me"),
 };

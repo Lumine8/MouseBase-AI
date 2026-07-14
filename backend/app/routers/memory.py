@@ -12,7 +12,7 @@ from app.services.activity_service import ActivityService
 
 from app.schemas.memory import MemoryResponse
 from app.schemas.update import UpdateMemoryRequest
-from app.services.gemini_embedding_service import GeminiEmbeddingService
+from app.services import create_embedding_service
 
 router = APIRouter(prefix="/memory", tags=["memory"])
 
@@ -69,7 +69,7 @@ async def update_memory(
 ) -> MemoryResponse:
     memory_service = MemoryService(
         db=db,
-        embedding_service=GeminiEmbeddingService(),
+        embedding_service=create_embedding_service(),
     )
 
     result = await memory_service.update_memory(memory_id, project, request)
