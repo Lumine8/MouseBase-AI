@@ -27,7 +27,7 @@ export default function Pricing() {
       try {
         const p = await fetchJson<Plan[]>("/payments/plans");
         if (p && p.length > 0) {
-          setPlans(p.some((x) => x.price > 0) ? p : null);
+          setPlans(p);
         }
       } catch {} finally {
         setLoading(false);
@@ -35,6 +35,14 @@ export default function Pricing() {
     };
     load();
   }, []);
+
+  const handlePlanClick = (planId: string) => {
+    if (planId === "FREE") {
+      navigate(loggedIn ? "/dashboard" : "/signup");
+    } else {
+      navigate(loggedIn ? "/billing" : "/signup");
+    }
+  };
 
   return (
     <>
@@ -68,7 +76,7 @@ export default function Pricing() {
                 <SkeletonLine width="60%" />
               </div>
             ))
-          ) : plans === null ? (
+          ) : !plans || plans.length === 0 ? (
             <div className="pricing-card" style={{
               background: "var(--bg-card)", borderRadius: 16,
               border: "1px solid var(--border-default)", padding: 32, textAlign: "center",
@@ -98,7 +106,7 @@ export default function Pricing() {
                   </div>
                   <div>
                     <span style={{ fontSize: 36, fontWeight: 700 }}>
-                      {plan.price === 0 ? "Free" : `$${plan.price / 100}`}
+                      {plan.price === 0 ? "Free" : `$${(plan.price / 100).toFixed(2)}`}
                     </span>
                     {isPaid && <span style={{ color: "var(--text-secondary)", fontSize: 14 }}>/mo</span>}
                   </div>
@@ -115,20 +123,13 @@ export default function Pricing() {
                       </div>
                     ))}
                   </div>
-                  {isPaid ? (
-                    <button disabled className="btn-secondary" style={{
-                      display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-                      opacity: 0.6, cursor: "default",
-                    }}>
-                      <FiClock /> Coming Soon
-                    </button>
-                  ) : (
-                    <button onClick={() => navigate(loggedIn ? "/dashboard" : "/signup")} className="btn-primary" style={{
-                      display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-                    }}>
-                      {loggedIn ? "Current Plan" : "Get Started"} <FiArrowRight />
-                    </button>
-                  )}
+                  <button onClick={() => handlePlanClick(plan.id)} className={isPaid ? "btn-primary" : "btn-secondary"} style={{
+                    display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                  }}>
+                    {plan.price === 0
+                      ? (loggedIn ? "Current Plan" : "Get Started")
+                      : (loggedIn ? "Upgrade" : "Sign Up")} <FiArrowRight />
+                  </button>
                 </div>
               );
             })
@@ -139,13 +140,15 @@ export default function Pricing() {
   );
 }
 
+const API_BASE = import.meta.env.VITE_API_URL ?? "/api/v1";
+
 async function fetchJson<T>(path: string): Promise<T> {
   const token = localStorage.getItem("mb_token") || localStorage.getItem("mb_api_key");
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   if (token) headers["Authorization"] = `Bearer ${token}`;
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 10_000);
-  const res = await fetch(`/api/v1${path}`, { method: "GET", headers, signal: controller.signal });
+  const res = await fetch(`${API_BASE}${path}`, { method: "GET", headers, signal: controller.signal });
   clearTimeout(timer);
   let data: any;
   try { data = await res.json(); } catch { data = {}; }

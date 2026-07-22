@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { FiX, FiPlus, FiDownload } from "react-icons/fi";
 
-const BASE = "/api/v1";
+const BASE = import.meta.env.VITE_API_URL ?? "/api/v1";
 
 interface Plan {
   id: string; name: string; price: number; max_projects: number;
