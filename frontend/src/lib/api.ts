@@ -390,6 +390,36 @@ export interface TimelineResponse {
   total_pages: number;
 }
 
+export interface TableInfo {
+  id: string;
+  label: string;
+  columns: string[];
+  row_count: number;
+}
+
+export interface TableRowsResponse {
+  table: string;
+  columns: string[];
+  rows: Record<string, unknown>[];
+  total: number;
+  page: number;
+  per_page: number;
+  total_pages: number;
+}
+
+export const data = {
+  listTables: () =>
+    request<{ tables: TableInfo[] }>("GET", "/data/tables"),
+  getRows: (table: string, params?: Record<string, string | number>) => {
+    const qs = params ? "?" + new URLSearchParams(
+      Object.entries(params).filter(([_, v]) => v !== undefined && v !== null).map(([k, v]) => [k, String(v)])
+    ).toString() : "";
+    return request<TableRowsResponse>("GET", `/data/${table}/rows${qs}`);
+  },
+  getCount: (table: string) =>
+    request<{ table: string; count: number }>("GET", `/data/${table}/count`),
+};
+
 export const api = {
   projects: {
     list: () =>

@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from "react-router-dom";
-import { FiGrid, FiDatabase, FiSearch, FiCode, FiBookOpen, FiActivity, FiSettings, FiUser, FiLogOut, FiCreditCard } from "react-icons/fi";
+import { FiGrid, FiDatabase, FiSearch, FiCode, FiBookOpen, FiActivity, FiSettings, FiUser, FiLogOut, FiCreditCard, FiLayers } from "react-icons/fi";
 import { useSidebar } from "../App";
 
 export default function Sidebar() {
@@ -8,6 +8,7 @@ export default function Sidebar() {
 
   const nav = [
     { to: "/dashboard", icon: FiGrid, label: "Dashboard" },
+    { to: "/data", icon: FiLayers, label: "Data" },
     { to: "/projects", icon: FiDatabase, label: "Projects" },
     { to: "/playground", icon: FiCode, label: "Playground" },
     { to: "/search", icon: FiSearch, label: "Search" },

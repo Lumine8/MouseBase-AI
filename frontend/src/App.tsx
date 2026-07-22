@@ -10,6 +10,7 @@ import SearchPage from "./pages/Search";
 import MemoryExplorer from "./pages/MemoryExplorer";
 import Documentation from "./pages/Documentation";
 import Analytics from "./pages/Analytics";
+import Data from "./pages/Data";
 import Settings from "./pages/Settings";
 import Landing from "./pages/Landing";
 import Pricing from "./pages/Pricing";
@@ -109,6 +110,7 @@ export default function App() {
       <Route path="/playground" element={<ProtectedRoute><Playground /></ProtectedRoute>} />
       <Route path="/search" element={<ProtectedRoute><SearchPage /></ProtectedRoute>} />
       <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
+      <Route path="/data" element={<ProtectedRoute><Data /></ProtectedRoute>} />
       <Route path="/billing" element={<ProtectedRoute><Billing /></ProtectedRoute>} />
       <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
 
