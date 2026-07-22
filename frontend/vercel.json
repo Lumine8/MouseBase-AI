@@ -1,10 +1,6 @@
 {
   "rewrites": [
     {
-      "source": "/api(/.*)?",
-      "destination": "https://api.mousebase.dev/api$1"
-    },
-    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
