@@ -18,8 +18,6 @@ PLAN_ORDER = [
     PlanType.FREE,
     PlanType.DEVELOPER,
     PlanType.PRO,
-    PlanType.TEAM_5,
-    PlanType.TEAM_10,
     PlanType.ENTERPRISE,
 ]
 
