@@ -85,10 +85,7 @@ app.add_middleware(RequestIDMiddleware)
 app.add_middleware(RequestTimingMiddleware)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://mousebase.dev",
-        "https://www.mousebase.dev",
-    ],
+    allow_origins=settings.CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

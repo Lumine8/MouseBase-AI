@@ -1,3 +1,4 @@
+import os
 from pydantic import Field
 from pathlib import Path
 
@@ -35,6 +36,20 @@ class Settings(BaseSettings):
     REDIS_URL: str = "redis://localhost:6379/0"
 
     FRONTEND_URL: str = "http://localhost:5173"
+
+    @property
+    def CORS_ORIGINS(self) -> list[str]:
+        raw = os.getenv("CORS_ORIGINS", "")
+        origins = [o.strip() for o in raw.split(",") if o.strip()]
+        if not origins:
+            origins = [
+                "http://localhost:5173",
+                "https://mousebase.dev",
+                "https://www.mousebase.dev",
+            ]
+        if self.FRONTEND_URL not in origins:
+            origins.append(self.FRONTEND_URL)
+        return origins
 
     API_KEY_ENCRYPTION_KEY: str = ""
 
