@@ -46,6 +46,8 @@ class Settings(BaseSettings):
                 "http://localhost:5173",
                 "https://mousebase.dev",
                 "https://www.mousebase.dev",
+                "https://mouse-base-ai.vercel.app",
+                "https://mousebase-ai.vercel.app",
             ]
         if self.FRONTEND_URL not in origins:
             origins.append(self.FRONTEND_URL)
