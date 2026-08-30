@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import date, timedelta
 
 from fastapi import APIRouter, Depends
-from sqlalchemy import select, func
+from sqlalchemy import select, func, literal
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.dependencies import get_db
@@ -123,7 +123,7 @@ async def dashboard_analytics(
             func.coalesce(func.sum(Usage.searches), 0),
             func.coalesce(func.sum(Usage.embeddings), 0),
         ).where(
-            Usage.project_id.in_(project_ids) if project_ids else False,
+            Usage.project_id.in_(project_ids) if project_ids else literal(False),
         )
     )
     t = total.one()
@@ -133,14 +133,14 @@ async def dashboard_analytics(
 
     mem_count = await db.execute(
         select(func.count(Memory.id)).where(
-            Memory.project_id.in_(project_ids) if project_ids else False,
+            Memory.project_id.in_(project_ids) if project_ids else literal(False),
         )
     )
     total_memories = mem_count.scalar() or 0
 
     storage = await db.execute(
         select(func.coalesce(func.sum(Usage.storage_bytes), 0)).where(
-            Usage.project_id.in_(project_ids) if project_ids else False,
+            Usage.project_id.in_(project_ids) if project_ids else literal(False),
         )
     )
     total_storage_bytes = storage.scalar() or 0
@@ -173,7 +173,7 @@ async def billing_usage(
 
     mem_count = await db.execute(
         select(func.count(Memory.id)).where(
-            Memory.project_id.in_(project_ids) if project_ids else False,
+            Memory.project_id.in_(project_ids) if project_ids else literal(False),
         )
     )
     total_memories = mem_count.scalar() or 0
@@ -185,7 +185,7 @@ async def billing_usage(
             func.coalesce(func.sum(Usage.embeddings), 0),
             func.coalesce(func.sum(Usage.storage_bytes), 0),
         ).where(
-            Usage.project_id.in_(project_ids) if project_ids else False,
+            Usage.project_id.in_(project_ids) if project_ids else literal(False),
             Usage.date >= month_start,
             Usage.date <= today,
         )
