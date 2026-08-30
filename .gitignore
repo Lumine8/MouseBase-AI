@@ -56,3 +56,5 @@ dist/
 .coverage
 coverage/
 htmlcov/
+.vercel
+.env*
