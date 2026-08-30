@@ -24,7 +24,7 @@ Unlike traditional databases that match exact keywords, MouseBase finds memories
 
 | Service | URL |
 |---------|-----|
-| Dashboard | [mouse-base-ai.vercel.app](https://mouse-base-ai.vercel.app) |
+| Dashboard | [mousebase-ai.vercel.app](https://mousebase-ai.vercel.app) |
 | API | [api.mousebase.dev](https://api.mousebase.dev) |
 | Health | [api.mousebase.dev/health/](https://api.mousebase.dev/health/) |
 
@@ -115,11 +115,14 @@ npx mousebase projects list
 
 | Plan | Price | Memories | Projects | Searches/mo | Requests/hr |
 |------|-------|----------|----------|-------------|-------------|
-| Free | $0 | 1,000 | 1 | 100 | 10 |
-| Hobby | $3.99/mo | 25,000 | 5 | 5,000 | 200 |
-| Pro | $7.99/mo | 250,000 | 10 | 50,000 | 2,000 |
+| Free | $0 | 5,000 | 3 | 5,000 | 500 |
+| Hobby | $3.99/mo | 25,000 | 5 | 25,000 | 1,000 |
+| Pro | $7.99/mo | 250,000 | 10 | 100,000 | 5,000 |
 
-Addons available: extra memories (+$1/mo per 10k), extra projects (+$1/mo each), extra searches (+$1/mo per 1k).
+**Addons:**
+- +1,000 memories — $0.49/mo
+- +1,000 searches — $0.29/mo
+- +1 project — $0.99/mo
 
 ---
 
@@ -129,33 +132,33 @@ All endpoints are available at `https://api.mousebase.dev/api/v1`.
 
 ### Memory Operations
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/remember/` | Store a memory |
-| `POST` | `/search/` | Search memories semantically |
-| `GET` | `/memory/{id}` | Get a memory by ID |
-| `PATCH` | `/memory/{id}` | Update a memory |
-| `DELETE` | `/memory/{id}` | Delete a memory |
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| `POST` | `/remember/` | API key | Store a memory |
+| `POST` | `/search/` | API key | Search memories semantically |
+| `GET` | `/memory/{id}` | API key | Get a memory by ID |
+| `PATCH` | `/memory/{id}` | API key | Update a memory |
+| `DELETE` | `/memory/{id}` | API key | Delete a memory |
 
 ### Memory Explorer
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/projects/{id}/memories` | Paginated list with filters |
-| `GET` | `/projects/{id}/memories/stats` | Per-project analytics |
-| `POST` | `/projects/{id}/memories/batch-delete` | Delete multiple memories |
-| `POST` | `/projects/{id}/memories/export` | Export as JSON/CSV/NDJSON |
-| `POST` | `/projects/{id}/memories/move` | Move to another project |
-| `POST` | `/projects/{id}/memories/batch-add-metadata` | Bulk metadata update |
-| `GET` | `/projects/{id}/memories/timeline` | Activity timeline |
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| `GET` | `/projects/{id}/memories` | JWT | Paginated list with filters |
+| `GET` | `/projects/{id}/memories/stats` | JWT | Per-project analytics |
+| `GET` | `/projects/{id}/memories/timeline` | JWT | Activity timeline |
+| `POST` | `/projects/{id}/memories/batch-delete` | JWT | Delete multiple memories |
+| `POST` | `/projects/{id}/memories/export` | JWT | Export as JSON/CSV/NDJSON |
+| `POST` | `/projects/{id}/memories/move` | JWT | Move to another project |
+| `POST` | `/projects/{id}/memories/batch-add-metadata` | JWT | Bulk metadata update |
 
 ### Data Explorer
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/data/tables` | List all tables with row counts |
-| `GET` | `/data/{table}/rows` | Paginated rows with sorting |
-| `GET` | `/data/{table}/count` | Row count for a table |
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| `GET` | `/data/tables` | JWT | List all tables with row counts |
+| `GET` | `/data/{table}/rows` | JWT | Paginated rows with sorting |
+| `GET` | `/data/{table}/count` | JWT | Row count for a table |
 
 ### Account & Auth
 
@@ -182,7 +185,7 @@ All endpoints are available at `https://api.mousebase.dev/api/v1`.
 | `GET` | `/projects/{id}` | Get project |
 | `PATCH` | `/projects/{id}` | Update project |
 | `DELETE` | `/projects/{id}` | Delete project |
-| `POST` | `/projects/{id}/api-key/rotate` | Rotate API key |
+| `POST` | `/projects/{id}/rotate-key` | Rotate API key |
 
 ### Dashboard & Analytics
 
@@ -197,14 +200,17 @@ All endpoints are available at `https://api.mousebase.dev/api/v1`.
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `GET` | `/payments/plans` | List available plans |
+| `GET` | `/payments/addons` | List available addons |
+| `GET` | `/payments/exchange-rate?currency=INR` | Live exchange rate |
 | `POST` | `/payments/create-order` | Create Razorpay order |
-| `POST` | `/payments/verify` | Verify payment |
+| `POST` | `/payments/verify` | Verify payment and upgrade plan |
 | `GET` | `/payments/subscription` | Get subscription info |
-| `POST` | `/payments/cancel` | Cancel subscription |
-| `GET` | `/payments/history` | Billing history |
+| `POST` | `/payments/cancel` | Cancel subscription (reverts to Free) |
+| `GET` | `/payments/history` | Payment history |
 | `POST` | `/payments/create-addon-order` | Create addon order |
 | `POST` | `/payments/verify-addon` | Verify addon payment |
 | `POST` | `/payments/cancel-addon` | Cancel addon |
+| `POST` | `/payments/webhook` | Razorpay webhook receiver |
 
 ---
 
@@ -226,9 +232,15 @@ MouseBase is built with production security from day one.
 - Sign out everywhere: `DELETE /auth/sessions`
 
 ### Rate Limiting
-- 60 requests per minute per IP (configurable)
-- Disabled in development
-- Per-endpoint rate limit overrides available
+- **Global**: 60 requests per minute per IP
+- **Per-user**: Plan-based hourly limits (500/hr Free, 1,000/hr Hobby, 5,000/hr Pro)
+- **Memory limits**: Enforced per account — 5k Free, 25k Hobby, 250k Pro
+
+### Plan Enforcement
+- Memory storage blocked when limit reached
+- Plans can be changed in any direction (upgrade/downgrade/same)
+- Cancellation immediately reverts to Free plan and limits
+- Subscription changes reflected in real-time on the dashboard
 
 ### Security Headers
 - `Strict-Transport-Security` (HSTS, 1 year, include subdomains)
@@ -246,6 +258,11 @@ MouseBase is built with production security from day one.
 - Sentry integration (enable with `SENTRY_DSN` env var)
 - All unhandled exceptions logged with request ID
 - Structured error responses: `{"error": {"code": "...", "message": "..."}}`
+
+### Webhook Processing
+- Razorpay webhook receiver with signature verification
+- Handles `payment.captured`, `subscription.cancelled`, `subscription.charged`
+- Duplicate event detection via unique event IDs
 
 ---
 
@@ -357,14 +374,27 @@ See the [examples directory](mousebase/examples/) for complete runnable scripts:
 
 ```
 Frontend (Vercel)  ──▶  API (Render)  ──▶  PostgreSQL (Neon)
-  mouse-base-ai.         api.mousebase.dev     ep-quiet-tooth-...
+  mousebase-ai.         api.mousebase.dev     ep-quiet-tooth-...
   vercel.app                                      (connection pooled)
        │                       │
        │                       ├── Sentry (error tracking)
+       │                       ├── In-memory rate limiting
+       │                       ├── Usage tracking (per-project)
        │                       └── Keepalive pings (GitHub Actions, 10 min)
        │
        └── PyPI / npm (package distribution)
 ```
+
+### What Runs Where
+
+| Component | Host | Notes |
+|-----------|------|-------|
+| Frontend | Vercel | React SPA, auto-deployed from `main` |
+| API Server | Render | FastAPI + uvicorn, free tier (spins down after inactivity) |
+| Database | Neon | Serverless PostgreSQL with pgvector, connection pooled |
+| Embeddings | Gemini / OpenAI | Configurable via env var, local fallback for dev |
+| Payments | Razorpay | One-time + subscription billing, webhook receiver |
+| Monitoring | Sentry | Error tracking, 0.1% sample rate |
 
 ---
 
@@ -374,7 +404,7 @@ Frontend (Vercel)  ──▶  API (Render)  ──▶  PostgreSQL (Neon)
 
 | Workflow | Trigger | Description |
 |----------|---------|-------------|
-| Backend CI | Push to main/develop, PRs | Ruff lint, Black format, pytest, Docker build |
+| Backend CI | Push to main/develop, PRs | Ruff lint, Black format, pytest |
 | Deploy Frontend | Push to main (frontend/) | Build + deploy to Vercel |
 | Keepalive | Every 10 minutes | Pings Render + Neon to prevent free-tier sleep |
 
@@ -403,7 +433,7 @@ MouseBase is in active development. The API is stable and ready for production u
 - **Python SDK**: v0.2.9 ([PyPI](https://pypi.org/project/mousebase/))
 - **JavaScript SDK**: v0.1.4 ([npm](https://www.npmjs.com/package/mousebase))
 - **Backend API**: v0.1.0 ([api.mousebase.dev](https://api.mousebase.dev))
-- **Dashboard**: [mouse-base-ai.vercel.app](https://mouse-base-ai.vercel.app)
+- **Dashboard**: [mousebase-ai.vercel.app](https://mousebase-ai.vercel.app)
 
 ## License
 
