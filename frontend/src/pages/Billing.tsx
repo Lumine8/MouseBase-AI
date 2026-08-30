@@ -262,9 +262,7 @@ export default function Billing() {
             <div>
               <h2 style={{ fontSize: 18, margin: "0 0 4px" }}>Current Plan</h2>
               <p style={{ fontSize: 13, color: "var(--text-secondary)", margin: 0 }}>
-                {isPaid
-                  ? "You are on the <strong>" + activePlanName + "</strong> plan"
-                  : "You are on the <strong>Free</strong> plan"}
+                You are on the <strong>{isPaid ? activePlanName : "Free"}</strong> plan
               </p>
             </div>
             <div style={{
