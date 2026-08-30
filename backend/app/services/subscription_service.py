@@ -69,6 +69,7 @@ async def upgrade_subscription(
     limits = _get_default_limits(new_plan)
     sub.plan = new_plan
     sub.status = SubscriptionStatus.ACTIVE
+    sub.cancel_at_period_end = False
     sub.renewal_date = datetime.now(timezone.utc) + timedelta(days=30)
     sub.max_projects = limits["max_projects"]
     sub.max_memories = limits["max_memories"]
