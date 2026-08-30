@@ -18,13 +18,29 @@ TABLE_CONFIG = {
     "projects": {
         "model": Project,
         "label": "Projects",
-        "columns": ["id", "name", "description", "plan", "status", "created_at", "updated_at", "last_used_at"],
+        "columns": [
+            "id",
+            "name",
+            "description",
+            "plan",
+            "status",
+            "created_at",
+            "updated_at",
+            "last_used_at",
+        ],
         "order_by": "created_at",
     },
     "memories": {
         "model": Memory,
         "label": "Memories",
-        "columns": ["id", "project_id", "external_id", "content", "created_at", "updated_at"],
+        "columns": [
+            "id",
+            "project_id",
+            "external_id",
+            "content",
+            "created_at",
+            "updated_at",
+        ],
         "order_by": "created_at",
     },
     "activity_logs": {
@@ -36,7 +52,16 @@ TABLE_CONFIG = {
     "usage": {
         "model": Usage,
         "label": "Usage",
-        "columns": ["id", "project_id", "date", "requests", "searches", "embeddings", "storage_bytes", "created_at"],
+        "columns": [
+            "id",
+            "project_id",
+            "date",
+            "requests",
+            "searches",
+            "embeddings",
+            "storage_bytes",
+            "created_at",
+        ],
         "order_by": "date",
     },
 }
@@ -56,18 +81,28 @@ async def list_tables(
     for key, cfg in TABLE_CONFIG.items():
         model = cfg["model"]
         if key == "projects":
-            count_q = select(func.count()).select_from(model).where(model.owner_id == current_user.id)
+            count_q = (
+                select(func.count())
+                .select_from(model)
+                .where(model.owner_id == current_user.id)
+            )
         elif hasattr(model, "project_id"):
-            count_q = select(func.count()).select_from(model).where(model.project_id.in_(project_ids_subq))
+            count_q = (
+                select(func.count())
+                .select_from(model)
+                .where(model.project_id.in_(project_ids_subq))
+            )
         else:
             count_q = select(func.count()).select_from(model)
         count = await db.scalar(count_q)
-        tables.append({
-            "id": key,
-            "label": cfg["label"],
-            "columns": cfg["columns"],
-            "row_count": count or 0,
-        })
+        tables.append(
+            {
+                "id": key,
+                "label": cfg["label"],
+                "columns": cfg["columns"],
+                "row_count": count or 0,
+            }
+        )
     return {"tables": tables}
 
 
@@ -157,9 +192,17 @@ async def get_table_count(
     project_ids_subq = _get_project_ids_query(current_user.id)
 
     if table == "projects":
-        q = select(func.count()).select_from(model).where(model.owner_id == current_user.id)
+        q = (
+            select(func.count())
+            .select_from(model)
+            .where(model.owner_id == current_user.id)
+        )
     elif hasattr(model, "project_id"):
-        q = select(func.count()).select_from(model).where(model.project_id.in_(project_ids_subq))
+        q = (
+            select(func.count())
+            .select_from(model)
+            .where(model.project_id.in_(project_ids_subq))
+        )
     else:
         q = select(func.count()).select_from(model)
     count = await db.scalar(q) or 0
