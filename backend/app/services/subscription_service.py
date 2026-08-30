@@ -104,6 +104,12 @@ async def cancel_subscription(db: AsyncSession, user_id: uuid.UUID) -> Subscript
         raise ValueError("Subscription is already canceled")
     sub.status = SubscriptionStatus.CANCELED
     sub.cancel_at_period_end = True
+    free_limits = _get_default_limits(PlanType.FREE)
+    sub.plan = PlanType.FREE
+    sub.max_projects = free_limits["max_projects"]
+    sub.max_memories = free_limits["max_memories"]
+    sub.max_searches_per_month = free_limits["max_searches_per_month"]
+    sub.requests_per_hour = free_limits["requests_per_hour"]
     await db.commit()
     await db.refresh(sub)
     return sub
