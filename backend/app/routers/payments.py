@@ -18,6 +18,10 @@ from app.schemas.payment import (
     VerifyPaymentRequest,
     VerifyPaymentResponse,
 )
+import logging
+from datetime import datetime, timedelta, timezone
+
+from app.models.subscription import SubscriptionStatus
 from app.services.exchange_rate import get_rate
 from app.services.payment_service import (
     create_addon_order as payment_create_addon_order,
@@ -35,6 +39,8 @@ from app.services.subscription_service import (
     get_subscription,
     upgrade_subscription,
 )
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/payments", tags=["payments"])
 
@@ -244,17 +250,89 @@ async def razorpay_webhook(
         result = process_webhook(body, signature)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+
     result_obj = await db.execute(
         select(WebhookEvent).where(WebhookEvent.razorpay_event_id == result["event_id"])
     )
     existing = result_obj.scalar_one_or_none()
     if existing:
         return {"status": "ignored", "reason": "duplicate"}
+
     webhook_event = WebhookEvent(
         razorpay_event_id=result["event_id"],
         event_type=result["event_type"],
         payload=result["payload"],
     )
     db.add(webhook_event)
+
+    event_type = result["event_type"]
+    payload = result["payload"]
+
+    try:
+        if event_type == "payment.captured":
+            await _handle_payment_captured(db, payload)
+        elif event_type == "subscription.cancelled":
+            await _handle_subscription_cancelled(db, payload)
+        elif event_type == "subscription.charged":
+            await _handle_subscription_charged(db, payload)
+    except Exception:
+        logger.exception("Failed to process webhook event %s", event_type)
+
     await db.commit()
     return {"status": "processed"}
+
+
+async def _handle_payment_captured(db: AsyncSession, payload: dict) -> None:
+    notes = (
+        payload.get("payload", {}).get("payment", {}).get("entity", {}).get("notes", {})
+    )
+    user_id = notes.get("user_id")
+    if not user_id:
+        return
+    try:
+        uid = __import__("uuid").UUID(user_id)
+    except (ValueError, AttributeError):
+        return
+    sub = await get_subscription(db, uid)
+    if sub:
+        sub.status = SubscriptionStatus.ACTIVE
+        sub.renewal_date = datetime.now(timezone.utc) + timedelta(days=30)
+
+
+async def _handle_subscription_cancelled(db: AsyncSession, payload: dict) -> None:
+    notes = (
+        payload.get("payload", {})
+        .get("subscription", {})
+        .get("entity", {})
+        .get("notes", {})
+    )
+    user_id = notes.get("user_id")
+    if not user_id:
+        return
+    try:
+        uid = __import__("uuid").UUID(user_id)
+    except (ValueError, AttributeError):
+        return
+    sub = await get_subscription(db, uid)
+    if sub and sub.status != SubscriptionStatus.CANCELED:
+        await cancel_subscription(db, uid)
+
+
+async def _handle_subscription_charged(db: AsyncSession, payload: dict) -> None:
+    notes = (
+        payload.get("payload", {})
+        .get("subscription", {})
+        .get("entity", {})
+        .get("notes", {})
+    )
+    user_id = notes.get("user_id")
+    if not user_id:
+        return
+    try:
+        uid = __import__("uuid").UUID(user_id)
+    except (ValueError, AttributeError):
+        return
+    sub = await get_subscription(db, uid)
+    if sub:
+        sub.status = SubscriptionStatus.ACTIVE
+        sub.renewal_date = datetime.now(timezone.utc) + timedelta(days=30)

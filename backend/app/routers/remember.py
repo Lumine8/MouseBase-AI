@@ -9,6 +9,7 @@ from app.schemas.memory import MemoryResponse
 from app.services.activity_service import ActivityService
 
 from app.services.memory_service import remember
+from app.services.usage_service import UsageService
 
 router = APIRouter(
     prefix="/remember",
@@ -50,6 +51,10 @@ async def remember_endpoint(
     db: AsyncSession = Depends(get_db),
 ) -> MemoryResponse:
     result = await remember(project=project, request=request, db=db)
+    usage = UsageService(db)
+    await usage.increment_requests(project.id)
+    await usage.increment_embeddings(project.id)
+    await usage.increment_storage(project.id, len(request.content.encode("utf-8")))
     activity = ActivityService(db)
     await activity.log(
         project_id=project.id,

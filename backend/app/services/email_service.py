@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import logging
 import smtplib
 from email.mime.text import MIMEText
@@ -27,7 +28,7 @@ class SMTPEmailSender:
         self.password = settings.SMTP_PASSWORD
         self.from_addr = settings.SMTP_FROM
 
-    def send(self, to: str, subject: str, body: str) -> None:
+    def _send_sync(self, to: str, subject: str, body: str) -> None:
         msg = MIMEText(body, "plain")
         msg["Subject"] = subject
         msg["From"] = self.from_addr
@@ -39,8 +40,27 @@ class SMTPEmailSender:
                 server.login(self.username, self.password)
             server.send_message(msg)
 
+    def send(self, to: str, subject: str, body: str) -> None:
+        asyncio.get_event_loop().run_in_executor(
+            None, self._send_sync, to, subject, body
+        )
+
+
+class AsyncEmailSender:
+    def __init__(self, sync_sender: SMTPEmailSender) -> None:
+        self._sync = sync_sender
+
+    def send(self, to: str, subject: str, body: str) -> None:
+        loop = asyncio.get_event_loop()
+        if loop.is_running():
+            asyncio.ensure_future(
+                asyncio.to_thread(self._sync._send_sync, to, subject, body)
+            )
+        else:
+            loop.run_in_executor(None, self._sync._send_sync, to, subject, body)
+
 
 def get_email_sender() -> EmailSender:
     if settings.SMTP_HOST and settings.ENVIRONMENT != "development":
-        return SMTPEmailSender()
+        return AsyncEmailSender(SMTPEmailSender())
     return ConsoleEmailSender()

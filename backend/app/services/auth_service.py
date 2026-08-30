@@ -177,12 +177,15 @@ class AuthService:
             raise InvalidTokenError()
 
         user.password_hash = password_hash.hash(request.password)
-        await self.db.execute(
+        result = await self.db.execute(
             select(RefreshToken).where(
                 RefreshToken.user_id == user_id,
                 RefreshToken.revoked.is_(False),
             )
         )
+        tokens = result.scalars().all()
+        for t in tokens:
+            t.revoked = True
         await self.db.commit()
 
     async def list_sessions(self, user_id: UUID) -> list[SessionResponse]:

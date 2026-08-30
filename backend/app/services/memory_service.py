@@ -39,6 +39,10 @@ async def remember(
     request: RememberRequest,
     db: AsyncSession,
 ) -> MemoryResponse:
+    limited, msg = await check_memory_limit(db, project)
+    if limited:
+        raise MemoryLimitError(msg)
+
     embedding_service = create_embedding_service()
     vector = await embedding_service.embed(request.content)
 

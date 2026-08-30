@@ -9,6 +9,7 @@ from app.models.project import Project
 
 from app.services.memory_service import MemoryService
 from app.services.activity_service import ActivityService
+from app.services.usage_service import UsageService
 
 from app.schemas.memory import MemoryResponse
 from app.schemas.update import UpdateMemoryRequest
@@ -30,6 +31,8 @@ async def get_memory(
     db: AsyncSession = Depends(get_db),
 ) -> MemoryResponse:
     memory_service = MemoryService(db=db)
+    usage = UsageService(db)
+    await usage.increment_requests(project.id)
     return await memory_service.get_memory(memory_id, project)
 
 
@@ -73,6 +76,11 @@ async def update_memory(
     )
 
     result = await memory_service.update_memory(memory_id, project, request)
+    usage = UsageService(db)
+    await usage.increment_requests(project.id)
+    if request.content is not None:
+        await usage.increment_embeddings(project.id)
+        await usage.increment_storage(project.id, len(request.content.encode("utf-8")))
     activity = ActivityService(db)
     changed = []
     if request.content is not None:
@@ -108,4 +116,6 @@ async def delete_memory(
         memory_id=memory_id,
     )
     memory_service = MemoryService(db=db)
+    usage = UsageService(db)
+    await usage.increment_requests(project.id)
     await memory_service.delete_memory(memory_id, project)

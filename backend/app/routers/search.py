@@ -9,6 +9,7 @@ from app.services.activity_service import ActivityService
 
 from app.services.search_service import SearchService
 from app.services import create_embedding_service
+from app.services.usage_service import UsageService
 
 router = APIRouter(
     prefix="/search",
@@ -51,6 +52,9 @@ async def search(
     search_service = SearchService(db=db, embedding_service=embedding_service)
 
     result = await search_service.search(project, request)
+    usage = UsageService(db)
+    await usage.increment_requests(project.id)
+    await usage.increment_searches(project.id)
     activity = ActivityService(db)
     await activity.log(
         project_id=project.id,
