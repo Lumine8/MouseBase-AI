@@ -28,10 +28,10 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
-      - name: Install Linux rollup binary
-        run: npm install @rollup/rollup-linux-x64-gnu --no-save
+      - name: Install platform-specific rollup binary
+        run: npm install --no-save @rollup/rollup-linux-x64-gnu
 
       - name: Build
         run: npm run build

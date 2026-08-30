@@ -34,7 +34,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "black>=26.5.1",
-    "ruff>=0.12.0",
+    "ruff>=0.15.20,<0.16.0",
     "httpx>=0.28.1",
     "pytest>=9.1.1",
     "pytest-asyncio>=1.4.0",
@@ -44,6 +44,22 @@ dev = [
 [tool.ruff]
 line-length = 100
 extend-exclude = ["migrations", "temp_migrations", "scripts"]
+
+[tool.ruff.lint]
+extend-ignore = [
+    "B008",   # Depends() in function args — standard FastAPI pattern
+    "BLE001", # Blind except — intentional in fallback/retry paths
+    "S110",   # try-except-pass — intentional fallback pattern
+    "DTZ011", # date.today() without tz — acceptable for daily buckets
+    "RUF012", # Mutable class attrs — standard for SQLAlchemy models
+    "I001",   # Import block sorting — handled by black/isort
+    "UP045",  # Optional[X] -> X | None — not enforced
+    "UP017",  # datetime.UTC alias — not enforced
+    "UP035",  # collections.abc imports — not enforced
+    "UP037",  # Remove quotes from annotations — not enforced
+    "RUF010", # Explicit conversion flag — not enforced
+    "RUF022", # __all__ not sorted — not enforced
+]
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
