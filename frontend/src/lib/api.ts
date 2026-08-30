@@ -11,7 +11,7 @@ class ApiError extends Error {
   }
 }
 
-const TIMEOUT_MS = 10_000;
+const TIMEOUT_MS = 60_000;
 
 async function request<T>(
   method: string,
