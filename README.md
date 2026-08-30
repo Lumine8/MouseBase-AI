@@ -9,7 +9,6 @@
     <a href="https://api.mousebase.dev/health/"><img src="https://img.shields.io/endpoint?style=flat-square&url=https%3A%2F%2Fapi.mousebase.dev%2Fhealth%2F&label=API&color=f59e0b" alt="API Status" /></a>
     <a href="LICENSE"><img src="https://img.shields.io/badge/license-Proprietary-fde68a?style=flat-square" alt="License" /></a>
     <a href="https://github.com/Lumine8/MouseBase-AI/actions"><img src="https://img.shields.io/github/actions/workflow/status/Lumine8/MouseBase-AI/ci.yml?style=flat-square&label=CI&color=f59e0b" alt="CI" /></a>
-    <a href="https://github.com/Lumine8/MouseBase-AI"><img src="https://img.shields.io/github/stars/Lumine8/MouseBase-AI?style=flat-square&label=Stars&color=b45309" alt="Stars" /></a>
   </p>
 </div>
 
@@ -20,6 +19,16 @@
 MouseBase gives your AI agents **persistent memory**. Store, retrieve, and semantically search memories with a simple API — backed by vector embeddings and PostgreSQL.
 
 Unlike traditional databases that match exact keywords, MouseBase finds memories by **meaning**. Your AI can remember user preferences, conversation context, and past decisions without you writing complex query logic.
+
+## Live
+
+| Service | URL |
+|---------|-----|
+| Dashboard | [mouse-base-ai.vercel.app](https://mouse-base-ai.vercel.app) |
+| API | [api.mousebase.dev](https://api.mousebase.dev) |
+| Health | [api.mousebase.dev/health/](https://api.mousebase.dev/health/) |
+
+---
 
 ## Quick Start
 
@@ -102,6 +111,18 @@ npx mousebase projects list
 
 ---
 
+## Pricing
+
+| Plan | Price | Memories | Projects | Searches/mo | Requests/hr |
+|------|-------|----------|----------|-------------|-------------|
+| Free | $0 | 1,000 | 1 | 100 | 10 |
+| Hobby | $3.99/mo | 25,000 | 5 | 5,000 | 200 |
+| Pro | $7.99/mo | 250,000 | 10 | 50,000 | 2,000 |
+
+Addons available: extra memories (+$1/mo per 10k), extra projects (+$1/mo each), extra searches (+$1/mo per 1k).
+
+---
+
 ## API Endpoints
 
 All endpoints are available at `https://api.mousebase.dev/api/v1`.
@@ -112,9 +133,9 @@ All endpoints are available at `https://api.mousebase.dev/api/v1`.
 |--------|----------|-------------|
 | `POST` | `/remember/` | Store a memory |
 | `POST` | `/search/` | Search memories semantically |
-| `GET` | `/{memory_id}` | Get a memory by ID |
-| `PATCH` | `/{memory_id}` | Update a memory |
-| `DELETE` | `/{memory_id}` | Delete a memory |
+| `GET` | `/memory/{id}` | Get a memory by ID |
+| `PATCH` | `/memory/{id}` | Update a memory |
+| `DELETE` | `/memory/{id}` | Delete a memory |
 
 ### Memory Explorer
 
@@ -126,12 +147,21 @@ All endpoints are available at `https://api.mousebase.dev/api/v1`.
 | `POST` | `/projects/{id}/memories/export` | Export as JSON/CSV/NDJSON |
 | `POST` | `/projects/{id}/memories/move` | Move to another project |
 | `POST` | `/projects/{id}/memories/batch-add-metadata` | Bulk metadata update |
+| `GET` | `/projects/{id}/memories/timeline` | Activity timeline |
+
+### Data Explorer
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/data/tables` | List all tables with row counts |
+| `GET` | `/data/{table}/rows` | Paginated rows with sorting |
+| `GET` | `/data/{table}/count` | Row count for a table |
 
 ### Account & Auth
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `POST` | `/auth/signup` | Create account (sends verification email) |
+| `POST` | `/auth/signup` | Create account |
 | `POST` | `/auth/login` | Sign in (returns access + refresh tokens) |
 | `POST` | `/auth/refresh` | Refresh access token |
 | `POST` | `/auth/verify-email` | Verify email with token |
@@ -152,16 +182,29 @@ All endpoints are available at `https://api.mousebase.dev/api/v1`.
 | `GET` | `/projects/{id}` | Get project |
 | `PATCH` | `/projects/{id}` | Update project |
 | `DELETE` | `/projects/{id}` | Delete project |
-| `POST` | `/projects/{id}/rotate-key` | Rotate API key |
+| `POST` | `/projects/{id}/api-key/rotate` | Rotate API key |
 
-### Dashboard & Payments
+### Dashboard & Analytics
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `GET` | `/metrics` | Dashboard metrics |
-| `GET` | `/analytics` | Usage analytics |
+| `GET` | `/dashboard/metrics` | Dashboard metrics |
+| `GET` | `/dashboard/analytics` | Usage analytics with daily breakdown |
+| `GET` | `/dashboard/billing-usage` | Billing usage summary |
+
+### Payments
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
 | `GET` | `/payments/plans` | List available plans |
+| `POST` | `/payments/create-order` | Create Razorpay order |
+| `POST` | `/payments/verify` | Verify payment |
 | `GET` | `/payments/subscription` | Get subscription info |
+| `POST` | `/payments/cancel` | Cancel subscription |
+| `GET` | `/payments/history` | Billing history |
+| `POST` | `/payments/create-addon-order` | Create addon order |
+| `POST` | `/payments/verify-addon` | Verify addon payment |
+| `POST` | `/payments/cancel-addon` | Cancel addon |
 
 ---
 
@@ -204,19 +247,45 @@ MouseBase is built with production security from day one.
 - All unhandled exceptions logged with request ID
 - Structured error responses: `{"error": {"code": "...", "message": "..."}}`
 
-### Secret Rotation
-- Management script at `backend/scripts/rotate_secrets.py`
-- Supports JWT secret, API key encryption key, and webhook secret rotation
-- Run `python scripts/rotate_secrets.py check` to view status
-
-### Health Monitoring
-- `GET /health/` — checks database connectivity, returns status + latency
-- `GET /` — simple liveness check
-- External monitoring recommended: UptimeRobot, Better Stack, or Render built-in
-
 ---
 
-## Docker
+## Self-Hosting
+
+### Requirements
+
+- Python 3.12+
+- PostgreSQL 16+ with pgvector extension
+- An embedding provider (Gemini or OpenAI API key)
+
+### Backend Setup
+
+```bash
+git clone https://github.com/Lumine8/MouseBase-AI.git
+cd MouseBase-AI/backend
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+pip install -e ".[dev]"
+
+# Configure environment
+cp .env.example .env
+# Edit .env with your DATABASE_URL, SECRET_KEY, GEMINI_API_KEY, etc.
+
+# Run migrations
+alembic upgrade head
+
+# Start server
+uvicorn app.main:app --reload
+```
+
+### Frontend Setup
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+### Docker
 
 ```bash
 docker run -d \
@@ -225,31 +294,6 @@ docker run -d \
   -e DATABASE_URL=postgresql://user:pass@host:5432/mousebase \
   -e GEMINI_API_KEY=your_key \
   lumine8/mousebase:latest
-```
-
-## Self-Hosting
-
-### Requirements
-
-- Python 3.10+
-- PostgreSQL 16+ with pgvector extension
-- An embedding provider (Gemini or OpenAI API key)
-
-### Setup
-
-```bash
-git clone https://github.com/Lumine8/MouseBase-AI.git
-cd MouseBase
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-
-# Configure environment
-cp .env.example .env
-# Edit .env with your database URL and API keys
-
-# Run
-uvicorn app.main:app --reload
 ```
 
 ---
@@ -290,28 +334,11 @@ project = client.projects.create(name="My Project")
 See the [examples directory](mousebase/examples/) for complete runnable scripts:
 
 - `notes.py` — Simple notes app with semantic search
-- `rag.py` — RAG pipeline (index → retrieve → LLM prompt)
+- `rag.py` — RAG pipeline (index -> retrieve -> LLM prompt)
 - `discord.py` — Discord bot with per-user memory recall
 - `notion.py` — Full CRUD notes app with MouseBase search
 - `customer_support.py` — Support ticket system with similar-issue lookup
 - `agent_memory.py` — AI agent with session-based memory management
-
----
-
-## Documentation
-
-Full documentation is available at the in-app `/docs` page, or in the [VitePress docs](docs/) directory:
-
-- [Introduction](docs/guide/introduction.md)
-- [Quickstart](docs/guide/quickstart.md)
-- [Authentication](docs/guide/authentication.md)
-- [Projects](docs/guide/projects.md)
-- [Remember](docs/guide/remember.md)
-- [Search](docs/guide/search.md)
-- [Errors](docs/guide/errors.md)
-- [Python SDK](docs/guide/python-sdk.md)
-- [JavaScript SDK](docs/guide/js-sdk.md)
-- [FAQ](docs/guide/faq.md)
 
 ---
 
@@ -329,13 +356,42 @@ Full documentation is available at the in-app `/docs` page, or in the [VitePress
 ### Deployed Infrastructure
 
 ```
-Frontend (Vercel)  ──▶  API (Render)  ──▶  PostgreSQL (Render / RDS)
-     │                       │
-     │                       ├── Sentry (error tracking)
-     │                       ├── UptimeRobot (external monitoring)
-     │                       └── Render cron (daily backups, secret rotation)
-     │
-     └── PyPI / npm (package distribution)
+Frontend (Vercel)  ──▶  API (Render)  ──▶  PostgreSQL (Neon)
+  mouse-base-ai.         api.mousebase.dev     ep-quiet-tooth-...
+  vercel.app                                      (connection pooled)
+       │                       │
+       │                       ├── Sentry (error tracking)
+       │                       └── Keepalive pings (GitHub Actions, 10 min)
+       │
+       └── PyPI / npm (package distribution)
+```
+
+---
+
+## Development
+
+### CI/CD
+
+| Workflow | Trigger | Description |
+|----------|---------|-------------|
+| Backend CI | Push to main/develop, PRs | Ruff lint, Black format, pytest, Docker build |
+| Deploy Frontend | Push to main (frontend/) | Build + deploy to Vercel |
+| Keepalive | Every 10 minutes | Pings Render + Neon to prevent free-tier sleep |
+
+### Commands
+
+```bash
+# Backend linting
+cd backend
+ruff check .
+black --check .
+
+# Tests
+pytest -vv
+
+# Database migrations
+alembic revision --autogenerate -m "description"
+alembic upgrade head
 ```
 
 ---
@@ -347,7 +403,7 @@ MouseBase is in active development. The API is stable and ready for production u
 - **Python SDK**: v0.2.9 ([PyPI](https://pypi.org/project/mousebase/))
 - **JavaScript SDK**: v0.1.4 ([npm](https://www.npmjs.com/package/mousebase))
 - **Backend API**: v0.1.0 ([api.mousebase.dev](https://api.mousebase.dev))
-- **API Status**: [api.mousebase.dev/health/](https://api.mousebase.dev/health/)
+- **Dashboard**: [mouse-base-ai.vercel.app](https://mouse-base-ai.vercel.app)
 
 ## License
 
