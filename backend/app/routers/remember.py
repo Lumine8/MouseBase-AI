@@ -10,6 +10,8 @@ from app.services.activity_service import ActivityService
 
 from app.services.memory_service import remember
 from app.services.usage_service import UsageService
+from app.services.rate_limiter import enforce_rate_limit
+from app.core.plan_enforcer import get_effective_limits
 
 router = APIRouter(
     prefix="/remember",
@@ -51,6 +53,8 @@ async def remember_endpoint(
     db: AsyncSession = Depends(get_db),
 ) -> MemoryResponse:
     result = await remember(project=project, request=request, db=db)
+    limits = await get_effective_limits(db, project.owner_id)
+    await enforce_rate_limit(project.owner_id, limits["requests_per_hour"])
     usage = UsageService(db)
     await usage.increment_requests(project.id)
     await usage.increment_embeddings(project.id)

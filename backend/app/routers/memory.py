@@ -10,6 +10,8 @@ from app.models.project import Project
 from app.services.memory_service import MemoryService
 from app.services.activity_service import ActivityService
 from app.services.usage_service import UsageService
+from app.services.rate_limiter import enforce_rate_limit
+from app.core.plan_enforcer import get_effective_limits
 
 from app.schemas.memory import MemoryResponse
 from app.schemas.update import UpdateMemoryRequest
@@ -30,6 +32,8 @@ async def get_memory(
     project: Project = Depends(get_current_project),
     db: AsyncSession = Depends(get_db),
 ) -> MemoryResponse:
+    limits = await get_effective_limits(db, project.owner_id)
+    await enforce_rate_limit(project.owner_id, limits["requests_per_hour"])
     memory_service = MemoryService(db=db)
     usage = UsageService(db)
     await usage.increment_requests(project.id)
@@ -70,6 +74,8 @@ async def update_memory(
     project: Project = Depends(get_current_project),
     db: AsyncSession = Depends(get_db),
 ) -> MemoryResponse:
+    limits = await get_effective_limits(db, project.owner_id)
+    await enforce_rate_limit(project.owner_id, limits["requests_per_hour"])
     memory_service = MemoryService(
         db=db,
         embedding_service=create_embedding_service(),
@@ -109,6 +115,8 @@ async def delete_memory(
     project: Project = Depends(get_current_project),
     db: AsyncSession = Depends(get_db),
 ) -> None:
+    limits = await get_effective_limits(db, project.owner_id)
+    await enforce_rate_limit(project.owner_id, limits["requests_per_hour"])
     activity = ActivityService(db)
     await activity.log(
         project_id=project.id,

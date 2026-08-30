@@ -10,6 +10,8 @@ from app.services.activity_service import ActivityService
 from app.services.search_service import SearchService
 from app.services import create_embedding_service
 from app.services.usage_service import UsageService
+from app.services.rate_limiter import enforce_rate_limit
+from app.core.plan_enforcer import get_effective_limits
 
 router = APIRouter(
     prefix="/search",
@@ -48,6 +50,8 @@ async def search(
     project: Project = Depends(get_current_project),
     db: AsyncSession = Depends(get_db),
 ) -> SearchResponse:
+    limits = await get_effective_limits(db, project.owner_id)
+    await enforce_rate_limit(project.owner_id, limits["requests_per_hour"])
     embedding_service = create_embedding_service()
     search_service = SearchService(db=db, embedding_service=embedding_service)
 
