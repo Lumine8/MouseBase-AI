@@ -43,8 +43,6 @@ dev = [
 
 [tool.ruff]
 line-length = 100
-
-[tool.ruff.lint]
 extend-exclude = ["migrations", "temp_migrations", "scripts"]
 
 [tool.pytest.ini_options]
