@@ -5,7 +5,7 @@ from typing import Optional
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.limits import PLAN_LIMITS, PLAN_HIERARCHY, ADDON_PRICING
+from app.core.limits import PLAN_LIMITS, ADDON_PRICING
 from app.models.subscription import Subscription, PlanType, SubscriptionStatus
 from app.models.payment import Payment
 from app.schemas.payment import (
@@ -66,22 +66,14 @@ async def upgrade_subscription(
     sub = await get_subscription(db, user_id)
     if not sub:
         raise ValueError("No subscription found for user")
-    current_plan_idx = PLAN_HIERARCHY.get(sub.plan, 0)
-    new_plan_idx = PLAN_HIERARCHY.get(new_plan, 0)
-    if new_plan_idx <= current_plan_idx:
-        raise ValueError(f"Cannot downgrade from {sub.plan.value} to {new_plan.value}")
-    current_limits = _get_default_limits(sub.plan)
-    addon_projects = sub.max_projects - current_limits["max_projects"]
-    addon_memories = sub.max_memories - current_limits["max_memories"]
-    addon_searches = (
-        sub.max_searches_per_month - current_limits["max_searches_per_month"]
-    )
     limits = _get_default_limits(new_plan)
     sub.plan = new_plan
+    sub.status = SubscriptionStatus.ACTIVE
     sub.renewal_date = datetime.now(timezone.utc) + timedelta(days=30)
-    sub.max_projects = limits["max_projects"] + addon_projects
-    sub.max_memories = limits["max_memories"] + addon_memories
-    sub.max_searches_per_month = limits["max_searches_per_month"] + addon_searches
+    sub.max_projects = limits["max_projects"]
+    sub.max_memories = limits["max_memories"]
+    sub.max_searches_per_month = limits["max_searches_per_month"]
+    sub.requests_per_hour = limits["requests_per_hour"]
     payment_record = Payment(
         subscription_id=sub.id,
         amount=limits["price"],
