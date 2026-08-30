@@ -262,17 +262,17 @@ export default function Billing() {
             <div>
               <h2 style={{ fontSize: 18, margin: "0 0 4px" }}>Current Plan</h2>
               <p style={{ fontSize: 13, color: "var(--text-secondary)", margin: 0 }}>
-                {sub?.status === "CANCELED"
-                  ? "Your subscription has been canceled"
-                  : "You are on the <strong>" + activePlanName + "</strong> plan"}
+                {isPaid
+                  ? "You are on the <strong>" + activePlanName + "</strong> plan"
+                  : "You are on the <strong>Free</strong> plan"}
               </p>
             </div>
             <div style={{
               padding: "6px 14px", borderRadius: 20, fontSize: 13, fontWeight: 600,
-              background: sub?.status === "ACTIVE" ? "rgba(34,197,94,0.1)" : "rgba(239,68,68,0.1)",
-              color: sub?.status === "ACTIVE" ? "#22c55e" : "#ef4444",
+              background: isPaid ? "rgba(34,197,94,0.1)" : "rgba(156,163,175,0.1)",
+              color: isPaid ? "#22c55e" : "#9ca3af",
             }}>
-              {sub?.status === "ACTIVE" ? "Active" : sub?.status === "CANCELED" ? "Canceled" : sub?.status || "Free"}
+              {isPaid ? "Active" : "Free"}
             </div>
           </div>
 
