@@ -1,0 +1,40 @@
+name: Keep Alive
+
+on:
+  schedule:
+    # Every 10 minutes to prevent Render/Neon free-tier sleep
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+jobs:
+  ping-backend:
+    name: Ping Render Backend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping API health
+        run: |
+          for i in 1 2 3; do
+            status=$(curl -s -o /dev/null -w "%{http_code}" --max-time 30 https://api.mousebase.dev/health/ || echo "000")
+            echo "Attempt $i: HTTP $status"
+            if [ "$status" = "200" ]; then
+              echo "Backend is alive"
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "Backend health check failed after 3 attempts"
+          exit 1
+
+  ping-neon:
+    name: Ping Neon DB
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install pg client
+        run: npm install pg
+      - name: Ping Neon database
+        run: |
+          node scripts/keepalive-neon.js "${{ secrets.NEON_DATABASE_URL }}"
