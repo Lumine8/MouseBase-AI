@@ -315,7 +315,7 @@ export default function Billing() {
 
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
             {isPaid && !sub?.cancel_at_period_end && (
-              <button onClick={handleCancel} className="btn-secondary" style={{ color: "#ef4444", borderColor: "rgba(239,68,68,0.3)" }}>
+              <button onClick={handleCancel} className="btn-secondary" style={{ color: "#ef4444" }}>
                 <FiX size={14} /> Cancel Subscription
               </button>
             )}

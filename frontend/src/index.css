@@ -387,6 +387,7 @@ code, pre {
   white-space: nowrap;
   line-height: 1.4;
   font-family: inherit;
+  outline: none;
 }
 .btn:disabled { opacity: 0.35; pointer-events: none; }
 .btn:focus-visible { outline: none; }
@@ -419,14 +420,14 @@ code, pre {
 .btn-secondary {
   background: transparent;
   color: var(--text-secondary);
-  border: 1px solid var(--border-input);
+  border: 1px solid transparent;
 }
 .btn-secondary:hover { background: var(--bg-hover); color: var(--text-primary); border-color: var(--text-muted); }
 
 .btn-danger {
   background: transparent;
   color: var(--red);
-  border: 1px solid rgba(239,68,68,0.2);
+  border: 1px solid transparent;
 }
 .btn-danger:hover { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.4); }
 
