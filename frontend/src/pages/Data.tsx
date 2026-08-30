@@ -1,12 +1,10 @@
 import { useEffect, useState, useCallback } from "react";
-import { FiDatabase, FiSearch, FiChevronLeft, FiChevronRight, FiChevronDown, FiChevronUp, FiRefreshCw, FiExternalLink, FiInfo } from "react-icons/fi";
-import { useNavigate } from "react-router-dom";
+import { FiDatabase, FiSearch, FiChevronLeft, FiChevronRight, FiChevronDown, FiChevronUp, FiRefreshCw, FiInfo } from "react-icons/fi";
 import { data, TableInfo, TableRowsResponse } from "../lib/api";
 
 type SortDir = "asc" | "desc";
 
 export default function Data() {
-  const navigate = useNavigate();
   const [tables, setTables] = useState<TableInfo[]>([]);
   const [activeTable, setActiveTable] = useState<string>("projects");
   const [rowsData, setRowsData] = useState<TableRowsResponse | null>(null);
