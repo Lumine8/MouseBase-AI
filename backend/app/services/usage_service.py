@@ -28,16 +28,16 @@ class UsageService:
 
     async def increment_requests(self, project_id: UUID, count: int = 1) -> None:
         usage = await self._get_or_create(project_id, date.today())
-        usage.requests += count
+        usage.requests = (usage.requests or 0) + count
 
     async def increment_searches(self, project_id: UUID, count: int = 1) -> None:
         usage = await self._get_or_create(project_id, date.today())
-        usage.searches += count
+        usage.searches = (usage.searches or 0) + count
 
     async def increment_embeddings(self, project_id: UUID, count: int = 1) -> None:
         usage = await self._get_or_create(project_id, date.today())
-        usage.embeddings += count
+        usage.embeddings = (usage.embeddings or 0) + count
 
     async def increment_storage(self, project_id: UUID, bytes_count: int) -> None:
         usage = await self._get_or_create(project_id, date.today())
-        usage.storage_bytes += bytes_count
+        usage.storage_bytes = (usage.storage_bytes or 0) + bytes_count
