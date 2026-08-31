@@ -293,6 +293,7 @@ from mousebase import (
     AuthenticationError,
     ValidationError,
     RateLimitError,
+    MemoryLimitError,
     EmbeddingProviderError,
     InternalError,
 )
@@ -303,6 +304,7 @@ from mousebase import (
 | `MissingAPIKeyError` | — | No API key provided or found in environment |
 | `AuthenticationError` | 401 | Invalid or expired API key |
 | `ValidationError` | 400/422 | Invalid request payload |
+| `MemoryLimitError` | 403 | Memory limit reached for your plan |
 | `RateLimitError` | 429 | Too many requests |
 | `EmbeddingProviderError` | 503 | Embedding service unavailable |
 | `InternalError` | 500/502 | Server error |
@@ -317,6 +319,8 @@ except MissingAPIKeyError:
     print("Please set your MOUSEBASE_API_KEY")
 except AuthenticationError:
     print("Invalid API key")
+except MemoryLimitError:
+    print("Memory limit reached — upgrade your plan")
 except RateLimitError:
     print("Slow down!")
 except MouseBaseError as e:

@@ -1,0 +1,45 @@
+name: Publish Python SDK to PyPI
+
+on:
+  push:
+    tags:
+      - "python-v*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to publish (e.g. 0.3.0)"
+        required: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mousebase
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install build tools
+        run: pip install build twine
+
+      - name: Build package
+        run: python -m build
+
+      - name: Publish to PyPI
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+        run: twine upload dist/*
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${GITHUB_REF#refs/tags/python-v}"
+          gh release create "python-v${TAG}" dist/* \
+            --title "Python SDK v${TAG}" \
+            --notes "Published to [PyPI](https://pypi.org/project/mousebase/${TAG}/)"

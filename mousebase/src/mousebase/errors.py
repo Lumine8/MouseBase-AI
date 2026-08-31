@@ -43,6 +43,13 @@ class RateLimitError(MouseBaseError):
         super().__init__(message, code=code, status_code=status_code)
 
 
+class MemoryLimitError(MouseBaseError):
+    def __init__(
+        self, message: str, code: str = "memory_limit_exceeded", status_code: int = 403
+    ):
+        super().__init__(message, code=code, status_code=status_code)
+
+
 class EmbeddingProviderError(MouseBaseError):
     def __init__(
         self,
@@ -63,6 +70,7 @@ class InternalError(MouseBaseError):
 _ERROR_MAP: dict[int, type[MouseBaseError]] = {
     400: ValidationError,
     401: AuthenticationError,
+    403: MemoryLimitError,
     409: ConflictError,
     429: RateLimitError,
     500: InternalError,
