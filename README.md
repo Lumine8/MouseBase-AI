@@ -20,12 +20,17 @@ MouseBase gives your AI agents **persistent memory**. Store, retrieve, and seman
 
 Unlike traditional databases that match exact keywords, MouseBase finds memories by **meaning**. Your AI can remember user preferences, conversation context, and past decisions without you writing complex query logic.
 
+🌐 **[mousebase.dev](https://mousebase.dev)** — Official website & dashboard
+
 ## Live
 
 | Service | URL |
 |---------|-----|
+| Website | [mousebase.dev](https://mousebase.dev) |
 | Dashboard | [mousebase-ai.vercel.app](https://mousebase-ai.vercel.app) |
 | API | [api.mousebase.dev](https://api.mousebase.dev) |
+| PyPI | [pypi.org/project/mousebase](https://pypi.org/project/mousebase/) |
+| npm | [npmjs.com/package/mousebase](https://www.npmjs.com/package/mousebase) |
 | Health | [api.mousebase.dev/health/](https://api.mousebase.dev/health/) |
 
 ---

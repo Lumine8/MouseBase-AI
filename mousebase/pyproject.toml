@@ -30,8 +30,11 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/Lumine8/MouseBase-AI"
+Homepage = "https://mousebase.dev"
+Documentation = "https://mousebase.dev"
 Source = "https://github.com/Lumine8/MouseBase-AI"
+Repository = "https://github.com/Lumine8/MouseBase-AI"
+Issues = "https://github.com/Lumine8/MouseBase-AI/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -57,6 +57,10 @@
   ],
   "license": "MIT",
   "author": "Sankar Gopan",
+  "homepage": "https://mousebase.dev",
+  "bugs": {
+    "url": "https://github.com/Lumine8/MouseBase-AI/issues"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Lumine8/MouseBase-AI.git"
