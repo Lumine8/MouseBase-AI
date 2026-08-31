@@ -200,6 +200,12 @@ All endpoints are available at `https://api.mousebase.dev/api/v1`.
 | `GET` | `/dashboard/analytics` | Usage analytics with daily breakdown |
 | `GET` | `/dashboard/billing-usage` | Billing usage summary |
 
+### Public Stats
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| `GET` | `/stats/downloads` | None | Live PyPI + npm download counts |
+
 ### Payments
 
 | Method | Endpoint | Description |
