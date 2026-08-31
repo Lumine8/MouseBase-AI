@@ -435,8 +435,8 @@ alembic upgrade head
 
 MouseBase is in active development. The API is stable and ready for production use.
 
-- **Python SDK**: v0.3.0 ([PyPI](https://pypi.org/project/mousebase/))
-- **JavaScript SDK**: v0.1.5 ([npm](https://www.npmjs.com/package/mousebase))
+- **Python SDK**: v0.3.1 ([PyPI](https://pypi.org/project/mousebase/))
+- **JavaScript SDK**: v0.1.6 ([npm](https://www.npmjs.com/package/mousebase))
 - **Backend API**: v0.1.0 ([api.mousebase.dev](https://api.mousebase.dev))
 - **Dashboard**: [mousebase-ai.vercel.app](https://mousebase-ai.vercel.app)
 
