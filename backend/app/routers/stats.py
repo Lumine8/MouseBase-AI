@@ -11,21 +11,27 @@ async def get_download_stats():
 
     async with httpx.AsyncClient(timeout=10) as client:
         try:
-            resp = await client.get("https://pypistats.org/api/packages/mousebase/recent")
+            resp = await client.get(
+                "https://pypistats.org/api/packages/mousebase/recent"
+            )
             if resp.status_code == 200:
                 pypi_data = resp.json().get("data", {})
         except Exception:
             pass
 
         try:
-            resp = await client.get("https://api.npmjs.org/downloads/point/last-week/mousebase")
+            resp = await client.get(
+                "https://api.npmjs.org/downloads/point/last-week/mousebase"
+            )
             if resp.status_code == 200:
                 npm_data = resp.json()
         except Exception:
             pass
 
         try:
-            resp = await client.get("https://api.npmjs.org/downloads/point/last-month/mousebase")
+            resp = await client.get(
+                "https://api.npmjs.org/downloads/point/last-month/mousebase"
+            )
             if resp.status_code == 200:
                 npm_data["last_month"] = resp.json().get("downloads", 0)
         except Exception:
@@ -42,6 +48,7 @@ async def get_download_stats():
             "last_month": npm_data.get("last_month", 0),
         },
         "total": {
-            "last_month": pypi_data.get("last_month", 0) + npm_data.get("last_month", 0),
+            "last_month": pypi_data.get("last_month", 0)
+            + npm_data.get("last_month", 0),
         },
     }
