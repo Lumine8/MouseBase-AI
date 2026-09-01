@@ -2,8 +2,8 @@ name: Keep Alive
 
 on:
   schedule:
-    # Every 10 minutes to prevent Render/Neon free-tier sleep
-    - cron: "*/10 * * * *"
+    # Every 3 minutes to prevent Render/Neon free-tier sleep
+    - cron: "*/3 * * * *"
   workflow_dispatch:
 
 jobs:
