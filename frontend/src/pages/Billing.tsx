@@ -450,34 +450,85 @@ export default function Billing() {
                               if (!win) return;
                               const date = new Date(pmt.created_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
                               const amount = (pmt.amount / 100).toFixed(2);
-                              win.document.write(`<!DOCTYPE html><html><head><title>Invoice ${pmt.id}</title><style>
-                                body{font-family:system-ui,sans-serif;max-width:600px;margin:40px auto;color:#111}
-                                h1{font-size:20px;margin:0 0 4px} .muted{color:#666;font-size:13px}
-                                table{width:100%;border-collapse:collapse;margin:24px 0}
-                                th,td{text-align:left;padding:10px 12px;border-bottom:1px solid #e5e7eb;font-size:14px}
-                                th{background:#f9fafb;font-weight:600}
-                                .total{font-size:18px;font-weight:700}
-                                .footer{margin-top:40px;font-size:12px;color:#999;border-top:1px solid #e5e7eb;padding-top:12px}
-                                @media print{body{margin:20px}}
+                              const invoiceNum = `INV-${String(pmt.id).slice(0, 8).toUpperCase()}`;
+                              win.document.write(`<!DOCTYPE html><html><head><title>${invoiceNum}</title><style>
+                                *{margin:0;padding:0;box-sizing:border-box}
+                                body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#1a1a2e;background:#fff;padding:40px}
+                                .invoice{max-width:680px;margin:0 auto}
+                                .header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:40px;padding-bottom:24px;border-bottom:2px solid #f0f0f0}
+                                .brand{display:flex;align-items:center;gap:12px}
+                                .brand img{height:36px}
+                                .brand-text h1{font-size:22px;font-weight:700;color:#1a1a2e;letter-spacing:-0.5px}
+                                .brand-text p{font-size:12px;color:#6b7280;margin-top:2px}
+                                .invoice-meta{text-align:right}
+                                .invoice-meta h2{font-size:28px;font-weight:800;color:#f5c542;letter-spacing:-1px}
+                                .invoice-meta p{font-size:13px;color:#6b7280;margin-top:4px}
+                                .details{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-bottom:32px}
+                                .details h3{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#9ca3af;margin-bottom:8px}
+                                .details p{font-size:14px;color:#374151;line-height:1.6}
+                                table{width:100%;border-collapse:collapse;margin-bottom:32px}
+                                thead{background:#f9fafb}
+                                th{text-align:left;padding:12px 16px;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:#6b7280;font-weight:600}
+                                td{padding:14px 16px;font-size:14px;color:#374151;border-bottom:1px solid #f0f0f0}
+                                .amount{text-align:right;font-weight:600}
+                                .total-row td{border-bottom:none;border-top:2px solid #e5e7eb;font-size:16px;font-weight:700;color:#1a1a2e;padding-top:16px}
+                                .status{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600}
+                                .status-paid{background:#ecfdf5;color:#059669}
+                                .status-dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+                                .footer{margin-top:48px;padding-top:24px;border-top:1px solid #f0f0f0;text-align:center}
+                                .footer p{font-size:12px;color:#9ca3af;line-height:1.8}
+                                .footer a{color:#f5c542;text-decoration:none}
+                                @media print{body{padding:20px;-webkit-print-color-adjust:exact;print-color-adjust:exact}}
                               </style></head><body>
-                                <h1>MouseBase</h1>
-                                <p class="muted">Invoice</p>
-                                <table>
-                                  <tr><th>Date</th><td>${date}</td></tr>
-                                  <tr><th>Invoice ID</th><td>${String(pmt.id).slice(0, 8).toUpperCase()}</td></tr>
-                                  <tr><th>Status</th><td>${pmt.status === "captured" ? "Paid" : pmt.status}</td></tr>
-                                </table>
-                                <table>
-                                  <tr><th>Description</th><th>Amount</th></tr>
-                                  <tr><td>MouseBase Subscription</td><td class="total">${amount} ${pmt.currency}</td></tr>
-                                </table>
-                                <div class="footer">
-                                  MouseBase — Persistent memory for AI agents<br>
-                                  mousebase.dev · support@mousebase.dev
+                                <div class="invoice">
+                                  <div class="header">
+                                    <div class="brand">
+                                      <img src="https://raw.githubusercontent.com/Lumine8/MouseBase-AI/main/frontend/public/assets/logo_mousebase.svg" alt="MouseBase" />
+                                      <div class="brand-text">
+                                        <h1>MouseBase</h1>
+                                        <p>Persistent memory for AI agents</p>
+                                      </div>
+                                    </div>
+                                    <div class="invoice-meta">
+                                      <h2>INVOICE</h2>
+                                      <p>${invoiceNum}</p>
+                                      <p>${date}</p>
+                                    </div>
+                                  </div>
+                                  <div class="details">
+                                    <div>
+                                      <h3>Bill To</h3>
+                                      <p>MouseBase Customer</p>
+                                    </div>
+                                    <div>
+                                      <h3>Payment</h3>
+                                      <p>
+                                        <span class="status status-paid"><span class="status-dot"></span> Paid</span>
+                                      </p>
+                                    </div>
+                                  </div>
+                                  <table>
+                                    <thead><tr><th>Description</th><th class="amount">Amount</th></tr></thead>
+                                    <tbody>
+                                      <tr>
+                                        <td>MouseBase Subscription — ${activePlanName} Plan</td>
+                                        <td class="amount">${amount} ${pmt.currency}</td>
+                                      </tr>
+                                      <tr class="total-row">
+                                        <td>Total</td>
+                                        <td class="amount">${amount} ${pmt.currency}</td>
+                                      </tr>
+                                    </tbody>
+                                  </table>
+                                  <div class="footer">
+                                    <p>
+                                      MouseBase · mousebase.dev<br>
+                                      Questions? Contact <a href="mailto:support@mousebase.dev">support@mousebase.dev</a>
+                                    </p>
+                                  </div>
                                 </div>
                               </body></html>`);
                               win.document.close();
-                              win.print();
                             }
                           }}
                         >
