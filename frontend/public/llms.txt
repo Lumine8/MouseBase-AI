@@ -1,0 +1,89 @@
+# MouseBase
+
+> MouseBase is a hosted persistent-memory API for AI applications. It stores and semantically retrieves project-scoped memories using vector embeddings backed by PostgreSQL with pgvector.
+
+## Overview
+
+MouseBase gives AI agents persistent memory. Store, retrieve, and semantically search memories with a simple API — backed by vector embeddings and PostgreSQL. Unlike traditional databases that match exact keywords, MouseBase finds memories by meaning.
+
+- **Website**: https://mousebase.dev
+- **API**: https://api.mousebase.dev/api/v1
+- **Dashboard**: https://mousebase-ai.vercel.app
+- **Python SDK**: https://pypi.org/project/mousebase/
+- **npm SDK**: https://www.npmjs.com/package/mousebase
+- **GitHub**: https://github.com/Lumine8/MouseBase-AI
+
+## SDKs
+
+### Python
+
+```bash
+pip install mousebase
+```
+
+```python
+from mousebase import MouseBase
+client = MouseBase(api_key="mb_live_...")
+result = client.remember("User prefers dark mode")
+results = client.search("What theme does the user want?")
+```
+
+### TypeScript / JavaScript
+
+```bash
+npm install mousebase
+```
+
+```typescript
+import { MouseBase } from "mousebase";
+const client = new MouseBase({ apiKey: process.env.MOUSEBASE_API_KEY! });
+await client.remember({ content: "User prefers dark mode" });
+const results = await client.search({ query: "UI preferences" });
+```
+
+## API Endpoints
+
+Base URL: `https://api.mousebase.dev/api/v1`
+
+### Memory Operations
+- `POST /remember/` — Store a memory
+- `POST /search/` — Semantic search
+- `GET /memory/{id}` — Get a memory
+- `PATCH /memory/{id}` — Update a memory
+- `DELETE /memory/{id}` — Delete a memory
+
+### Authentication
+- `POST /auth/signup` — Create account
+- `POST /auth/login` — Sign in
+- `POST /auth/refresh` — Refresh token
+
+### Projects
+- `GET /projects/` — List projects
+- `POST /projects/` — Create project
+- `GET /projects/{id}` — Get project
+
+### Dashboard
+- `GET /dashboard/metrics` — Dashboard metrics
+- `GET /dashboard/analytics` — Usage analytics
+- `GET /stats/downloads` — SDK download stats
+
+## Pricing
+
+| Plan | Price | Memories | Projects |
+|------|-------|----------|----------|
+| Free | $0/mo | 5,000 | 3 |
+| Hobby | $3.99/mo | 25,000 | 5 |
+| Pro | $7.99/mo | 250,000 | 10 |
+
+## Architecture
+
+- **Frontend**: React SPA on Vercel
+- **API**: FastAPI + uvicorn on Render
+- **Database**: PostgreSQL with pgvector on Neon
+- **Embeddings**: Gemini or OpenAI (configurable)
+- **Payments**: Razorpay
+
+## Contact
+
+- Email: support@mousebase.dev
+- GitHub Issues: https://github.com/Lumine8/MouseBase-AI/issues

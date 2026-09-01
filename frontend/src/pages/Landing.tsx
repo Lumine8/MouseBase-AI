@@ -417,7 +417,7 @@ export default function Landing() {
           >
             Get Started Free <FiArrowRight />
           </button>
-          <a href="https://github.com/anomalyco/MouseBase" target="_blank" rel="noopener noreferrer" style={{
+          <a href="https://github.com/Lumine8/MouseBase-AI" target="_blank" rel="noopener noreferrer" style={{
             border: "1px solid #2A2A2A", borderRadius: 14, padding: "12px 28px", height: 48,
             fontSize: 15, color: "var(--text-primary)", textDecoration: "none",
             display: "inline-flex", alignItems: "center", gap: 8,

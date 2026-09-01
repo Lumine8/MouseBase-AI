@@ -84,7 +84,7 @@ const content: Record<string, { title: string; body: string }> = {
 Clone the repository:
 
 \`\`\`bash
-git clone https://github.com/anomalyco/MouseBase.git
+git clone https://github.com/Lumine8/MouseBase-AI.git
 cd MouseBase
 \`\`\`
 

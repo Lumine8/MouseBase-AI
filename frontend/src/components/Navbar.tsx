@@ -16,7 +16,7 @@ export default function Navbar() {
       </div>
 
       <div className="navbar-right">
-        <a href="https://github.com/anomalyco/MouseBase" target="_blank" rel="noopener noreferrer" className="navbar-icon-btn navbar-desktop-only" title="GitHub">
+        <a href="https://github.com/Lumine8/MouseBase-AI" target="_blank" rel="noopener noreferrer" className="navbar-icon-btn navbar-desktop-only" title="GitHub">
           <FiGithub size={18} />
         </a>
         <button className="navbar-icon-btn navbar-desktop-only" title="Notifications">

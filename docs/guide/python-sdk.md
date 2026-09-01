@@ -515,7 +515,7 @@ All exceptions have `.code` (str), `.message` (str), and `.status_code` (int) at
 
 ## Examples
 
-Complete runnable examples are in the [examples directory](https://github.com/anomalyco/MouseBase/tree/main/mousebase/examples):
+Complete runnable examples are in the [examples directory](https://github.com/Lumine8/MouseBase-AI/tree/main/mousebase/examples):
 
 | File | What it demonstrates |
 |------|---------------------|

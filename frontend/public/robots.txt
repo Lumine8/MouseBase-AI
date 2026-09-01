@@ -3,6 +3,15 @@ Allow: /
 Allow: /pricing
 Allow: /docs
 Allow: /docs/
+Allow: /blog
+Allow: /blog/
+Allow: /status
+Allow: /changelog
+Allow: /roadmap
+Allow: /trust
+Allow: /about
+Allow: /contact
+Allow: /legal/
 Allow: /login
 Allow: /signup
 Disallow: /dashboard
@@ -13,5 +22,30 @@ Disallow: /search
 Disallow: /analytics
 Disallow: /billing
 Disallow: /settings
+Disallow: /data
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: Bytespider
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: omgili
+Disallow: /
 
 Sitemap: https://mousebase.dev/sitemap.xml

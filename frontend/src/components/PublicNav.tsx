@@ -48,7 +48,7 @@ export default function PublicNav() {
               >{l.label}</a>
             );
           })}
-          <a href="https://github.com/anomalyco/MouseBase" target="_blank" rel="noopener noreferrer" style={{ color: "var(--text-secondary)", fontSize: 16 }}><FiGithub /></a>
+          <a href="https://github.com/Lumine8/MouseBase-AI" target="_blank" rel="noopener noreferrer" style={{ color: "var(--text-secondary)", fontSize: 16 }}><FiGithub /></a>
           {loggedIn ? (
             <button onClick={() => navigate("/dashboard")} className="btn-primary" style={{ padding: "8px 20px", fontSize: 14 }}>
               Dashboard
@@ -84,7 +84,7 @@ export default function PublicNav() {
               style={{ color: "var(--text-secondary)", textDecoration: "none", fontSize: 14, padding: "8px 0" }}
             >{l.label}</a>
           ))}
-          <a href="https://github.com/anomalyco/MouseBase" target="_blank" rel="noopener noreferrer" style={{ color: "var(--text-secondary)", textDecoration: "none", fontSize: 14, padding: "8px 0" }}>GitHub</a>
+          <a href="https://github.com/Lumine8/MouseBase-AI" target="_blank" rel="noopener noreferrer" style={{ color: "var(--text-secondary)", textDecoration: "none", fontSize: 14, padding: "8px 0" }}>GitHub</a>
           {loggedIn ? (
             <button onClick={() => navigate("/dashboard")} className="btn-primary" style={{ width: "100%", padding: "12px", fontSize: 14 }}>Dashboard</button>
           ) : (
