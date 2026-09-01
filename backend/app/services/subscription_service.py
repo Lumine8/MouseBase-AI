@@ -137,6 +137,8 @@ async def get_billing_history(db: AsyncSession, user_id: uuid.UUID) -> BillingHi
                 currency=p.currency,
                 status=p.status,
                 created_at=p.created_at,
+                razorpay_payment_id=p.razorpay_payment_id,
+                invoice_id=p.invoice_id,
             )
             for p in payments
         ]

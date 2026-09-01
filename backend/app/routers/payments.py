@@ -162,6 +162,42 @@ async def billing_history(
     return await get_billing_history(db, current_user.id)
 
 
+@router.get("/invoice/{payment_id}")
+async def get_invoice_url(
+    payment_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    from app.models.payment import Payment as PaymentModel
+    from app.models.subscription import Subscription
+    from sqlalchemy import select
+
+    sub = await db.execute(
+        select(Subscription).where(Subscription.user_id == current_user.id)
+    )
+    subscription = sub.scalar_one_or_none()
+    if not subscription:
+        raise HTTPException(status_code=404, detail="No subscription found")
+
+    result = await db.execute(
+        select(PaymentModel).where(
+            PaymentModel.id == payment_id,
+            PaymentModel.subscription_id == subscription.id,
+        )
+    )
+    payment = result.scalar_one_or_none()
+    if not payment:
+        raise HTTPException(status_code=404, detail="Payment not found")
+
+    if payment.razorpay_payment_id:
+        return {
+            "receipt_url": f"https://dashboard.razorpay.com/app/payments/{payment.razorpay_payment_id}",
+            "payment_id": payment.razorpay_payment_id,
+        }
+
+    raise HTTPException(status_code=404, detail="No Razorpay payment ID available")
+
+
 @router.post("/create-addon-order", response_model=CreateOrderResponse)
 async def create_addon_order(
     addon_type: str = Body(...),

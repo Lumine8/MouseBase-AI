@@ -65,6 +65,8 @@ class PaymentHistory(BaseModel):
     currency: str
     status: str
     created_at: datetime
+    razorpay_payment_id: str | None = None
+    invoice_id: str | None = None
 
 
 class BillingHistory(BaseModel):

@@ -441,39 +441,44 @@ export default function Billing() {
                         <button
                           className="btn-ghost"
                           style={{ fontSize: 12, display: "flex", alignItems: "center", gap: 4 }}
-                          onClick={() => {
-                            const win = window.open("", "_blank");
-                            if (!win) return;
-                            const date = new Date(pmt.created_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
-                            const amount = (pmt.amount / 100).toFixed(2);
-                            win.document.write(`<!DOCTYPE html><html><head><title>Invoice ${pmt.id}</title><style>
-                              body{font-family:system-ui,sans-serif;max-width:600px;margin:40px auto;color:#111}
-                              h1{font-size:20px;margin:0 0 4px} .muted{color:#666;font-size:13px}
-                              table{width:100%;border-collapse:collapse;margin:24px 0}
-                              th,td{text-align:left;padding:10px 12px;border-bottom:1px solid #e5e7eb;font-size:14px}
-                              th{background:#f9fafb;font-weight:600}
-                              .total{font-size:18px;font-weight:700}
-                              .footer{margin-top:40px;font-size:12px;color:#999;border-top:1px solid #e5e7eb;padding-top:12px}
-                              @media print{body{margin:20px}}
-                            </style></head><body>
-                              <h1>MouseBase</h1>
-                              <p class="muted">Invoice</p>
-                              <table>
-                                <tr><th>Date</th><td>${date}</td></tr>
-                                <tr><th>Invoice ID</th><td>${String(pmt.id).slice(0, 8).toUpperCase()}</td></tr>
-                                <tr><th>Status</th><td>${pmt.status === "captured" ? "Paid" : pmt.status}</td></tr>
-                              </table>
-                              <table>
-                                <tr><th>Description</th><th>Amount</th></tr>
-                                <tr><td>MouseBase Subscription</td><td class="total">${amount} ${pmt.currency}</td></tr>
-                              </table>
-                              <div class="footer">
-                                MouseBase — Persistent memory for AI agents<br>
-                                mousebase.dev · support@mousebase.dev
-                              </div>
-                            </body></html>`);
-                            win.document.close();
-                            win.print();
+                          onClick={async () => {
+                            try {
+                              const data = await fetchJson<{ receipt_url: string }>(`/payments/invoice/${pmt.id}`);
+                              window.open(data.receipt_url, "_blank");
+                            } catch {
+                              const win = window.open("", "_blank");
+                              if (!win) return;
+                              const date = new Date(pmt.created_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+                              const amount = (pmt.amount / 100).toFixed(2);
+                              win.document.write(`<!DOCTYPE html><html><head><title>Invoice ${pmt.id}</title><style>
+                                body{font-family:system-ui,sans-serif;max-width:600px;margin:40px auto;color:#111}
+                                h1{font-size:20px;margin:0 0 4px} .muted{color:#666;font-size:13px}
+                                table{width:100%;border-collapse:collapse;margin:24px 0}
+                                th,td{text-align:left;padding:10px 12px;border-bottom:1px solid #e5e7eb;font-size:14px}
+                                th{background:#f9fafb;font-weight:600}
+                                .total{font-size:18px;font-weight:700}
+                                .footer{margin-top:40px;font-size:12px;color:#999;border-top:1px solid #e5e7eb;padding-top:12px}
+                                @media print{body{margin:20px}}
+                              </style></head><body>
+                                <h1>MouseBase</h1>
+                                <p class="muted">Invoice</p>
+                                <table>
+                                  <tr><th>Date</th><td>${date}</td></tr>
+                                  <tr><th>Invoice ID</th><td>${String(pmt.id).slice(0, 8).toUpperCase()}</td></tr>
+                                  <tr><th>Status</th><td>${pmt.status === "captured" ? "Paid" : pmt.status}</td></tr>
+                                </table>
+                                <table>
+                                  <tr><th>Description</th><th>Amount</th></tr>
+                                  <tr><td>MouseBase Subscription</td><td class="total">${amount} ${pmt.currency}</td></tr>
+                                </table>
+                                <div class="footer">
+                                  MouseBase — Persistent memory for AI agents<br>
+                                  mousebase.dev · support@mousebase.dev
+                                </div>
+                              </body></html>`);
+                              win.document.close();
+                              win.print();
+                            }
                           }}
                         >
                           <FiDownload size={12} /> Invoice
