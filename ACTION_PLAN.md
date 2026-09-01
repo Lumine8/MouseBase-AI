@@ -120,14 +120,34 @@ Write high-quality, indexable articles:
 - [ ] "Tenant Isolation for Agent Memory"
 - [ ] "Sensitive Data and AI Memory Retention"
 
+### Content Guidelines
+Each article must:
+- Answer the query in the first paragraph
+- Use descriptive H2 headings
+- Include a short runnable example with expected output
+- Identify trade-offs
+- Link to relevant SDK/API documentation
+- Include author identity, publication date, last-updated date, source links
+- State what was tested
+
+### AI-Search Visibility Principles
+- Write clear, self-contained facts easy to verify
+- Explicit definition: "MouseBase is a hosted persistent-memory API for AI applications that stores and semantically retrieves project-scoped memories."
+- State supported SDKs, API base URL, storage model, quotas, pricing, limitations, security boundaries in HTML text
+- Use short answer blocks under descriptive headings
+- Include tables for supported operations, code snippets with canonical URLs, "last verified" dates
+- Publish original benchmarks and architecture diagrams with explanatory alt text
+- Do NOT treat llms.txt as a substitute for SEO — normal crawlability and high-quality content remain the foundation
+
 ### Onboarding
 - [ ] One canonical quickstart: create project → store memory → search → delete (under 5 min)
 - [ ] Runnable examples in Python and JavaScript
 - [ ] Add author identity, publication date, and last-updated dates to all content
+- [ ] Three proof points below hero: working 5-min quickstart, public retrieval benchmark, transparent security/data-lifecycle page
 
 ---
 
-## Iteration 6: Growth (Week 8–16)
+## Iteration 6: Growth & Developer Attention (Week 8–16)
 
 ### Design Partners
 - [ ] Recruit 5–10 design partners building real agents
@@ -139,10 +159,36 @@ Write high-quality, indexable articles:
 - [ ] Emphasize: scoped, inspectable, evaluable, easy to delete
 - [ ] Avoid "just another vector database" framing
 
+### Developer Attention Strategy
+- [ ] Publish a small open-source benchmark repository (dataset format, evaluation script, baseline results, MouseBase results)
+- [ ] Share experiment on Hacker News, Reddit (r/LocalLLaMA, r/MachineLearning), GitHub Discussions, developer newsletters
+- [ ] Frame as concrete result: "How memory retrieval changes when recency and importance are added to cosine similarity"
+- [ ] Create canonical starter templates for: LangGraph, OpenAI Agents SDK, LlamaIndex, CrewAI, plain FastAPI/Node
+- [ ] Each template: one-command setup, deployed demo, architecture diagram, link to docs
+- [ ] Add public changelog and roadmap with dates, version numbers, breaking-change policy, migration notes
+- [ ] Add "memory inspector" demo (synthetic data, no personal info needed)
+- [ ] Encourage GitHub stars/issues only after repo links are correct and quickstart works
+
 ### Benchmarks & Evidence
 - [ ] Publish retrieval benchmarks with methodology
 - [ ] Publish latency benchmarks across plans
 - [ ] Document real-world usage patterns from design partners
+
+---
+
+## Measurement Plan
+
+Track these metrics to measure progress:
+
+| Metric | Baseline | Target |
+|--------|----------|--------|
+| Indexed pages | Search Console coverage report | 100% of intended public pages indexed |
+| Branded discovery | Queries containing "MouseBase" | Increasing impressions/clicks month over month |
+| Non-branded discovery | "AI agent memory", "persistent memory API", "long-term memory LLM" | 10+ pages receiving impressions; prioritize technical page clicks |
+| AI citations | Manual search in ChatGPT, Google AI, Copilot | Baseline of cited pages; improve docs/benchmark representation |
+| Developer conversion | Docs landing → SDK install → API request → retained project | Instrument each step; reduce largest drop-off |
+| Content quality | Time on page, scroll depth, code-copy events, outbound GitHub/PyPI/npm clicks | Pages attracting qualified developers, not empty traffic |
+| Product proof | Quickstart success rate, API p50/p95 latency | Publish reproducible evidence, not unsupported claims |
 
 ---
 
