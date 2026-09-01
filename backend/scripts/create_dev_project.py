@@ -10,14 +10,13 @@ from sqlalchemy import select
 from app.core.security import (
     APIKey,
     encrypt_api_key,
+    generate_api_key,
     hash_api_key,
     parse_api_key,
 )
 from app.db.database import AsyncSessionLocal
 from app.models.project import Project
 from app.models.user import User
-
-DEFAULT_TEST_API_KEY = "mb_test_ci_placeholder_key_for_local_dev_only"
 
 
 async def main():
@@ -45,7 +44,13 @@ async def main():
         else:
             print(f"User already exists: {user.email}")
 
-        fixed_key = os.getenv("TEST_API_KEY", DEFAULT_TEST_API_KEY)
+        env_key = os.getenv("TEST_API_KEY")
+        if env_key and env_key.startswith("mb_live_"):
+            fixed_key = env_key
+        else:
+            generated = generate_api_key()
+            fixed_key = generated.key
+            print(f"No valid TEST_API_KEY env var — generated a new key for this run.")
         key_id, secret = parse_api_key(fixed_key)
         api_key = APIKey(key=fixed_key, key_id=key_id)
 
@@ -84,6 +89,12 @@ async def main():
 
         print("\nFull key for sign-in:")
         print(f"  {fixed_key}")
+
+        key_file = os.getenv("TEST_API_KEY_FILE")
+        if key_file:
+            with open(key_file, "w") as f:
+                f.write(fixed_key)
+            print(f"Key written to {key_file}")
 
 
 if __name__ == "__main__":

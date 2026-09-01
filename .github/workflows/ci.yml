@@ -45,7 +45,7 @@ jobs:
       EMBEDDING_MODEL: text-embedding-004
       EMBEDDING_DIMENSIONS: 768
 
-      TEST_API_KEY: mb_test_ci_key_for_github_actions_only
+      TEST_API_KEY_FILE: /tmp/test_api_key.txt
 
     steps:
       - name: Checkout Repository
@@ -95,6 +95,9 @@ jobs:
 
       - name: Create Development Project
         run: python -m scripts.create_dev_project
+
+      - name: Export Test API Key
+        run: echo "TEST_API_KEY=$(cat /tmp/test_api_key.txt)" >> "$GITHUB_ENV"
 
       - name: Run Tests
         run: pytest -vv
