@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.limits import PLAN_LIMITS, ADDON_PRICING
 from app.models.subscription import Subscription, PlanType, SubscriptionStatus
 from app.models.payment import Payment
+from app.models.project import Project
 from app.schemas.payment import (
     PlanInfo,
     PaymentHistory,
@@ -75,6 +76,11 @@ async def upgrade_subscription(
     sub.max_memories = limits["max_memories"]
     sub.max_searches_per_month = limits["max_searches_per_month"]
     sub.requests_per_hour = limits["requests_per_hour"]
+    projects_result = await db.execute(
+        select(Project).where(Project.owner_id == user_id)
+    )
+    for project in projects_result.scalars().all():
+        project.plan = new_plan.value.lower()
     payment_record = Payment(
         subscription_id=sub.id,
         amount=limits["price"],
@@ -103,6 +109,11 @@ async def cancel_subscription(db: AsyncSession, user_id: uuid.UUID) -> Subscript
     sub.max_memories = free_limits["max_memories"]
     sub.max_searches_per_month = free_limits["max_searches_per_month"]
     sub.requests_per_hour = free_limits["requests_per_hour"]
+    projects_result = await db.execute(
+        select(Project).where(Project.owner_id == user_id)
+    )
+    for project in projects_result.scalars().all():
+        project.plan = "free"
     await db.commit()
     await db.refresh(sub)
     return sub

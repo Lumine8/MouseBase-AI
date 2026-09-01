@@ -59,6 +59,13 @@ async def dashboard_metrics(
 
     plan = project_list[0].plan if project_list else "free"
 
+    sub_result = await db.execute(
+        select(Subscription).where(Subscription.user_id == current_user.id)
+    )
+    subscription = sub_result.scalar_one_or_none()
+    if subscription:
+        plan = subscription.plan.value.lower()
+
     return {
         "total_memories": total_memories,
         "total_searches": total_searches,
@@ -204,6 +211,17 @@ async def billing_usage(
             "max_searches_per_month": subscription.max_searches_per_month,
             "max_projects": subscription.max_projects,
             "requests_per_hour": subscription.requests_per_hour,
+        }
+    else:
+        from app.core.limits import PLAN_LIMITS
+        from app.models.subscription import PlanType
+
+        default = PLAN_LIMITS[PlanType.FREE]
+        plan_limits = {
+            "max_memories": default["max_memories"],
+            "max_searches_per_month": default["max_searches_per_month"],
+            "max_projects": default["max_projects"],
+            "requests_per_hour": default["requests_per_hour"],
         }
 
     return {

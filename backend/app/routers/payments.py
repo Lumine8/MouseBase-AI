@@ -277,6 +277,7 @@ async def razorpay_webhook(
             await _handle_subscription_charged(db, payload)
     except Exception:
         logger.exception("Failed to process webhook event %s", event_type)
+        raise
 
     await db.commit()
     return {"status": "processed"}

@@ -25,9 +25,11 @@ async def check_memory_limit(
 ) -> tuple[bool, str]:
     sub = await get_subscription_for_project(db, project)
     if sub is None:
-        return False, "No subscription found for project owner"
-    plan_limits = PLAN_LIMITS.get(sub.plan, PLAN_LIMITS[PlanType.FREE])
-    max_memories = max(sub.max_memories, plan_limits["max_memories"])
+        plan_limits = PLAN_LIMITS[PlanType.FREE]
+        max_memories = plan_limits["max_memories"]
+    else:
+        plan_limits = PLAN_LIMITS.get(sub.plan, PLAN_LIMITS[PlanType.FREE])
+        max_memories = max(sub.max_memories, plan_limits["max_memories"])
     count_result = await db.execute(
         select(func.count(Memory.id)).where(
             Memory.project_id.in_(
@@ -50,9 +52,11 @@ async def check_project_limit(
     )
     sub = sub_result.scalar_one_or_none()
     if sub is None:
-        return False, "No subscription found"
-    plan_limits = PLAN_LIMITS.get(sub.plan, PLAN_LIMITS[PlanType.FREE])
-    max_projects = max(sub.max_projects, plan_limits["max_projects"])
+        plan_limits = PLAN_LIMITS[PlanType.FREE]
+        max_projects = plan_limits["max_projects"]
+    else:
+        plan_limits = PLAN_LIMITS.get(sub.plan, PLAN_LIMITS[PlanType.FREE])
+        max_projects = max(sub.max_projects, plan_limits["max_projects"])
     count_result = await db.execute(
         select(func.count(Project.id)).where(Project.owner_id == owner_id)
     )
