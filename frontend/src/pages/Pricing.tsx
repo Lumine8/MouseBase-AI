@@ -38,7 +38,7 @@ export default function Pricing() {
 
   const handlePlanClick = (planId: string) => {
     if (planId === "FREE") {
-      navigate(loggedIn ? "/dashboard" : "/signup");
+      navigate(loggedIn ? "/billing" : "/signup");
     } else {
       navigate(loggedIn ? "/billing" : "/signup");
     }
