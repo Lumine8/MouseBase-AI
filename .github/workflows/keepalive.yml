@@ -37,4 +37,4 @@ jobs:
         run: npm install pg
       - name: Ping Neon database
         run: |
-          node scripts/keepalive-neon.js "${{ secrets.NEON_DATABASE_URL }}"
+          node scripts/keepalive-neon.js "${{ secrets.DATABASE_URL }}"
