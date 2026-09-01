@@ -218,6 +218,7 @@ All endpoints are available at `https://api.mousebase.dev/api/v1`.
 | `GET` | `/payments/subscription` | Get subscription info |
 | `POST` | `/payments/cancel` | Cancel subscription (reverts to Free) |
 | `GET` | `/payments/history` | Payment history |
+| `GET` | `/payments/invoice/{id}` | Get Razorpay receipt URL |
 | `POST` | `/payments/create-addon-order` | Create addon order |
 | `POST` | `/payments/verify-addon` | Verify addon payment |
 | `POST` | `/payments/cancel-addon` | Cancel addon |
@@ -391,7 +392,7 @@ Frontend (Vercel)  ──▶  API (Render)  ──▶  PostgreSQL (Neon)
        │                       ├── Sentry (error tracking)
        │                       ├── In-memory rate limiting
        │                       ├── Usage tracking (per-project)
-       │                       └── Keepalive pings (GitHub Actions, 10 min)
+       │                       └── Keepalive pings (GitHub Actions, 3 min)
        │
        └── PyPI / npm (package distribution)
 ```
@@ -417,7 +418,7 @@ Frontend (Vercel)  ──▶  API (Render)  ──▶  PostgreSQL (Neon)
 |----------|---------|-------------|
 | Backend CI | Push to main/develop, PRs | Ruff lint, Black format, pytest |
 | Deploy Frontend | Push to main (frontend/) | Build + deploy to Vercel |
-| Keepalive | Every 10 minutes | Pings Render + Neon to prevent free-tier sleep |
+| Keepalive | Every 3 minutes | Pings Render + Neon to prevent free-tier sleep |
 
 ### Commands
 
@@ -441,8 +442,8 @@ alembic upgrade head
 
 MouseBase is in active development. The API is stable and ready for production use.
 
-- **Python SDK**: v0.3.1 ([PyPI](https://pypi.org/project/mousebase/))
-- **JavaScript SDK**: v0.1.6 ([npm](https://www.npmjs.com/package/mousebase))
+- **Python SDK**: v0.3.2 ([PyPI](https://pypi.org/project/mousebase/))
+- **JavaScript SDK**: v0.1.7 ([npm](https://www.npmjs.com/package/mousebase))
 - **Backend API**: v0.1.0 ([api.mousebase.dev](https://api.mousebase.dev))
 - **Dashboard**: [mousebase-ai.vercel.app](https://mousebase-ai.vercel.app)
 
