@@ -1,6 +1,9 @@
+import os
 import pytest
 
-TEST_API_KEY = "mb_live_ZbqFJSTeqGsxQUFT_C56InqSqcVN36jb-jzUYqF2q3XToAz1z_96vDE1FB2E"
+TEST_API_KEY = os.environ.get(
+    "TEST_API_KEY", "mb_test_ci_placeholder_key_for_local_dev_only"
+)
 
 
 @pytest.mark.asyncio

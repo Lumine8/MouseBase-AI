@@ -17,9 +17,7 @@ from app.db.database import AsyncSessionLocal
 from app.models.project import Project
 from app.models.user import User
 
-DEFAULT_TEST_API_KEY = (
-    "mb_live_ZbqFJSTeqGsxQUFT_" "C56InqSqcVN36jb-jzUYqF2q3XToAz1z_96vDE1FB2E"
-)
+DEFAULT_TEST_API_KEY = "mb_test_ci_placeholder_key_for_local_dev_only"
 
 
 async def main():

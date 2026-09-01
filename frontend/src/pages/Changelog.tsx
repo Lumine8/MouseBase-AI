@@ -10,7 +10,7 @@ const entries = [
 export default function Changelog() {
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg-base)" }}>
-      <SEO title="Changelog" description="MouseBase changelog and release notes" path="/changelog" />
+      <SEO title="Changelog" description="Version history and release notes for MouseBase — persistent memory API for AI agents. See what shipped recently." path="/changelog" />
       <PublicNav />
       <div className="page" style={{ paddingTop: 100, maxWidth: 640, margin: "0 auto" }}>
         <h1 style={{ fontSize: 32, fontWeight: 700, letterSpacing: "-0.03em", marginBottom: 8 }}>Changelog</h1>

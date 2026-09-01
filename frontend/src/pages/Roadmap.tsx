@@ -34,7 +34,7 @@ const sections = [
 export default function Roadmap() {
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg-base)" }}>
-      <SEO title="Roadmap" description="MouseBase product roadmap" path="/roadmap" />
+      <SEO title="Roadmap" description="MouseBase product roadmap — upcoming features like memory versioning, TTL, retrieval benchmarks, and SDK improvements." path="/roadmap" />
       <PublicNav />
       <div className="page" style={{ paddingTop: 100, maxWidth: 640, margin: "0 auto" }}>
         <h1 style={{ fontSize: 32, fontWeight: 700, letterSpacing: "-0.03em", marginBottom: 8 }}>Roadmap</h1>

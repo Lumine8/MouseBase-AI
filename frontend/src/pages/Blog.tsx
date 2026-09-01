@@ -10,7 +10,7 @@ const posts = [
 export default function Blog() {
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg-base)" }}>
-      <SEO title="Blog" description="MouseBase blog — product updates, engineering notes, and AI memory insights" path="/blog" />
+      <SEO title="Blog" description="Product updates, engineering deep-dives, and guides for building AI agents with persistent memory using MouseBase." path="/blog" />
       <PublicNav />
       <div className="page" style={{ paddingTop: 100, maxWidth: 640, margin: "0 auto" }}>
         <h1 style={{ fontSize: 32, fontWeight: 700, letterSpacing: "-0.03em", marginBottom: 8 }}>Blog</h1>

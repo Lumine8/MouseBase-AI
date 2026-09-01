@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
   FiArrowRight, FiSearch, FiDatabase, FiServer, FiLock, FiCode, FiGithub,
   FiTerminal, FiSave, FiBook, FiMessageCircle, FiCpu, FiHeadphones, FiHardDrive,
-  FiLayers
+  FiLayers, FiCheck
 } from "react-icons/fi";
 import PublicNav from "../components/PublicNav";
 import Footer from "../components/Footer";
@@ -310,33 +310,43 @@ export default function Landing() {
       </section>
 
       {/* Pricing */}
-      <section style={{ maxWidth: 400, margin: "0 auto", padding: "0 24px 100px", position: "relative", zIndex: 1 }}>
+      <section style={{ maxWidth: 900, margin: "0 auto", padding: "0 24px 100px", position: "relative", zIndex: 1 }}>
         <h2 style={{ fontSize: 32, fontWeight: 700, textAlign: "center", letterSpacing: "-0.03em", color: "var(--text-primary)", marginBottom: 16 }}>
           Pricing
         </h2>
-        <div style={{
-          background: "var(--bg-card)", border: "1px solid var(--border-default)", borderRadius: 18,
-          padding: 48, textAlign: "center",
-          transition: "all 180ms cubic-bezier(0.25,0.1,0.25,1)"
-        }}
-          onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--accent)"; e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 4px 20px rgba(245,197,66,0.06)"; }}
-          onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border-default)"; e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
-        >
-          <span style={{ fontSize: 48 }}>🚧</span>
-          <h3 style={{ fontSize: 20, fontWeight: 600, color: "var(--text-primary)", marginTop: 16, marginBottom: 8 }}>Coming Soon</h3>
-          <p style={{ fontSize: 14, color: "var(--text-secondary)", lineHeight: 1.6 }}>
-            Pricing details are being finalized. <br />Sign up now to lock in early access pricing.
-          </p>
-          <button onClick={() => navigate("/login")} style={{
-            marginTop: 20, background: "var(--accent)", color: "#090909", border: "none",
-            borderRadius: 12, padding: "10px 24px", fontSize: 14, fontWeight: 600,
-            cursor: "pointer", transition: "all 180ms"
-          }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = "var(--accent-hover)"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = "var(--accent)"; }}
-          >
-            Get Early Access
-          </button>
+        <p style={{ textAlign: "center", fontSize: 15, color: "var(--text-secondary)", marginBottom: 48, maxWidth: 440, marginLeft: "auto", marginRight: "auto" }}>
+          Start free. Scale when you need to.
+        </p>
+        <div style={{ display: "flex", gap: 24, flexWrap: "wrap", justifyContent: "center" }}>
+          {[
+            { name: "Free", price: "$0", features: ["5,000 memories", "50 searches/mo", "1 project", "100 req/hr"] },
+            { name: "Hobby", price: "$3.99/mo", features: ["25,000 memories", "500 searches/mo", "3 projects", "500 req/hr"] },
+            { name: "Pro", price: "$7.99/mo", features: ["250,000 memories", "5,000 searches/mo", "10 projects", "2,000 req/hr"] },
+          ].map((plan, i) => (
+            <div key={plan.name} style={{
+              background: "var(--bg-card)", border: i === 2 ? "2px solid var(--accent)" : "1px solid var(--border-default)",
+              borderRadius: 16, padding: 32, flex: "1 1 240px", maxWidth: 280,
+            }}>
+              <h3 style={{ fontSize: 18, fontWeight: 700, margin: "0 0 8px" }}>{plan.name}</h3>
+              <div style={{ fontSize: 28, fontWeight: 700, marginBottom: 16 }}>{plan.price}</div>
+              {plan.features.map((f) => (
+                <div key={f} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14, marginBottom: 8 }}>
+                  <FiCheck style={{ color: "var(--accent)" }} /> {f}
+                </div>
+              ))}
+              <button onClick={() => navigate("/signup")} style={{
+                marginTop: 16, background: i === 2 ? "var(--accent)" : "transparent",
+                color: i === 2 ? "#090909" : "var(--text-primary)",
+                border: i === 2 ? "none" : "1px solid var(--border-default)",
+                borderRadius: 10, padding: "10px 20px", fontSize: 14, fontWeight: 600, cursor: "pointer", width: "100%",
+              }}>
+                Get Started
+              </button>
+            </div>
+          ))}
+        </div>
+        <div style={{ textAlign: "center", marginTop: 32 }}>
+          <a href="/pricing" style={{ color: "var(--accent)", fontSize: 14, textDecoration: "none" }}>Compare all plans →</a>
         </div>
       </section>
 

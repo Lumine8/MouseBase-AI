@@ -45,7 +45,7 @@ jobs:
       EMBEDDING_MODEL: text-embedding-004
       EMBEDDING_DIMENSIONS: 768
 
-      TEST_API_KEY: mb_live_ZbqFJSTeqGsxQUFT_C56InqSqcVN36jb-jzUYqF2q3XToAz1z_96vDE1FB2E
+      TEST_API_KEY: mb_test_ci_key_for_github_actions_only
 
     steps:
       - name: Checkout Repository

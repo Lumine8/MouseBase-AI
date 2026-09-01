@@ -86,7 +86,7 @@ export default function Playground() {
   };
 
   const apiKey = apiKeyInput || localStorage.getItem("mb_api_key") || "YOUR_API_KEY";
-  const baseUrl = window.location.origin.replace(/:\d+$/, "") + ":8000/api/v1";
+  const baseUrl = import.meta.env.VITE_API_URL ?? "https://api.mousebase.dev/api/v1";
 
   const examples: Record<Tab, CodeExample[]> = {
     remember: [
