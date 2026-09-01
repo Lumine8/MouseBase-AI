@@ -1,6 +1,6 @@
 # MouseBase Roadmap
 
-> "Before getting users, make sure the infrastructure is solid."
+> "Make the existing core reliable, measurable, easy to integrate, and meaningfully better than basic vector search."
 
 ---
 
@@ -22,205 +22,70 @@
 - Python SDK, JavaScript SDK, Browser SDK, CLI
 - Framework integrations: LangChain, LlamaIndex, OpenAI Agents, MCP Server, CrewAI, Mastra
 - Framework adapters: Next.js, Express, NestJS, Cloudflare Workers, Deno, Bun
-- SEO: robots.txt, JSON-LD, sitemap, llms.txt, Open Graph, per-page meta tags
+- SEO: robots.txt, JSON-LD, sitemap, Open Graph, per-page meta tags
 
 ### What's Not Live
-- Memory types (fact, preference, conversation, etc.) — currently flat `{content, metadata}`
-- Auto-tagging
-- Memory relationships
-- Hybrid search (vector + BM25)
-- Memory lifecycle (TTL, versioning, archive)
-- Collections (hierarchical organization)
-- Bulk import from external sources
+- Hybrid search (vector + BM25 + metadata + recency)
+- Memory lifecycle (TTL, archive, soft-delete, versioning)
+- Optional memory type field
+- Operational relationships (supersedes, contradicts, derived_from, duplicate_of)
+- Provenance and confidence metadata
+- External uptime monitoring and status page
+- Automated database backups
+- Automated secret rotation
 
 ---
 
-## Phase 0 — Infrastructure Hardening (Pre-Launch)
+## Three Product Layers
 
-### Monitoring & Observability
+| Layer | Product Promise | Priority |
+|-------|----------------|----------|
+| **Reliable memory substrate** | Store, search, inspect, update, archive, and delete scoped memories safely. | Immediate |
+| **Intelligent retrieval and lifecycle** | Return the right memory using semantic, keyword, metadata, recency, importance, and retention signals. | Next |
+| **Automated memory intelligence** | Extract, deduplicate, reconcile, relate, and import memories with explainability and cost controls. | Later, after usage evidence |
+
+---
+
+## Stage 0 — Release Hardening
+
+Before broad community promotion, complete these reliability and trust requirements.
+
+### Monitoring
 - [x] Render logs — available via Render dashboard
-- [x] **Sentry** — `sentry_sdk` installed, initialized in lifespan when `SENTRY_DSN` env var is set. Traces sample rate 0.1, PII disabled.
-- [ ] **BetterStack / UptimeRobot** — external uptime monitoring + status page
-- [x] **Structured logging** — `structlog` configured. JSON output in production, colorized console in development.
-- [x] **Request IDs** — `RequestIDMiddleware` generates `X-Request-ID` on every request.
+- [x] **Sentry** — error tracking, 0.1% sample rate, PII disabled
+- [x] **Structured logging** — `structlog`, JSON in production, colorized in dev
+- [x] **Request IDs** — `X-Request-ID` on every request
+- [ ] **External uptime monitoring** — BetterStack or UptimeRobot with public status page. A memory service needs visible availability and incident communication.
 
 ### Security
-- [x] **Email verification** — token-based with 24-hour expiry
-- [x] **Password reset** — token-based with 1-hour expiry, invalidates all sessions
-- [x] **JWT refresh tokens** — 15 min access + 30 day refresh, rotation on use
-- [x] **Session management** — list, revoke single, revoke all
-- [x] **Rate limiting** — 60 req/min per IP, plan-based hourly limits
-- [x] **Security headers** — HSTS, XFO, XSS, Referrer-Policy, Permissions-Policy
-- [x] **Hardcoded secrets removed** — API keys no longer in codebase or CI
-- [x] **Dynamic CI key generation** — bootstrap script generates valid keys, CI exports for tests
-- [ ] **Secret rotation** — automated API key + JWT secret rotation schedule
+- [x] Email verification — token-based, 24-hour expiry
+- [x] Password reset — token-based, 1-hour expiry, invalidates all sessions
+- [x] JWT refresh tokens — 15 min access + 30 day refresh, rotation on use
+- [x] Session management — list, revoke single, revoke all
+- [x] Rate limiting — 60 req/min per IP, plan-based hourly limits
+- [x] Security headers — HSTS, XFO, XSS, Referrer-Policy, Permissions-Policy
+- [x] Hardcoded secrets removed from codebase and CI
+- [x] Dynamic CI key generation — bootstrap script generates valid keys
+- [ ] **Secret rotation** — automated API key rotation; JWT signing secret rotation with overlapping verification window so active sessions are not broken
 
 ### Reliability
-- [ ] **Automated backups** — daily DB dumps with retention policy
-- [x] **Database indexes** — 13 indexes across all tables
-- [x] **Connection pooling** — pool_size=20, max_overflow=10, pool_pre_ping=True
-- [x] **Health endpoints** — `GET /health/` with DB check + latency
-- [x] **Graceful startup/shutdown** — FastAPI lifespan context manager
+- [ ] **Automated backups** — daily DB dumps with retention policy, encryption, restore testing, defined RPO/RTO. A backup that has never been restored is not proven.
+- [x] Database indexes — 13 indexes across all tables
+- [x] Connection pooling — pool_size=20, max_overflow=10, pool_pre_ping=True
+- [x] Health endpoints — `GET /health/` with DB check + latency
+- [x] Graceful startup/shutdown — FastAPI lifespan
 
-### Billing & Payments
-- [x] **Razorpay integration** — one-time orders, plan upgrades, addons
-- [x] **Webhook processing** — payment.captured, subscription.cancelled, subscription.charged
-- [x] **Invoice generation** — Razorpay receipt URL with fallback to branded printable invoice
-- [x] **Plan enforcement** — memory, project, and rate limits enforced
-- [x] **No-subscription fallback** — users without subscription get FREE plan limits (not unlimited)
-- [x] **Project.plan sync** — subscription upgrades/cancels now update project.plan
-- [x] **Webhook error handling** — failed handlers re-raise so Razorpay retries
-- [x] **Dashboard reads subscription** — plan shown from Subscription table, not stale project.plan
-- [x] **Monthly search limit** — enforced via billing-usage endpoint
+### Billing
+- [x] Razorpay integration — one-time orders, plan upgrades, addons
+- [x] Webhook processing — payment.captured, subscription.cancelled, subscription.charged
+- [x] Invoice generation — Razorpay receipt URL with branded fallback
+- [x] Plan enforcement — memory, project, and rate limits enforced
+- [x] No-subscription fallback — FREE plan limits applied (not unlimited)
+- [x] Project.plan sync — subscription changes update project.plan
+- [x] Webhook error handling — failed handlers re-raise so Razorpay retries
+- [x] Dashboard reads subscription — plan from Subscription table, not stale project.plan
 
----
-
-## Phase 0.5 — Memory Explorer
-
-- [x] **Memory list** — paginated table with columns: Content, External ID, Created, Updated
-- [x] **Search & filter** — filter by content, external ID, metadata, date range
-- [x] **Memory inspector** — full detail view with JSON, timestamps, similarity history
-- [x] **Table customization** — show/hide/reorder columns
-- [x] **Bulk operations** — select → delete, export, move, add metadata
-- [x] **Export** — JSON, CSV, NDJSON
-- [x] **Analytics** — per-project stats: total memories, storage, top external IDs, top metadata keys
-- [x] **Timeline** — activity feed (Remember/Search/Patch/Delete events)
-
----
-
-## Phase 1 — Memory Types
-
-Replace the uniform `{content, metadata}` model with typed memories:
-
-| Type | Description | Example |
-|---|---|---|
-| `fact` | Immutable truth | "The sky is blue" |
-| `preference` | User preference | "I prefer Rust over Go" |
-| `conversation` | Dialogue turn | "User asked about Python" |
-| `document` | Long-form text | PDF/Notion import |
-| `knowledge` | Structured knowledge | "E=mc^2" |
-| `observation` | Observed behavior | "User visits docs at 2pm daily" |
-| `task` | Action item | "Deploy v2 by Friday" |
-
-Each type carries its own schema and validation rules.
-
----
-
-## Phase 2 — Automatic Tagging
-
-Auto-generate tags on every memory:
-
-```json
-{
-  "content": "I prefer Rust over Go",
-  "type": "preference",
-  "tags": {
-    "languages": ["Rust", "Go"],
-    "category": "programming",
-    "sentiment": "positive",
-    "entities": []
-  }
-}
-```
-
-Tag sources:
-- **Language detection** — programming languages, spoken languages
-- **Framework detection** — React, FastAPI, PyTorch, etc.
-- **Entity extraction** — people, companies, products, locations
-- **Topic classification** — ML, web dev, devops, design
-- **User attribution** — which user/project owns it
-
----
-
-## Phase 3 — Memory Relationships
-
-Allow memories to reference each other:
-
-```
-Memory A (OpenAI)
-  ├── relates_to → Memory B (GPT-5)
-  ├── depends_on → Memory C (API Key)
-  └── parent_of  → Memory D (Chat History)
-```
-
-Relationship types:
-- `relates_to` — generic association
-- `depends_on` — prerequisite
-- `parent_of` / `child_of` — hierarchy
-- `references` — citation
-- `duplicates` — dedup marker
-- `conflicts_with` — contradiction tracking
-
----
-
-## Phase 4 — Hybrid Search
-
-**Current**: Vector search only
-**Future**:
-```
-Score = α * vector_similarity
-      + β * keyword_relevance  (BM25 / FTS)
-      + γ * metadata_match
-      + δ * recency_boost
-```
-
-Ranking factors:
-- `relevance` — semantic similarity to query
-- `freshness` — newer results rank higher
-- `importance` — user-defined priority, view count, link count
-- `usage_frequency` — how often a memory is retrieved
-
----
-
-## Phase 5 — Memory Lifecycle
-
-Instead of storing forever:
-
-| Operation | Behavior |
-|---|---|
-| `replace` | Overwrite content, preserve id/relationships |
-| `merge` | Combine with existing, keep both histories |
-| `archive` | Soft delete, exclude from search by default |
-| `expire` | TTL-based auto-removal |
-| `version` | Track edit history, rollback support |
-
----
-
-## Phase 6 — Collections
-
-Hierarchical organization:
-
-```
-Workspace
-  └── Project
-       └── Collection
-            └── Memories
-```
-
-- Collections are user-defined folders/namespaces
-- Memories belong to exactly one collection (or root project)
-- Search can scope to workspace, project, or collection
-
----
-
-## Phase 7 — Bulk Import
-
-Support importing from external sources:
-
-| Source | Format |
-|---|---|
-| CSV | `content, type, tags, ...` |
-| JSON | Array of memory objects |
-| Markdown | Headers → titles, paragraphs → memories |
-| PDF | Extract text, chunk by page/section |
-| Notion | Export → HTML/Markdown |
-| Slack | Channel export → conversations |
-
----
-
-## Testing & Quality
-
-### Test Coverage Needed
+### Testing (release-blocking)
 - [ ] Cross-project access isolation tests
 - [ ] Cross-user access isolation tests
 - [ ] API key rotation tests
@@ -228,76 +93,242 @@ Support importing from external sources:
 - [ ] Memory deletion propagation tests
 - [ ] Export functionality tests
 - [ ] Rate limit enforcement tests
-- [ ] CI generates ephemeral credentials per run (done — bootstrap generates key)
+- [x] CI generates ephemeral credentials per run
 
-### API Examples
-- [x] Centralize API base URL in playground (uses `VITE_API_URL`)
+### SDK Examples
+- [x] Centralize API base URL in playground
 - [ ] Automated test verifying all generated examples use canonical API origin
-- [ ] Ensure Python and JavaScript quickstarts are copy-paste ready
+- [ ] Copy-paste validation for all Python and JavaScript quickstarts
 
 ---
 
-## SEO & Discoverability
+## Stage 1 — Retrieval and Lifecycle Core
+
+The highest-value near-term features. This stage gives MouseBase a meaningful product advantage while preserving the simple API.
+
+### Hybrid Search
+
+Vector-only search is a weak long-term differentiator. Developers need exact retrieval for names, package versions, ticket IDs, URLs, error messages, and code identifiers — plus semantic retrieval for paraphrases.
+
+**Ranking formula:**
+```
+final_score =
+    0.60 * semantic_score
+  + 0.25 * keyword_score  (BM25 / full-text)
+  + 0.10 * metadata_match
+  + 0.05 * recency_or_importance_score
+```
+
+Weights are internal first, evaluated on a fixed dataset, not hard-coded as product truth.
+
+- [ ] Add PostgreSQL full-text search (tsvector / tsquery) alongside pgvector
+- [ ] Combine semantic + keyword scores with configurable weights
+- [ ] Metadata filter API (exact match, contains, range)
+- [ ] Recency weighting (newer memories rank higher, configurable decay)
+- [ ] Importance field (user-defined, affects ranking)
+- [ ] Deterministic tie-breaking (by created_at, then id)
+- [ ] Public evaluation suite with fixed dataset
+
+**What this solves:** exact names, IDs, code symbols, error messages, recent preferences that embeddings miss.
+
+### Memory Lifecycle
+
+Users are more likely to experience problems with stale, duplicated, contradictory, or undeletable memories than with a missing label.
+
+| Capability | Behavior |
+|---|---|
+| `active` | Included in normal retrieval. |
+| `archived` | Retained for audit/history, excluded by default. |
+| `expired` | Automatically excluded and removed according to TTL policy. |
+| `deleted` | Hidden immediately, removed according to documented deletion guarantees. |
+| `superseded` | Linked to a newer memory, excluded or down-ranked. |
+| `version` | Every update has a recoverable history and timestamp. |
+
+- [ ] `expires_at` field — TTL-based auto-removal (background worker)
+- [ ] Archive endpoint — soft delete, exclude from search by default
+- [ ] Restore endpoint — un-archive a memory
+- [ ] Soft-delete — hidden immediately, hard-delete after retention period
+- [ ] Version history — every update creates a versioned snapshot
+- [ ] Explicit replace/merge semantics on update
+- [ ] Delete freshness measurement (how fast does a deleted memory disappear from search results?)
+
+### Provenance & Confidence
+
+Add fields only where their semantics are clear and they affect retrieval or governance.
+
+- [ ] `source` field — where the memory came from (api, import, enrichment, etc.)
+- [ ] `confidence` field — float 0-1, how certain the system is about this memory
+- [ ] `importance` field — user-defined priority, affects ranking
+- [ ] `supersedes_id` field — links to the memory this one replaces
+
+### Metadata Filters
+
+- [ ] Filter by `type`, `source`, `confidence`, `importance`, `created_at`, `updated_at`, `expires_at`
+- [ ] Filter by arbitrary metadata key-value pairs
+- [ ] Combine filters with AND/OR logic
+
+---
+
+## Stage 2 — Lightweight Semantic Structure
+
+Add optional structure without rigid schemas or mandatory categories.
+
+### Optional Memory Type
+
+Do not enforce a closed taxonomy. Different applications want different concepts: `customer_fact`, `workflow_state`, `tool_result`, `instruction`, `entity`, `decision`. Allow custom types.
+
+```json
+{
+  "content": "I prefer Rust over Go",
+  "type": "preference",
+  "metadata": {
+    "category": "programming",
+    "confidence": 0.94,
+    "source": "conversation"
+  }
+}
+```
+
+- [ ] Optional `type` field on memory creation/update
+- [ ] Reserved types: `fact`, `preference`, `conversation`, `task`, `document`
+- [ ] Custom types accepted (any string)
+- [ ] Retrieval can filter/boost by type
+- [ ] Missing type never prevents storage
+
+### Operational Relationships
+
+Begin with relationships that solve real memory problems. Not a general knowledge graph.
+
+| Edge | Use |
+|---|---|
+| `supersedes` | A newer preference or fact replaces an older one. |
+| `contradicts` | Two memories cannot both be trusted without resolution. |
+| `derived_from` | A summary or extracted fact points to its source. |
+| `duplicate_of` | Duplicate writes can be collapsed or down-ranked. |
+
+- [ ] `relationship` field on memory (optional, one of the 4 edges)
+- [ ] `related_memory_id` field — the target of the relationship
+- [ ] Expose relationships in Memory Inspector and audit trail
+- [ ] Search can exclude `duplicate_of` and `superseded` memories by default
+- [ ] No arbitrary user-defined graph edges yet
+
+### Memory Inspector Improvements
+
+- [ ] Show why a memory was returned (which signal matched: semantic, keyword, metadata, recency)
+- [ ] Show which memory supersedes it (if any)
+- [ ] Show version history
+- [ ] Show provenance chain (derived_from links)
+
+---
+
+## Stage 3 — Optional Intelligence
+
+Opt-in per project, observable, budget-limited, reversible. The system should suggest changes before it automatically applies them.
+
+### Async Auto-Tagging
+
+Never on the critical write path. Increases latency, cost, false positives, and privacy concerns.
+
+- [ ] Enrichment mode: `enrichment="async"` or separate enrichment job
+- [ ] Tags stored with source, model/version, confidence, timestamp, processing status
+- [ ] User can re-run enrichment after changing models
+- [ ] Never silently mutate customer memory content
+- [ ] Low-confidence tags not treated as facts
+- [ ] User can disable enrichment per project
+
+### Deduplication & Conflict Detection
+
+- [ ] Suggest duplicate detection on write (async, not blocking)
+- [ ] Flag contradictions between memories
+- [ ] Suggest supersession when a newer memory contradicts an older one
+- [ ] All suggestions are opt-in, user confirms before applying
+
+### Summarization & Extraction
+
+- [ ] Optional memory summarization (async)
+- [ ] Entity extraction (people, companies, products)
+- [ ] Topic classification
+- [ ] All with provenance, confidence, and cost tracking
+
+---
+
+## Stage 4 — Ecosystem Expansion
+
+Selective investment. Avoid maintaining every adapter until usage data shows demand.
+
+### Integrations
+
+Keep the highest-value integrations:
+- [x] LangChain
+- [x] LlamaIndex
+- [x] OpenAI Agents
+- [x] MCP Server
+- [ ] LangGraph (template repository)
+- [ ] Plain REST/FastAPI path
+
+Defer until demand:
+- CrewAI, Mastra, other framework adapters → use template repository instead
+
+### Import
+
+Start with robust JSON/NDJSON (universal, deterministic). Build others only when a design partner requests one.
+
+- [ ] JSON/NDJSON import endpoint (already have export, add import)
+- [ ] Validation, dedup, and provenance tagging on import
+- [ ] Notion, Slack, PDF, CSV → only after design partner demand
+
+---
+
+## Stage 5 — Advanced Graph & Enterprise
+
+After evidence of sustained usage and a clear buyer.
+
+- [ ] Arbitrary user-defined relationship edges
+- [ ] Hierarchical collections (only if namespaces + metadata prove insufficient)
+- [ ] Multi-hop graph retrieval
+- [ ] Advanced policy engines
+- [ ] Regional data residency
+- [ ] Enterprise administration (SSO, audit logs, team management)
+
+---
+
+## SEO & Content
 
 ### Done
-- [x] Fix robots.txt for OAI-SearchBot and AI crawlers
-- [x] Fix GitHub links (anomalyco → Lumine8)
-- [x] Add JSON-LD structured data (SoftwareApplication, WebSite, Organization)
-- [x] Update sitemap.xml (16 URLs)
-- [x] Add llms.txt
-- [x] Update homepage hero copy
-- [x] Improve meta descriptions for Blog, Changelog, Roadmap
+- [x] robots.txt for AI crawlers
+- [x] JSON-LD structured data
+- [x] sitemap.xml (16 URLs)
+- [x] Open Graph, per-page meta tags
+- [x] GitHub links fixed
+- [x] Hero copy updated
 
 ### Still TODO
 - [ ] Submit sitemap to Google Search Console and Bing Webmaster Tools
-- [ ] Inspect homepage, docs, pricing, and use-case pages in Search Console
-
----
-
-## Content & Onboarding
+- [ ] Inspect pages in Search Console
+- [ ] Content quality > special AI files (llms.txt is nice but not a priority)
 
 ### Knowledge Base Articles
 Each article: answer query in first paragraph, descriptive H2 headings, runnable example, trade-offs, SDK/API links, author/date/last-updated.
 
-**Category Education**
-- [ ] "What Is Persistent Memory for AI Agents?"
-- [ ] "Long-Term Memory vs RAG vs Context Window"
-- [ ] "Semantic, Episodic, and Procedural Memory for Agents"
-
-**Implementation Guides**
+**Priority 1 — Implementation**
 - [ ] "How to Add Persistent Memory to a Python Agent"
-- [ ] "PostgreSQL + pgvector Memory Store Tutorial"
-- [ ] "Memory Namespaces for Multi-Tenant AI Apps"
+- [ ] "How to Add Persistent Memory to a JavaScript Agent"
 
-**Evaluation**
+**Priority 2 — Evaluation**
 - [ ] "How to Evaluate AI Agent Memory Retrieval"
 - [ ] "Memory Precision, Recall, Freshness, and Latency"
-- [ ] "When Semantic Search Fails for Agent Memory"
 
-**Comparisons**
+**Priority 3 — Comparisons**
 - [ ] "MouseBase vs Redis for AI Memory"
-- [ ] "MouseBase vs a Vector Database"
-- [ ] "Hosted Memory API vs Self-Hosted pgvector"
+- [ ] "MouseBase vs Self-Hosted pgvector"
 
-**Use Cases**
-- [ ] "Persistent Memory for Customer Support Agents"
-- [ ] "Memory for RAG Applications"
-- [ ] "Memory for Coding Agents"
-- [ ] "Memory for Discord Bots"
-
-**Trust & Governance**
-- [ ] "How to Delete AI Memories Reliably"
-- [ ] "Tenant Isolation for Agent Memory"
-- [ ] "Sensitive Data and AI Memory Retention"
-
-### Onboarding
-- [ ] One canonical quickstart: create project → store memory → search → delete (under 5 min)
-- [ ] Runnable examples in Python and JavaScript
-- [ ] Three proof points below hero: working 5-min quickstart, public retrieval benchmark, transparent security page
+**Priority 4 — Education**
+- [ ] "What Is Persistent Memory for AI Agents?"
+- [ ] "Long-Term Memory vs RAG vs Context Window"
 
 ---
 
-## Growth & Developer Attention
+## Growth
 
 ### Design Partners
 - [ ] Recruit 5–10 design partners building real agents
@@ -305,33 +336,39 @@ Each article: answer query in first paragraph, descriptive H2 headings, runnable
 - [ ] Collect evidence of reduced prompt/context work
 
 ### Positioning
-- [ ] Reframe as: "Operational memory infrastructure for production AI agents"
-- [ ] Emphasize: scoped, inspectable, evaluable, easy to delete
-- [ ] Avoid "just another vector database" framing
-
-### Developer Attention Strategy
-- [ ] Publish open-source benchmark repository (dataset, eval script, baseline + MouseBase results)
-- [ ] Share on Hacker News, Reddit (r/LocalLLaMA, r/MachineLearning), GitHub Discussions
-- [ ] Create canonical starter templates: LangGraph, OpenAI Agents SDK, LlamaIndex, CrewAI, FastAPI/Node
-- [ ] Each template: one-command setup, deployed demo, architecture diagram, docs link
-- [ ] Public changelog and roadmap with dates, version numbers, breaking-change policy
-- [ ] "Memory inspector" demo with synthetic data
+- "Operational memory infrastructure for production AI agents"
+- Emphasize: scoped, inspectable, evaluable, easy to delete
+- Avoid "just another vector database" framing
 
 ### Benchmarks & Evidence
-- [ ] Publish retrieval benchmarks with methodology
-- [ ] Publish latency benchmarks across plans
+- [ ] Publish retrieval benchmark (vector-only vs hybrid) with methodology
+- [ ] Publish latency benchmarks (p50/p95) across plans
+- [ ] Publish delete/archive freshness measurements
 - [ ] Document real-world usage patterns from design partners
+
+### Developer Attention
+- [ ] Open-source benchmark repository (dataset, eval script, baseline + MouseBase results)
+- [ ] Share on Hacker News, Reddit, GitHub Discussions
+- [ ] Canonical starter templates: LangGraph, OpenAI Agents, LlamaIndex, FastAPI/Node
+- [ ] Public changelog with version numbers and breaking-change policy
 
 ---
 
 ## Measurement Plan
 
+### Product Metrics
 | Metric | Baseline | Target |
 |--------|----------|--------|
-| Indexed pages | Search Console coverage report | 100% of intended public pages indexed |
-| Branded discovery | Queries containing "MouseBase" | Increasing impressions/clicks month over month |
-| Non-branded discovery | "AI agent memory", "persistent memory API" | 10+ pages receiving impressions |
-| AI citations | Manual search in ChatGPT, Google AI, Copilot | Baseline of cited pages; improve docs/benchmark representation |
-| Developer conversion | Docs → SDK install → API request → retained project | Instrument each step; reduce largest drop-off |
-| Content quality | Time on page, scroll depth, code-copy events | Pages attracting qualified developers |
-| Product proof | Quickstart success rate, API p50/p95 latency | Publish reproducible evidence |
+| Hybrid vs vector precision@5 | Vector-only baseline | +15% improvement |
+| p50 latency | Current vector-only | < 100ms for hybrid |
+| p95 latency | Current vector-only | < 300ms for hybrid |
+| Delete freshness | Unknown | < 60 seconds from API call to search exclusion |
+| Archive freshness | Unknown | < 60 seconds from API call to search exclusion |
+
+### Business Metrics
+| Metric | Baseline | Target |
+|--------|----------|--------|
+| Indexed pages | Search Console | 100% of intended pages |
+| Branded discovery | Queries for "MouseBase" | Growing month over month |
+| Developer conversion | Docs → SDK → API request → retained project | Instrument each step |
+| Quickstart success rate | Unknown | > 80% complete without help |
