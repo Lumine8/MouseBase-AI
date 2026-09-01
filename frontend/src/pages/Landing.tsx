@@ -131,8 +131,8 @@ export default function Landing() {
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg-base)", position: "relative", overflow: "hidden" }}>
       <SEO
-        title="Persistent Memory for AI Agents"
-        description="MouseBase gives your AI agents persistent memory. Store, search, and retrieve long-term context with a simple API. Python SDK, REST API, and self-hosted."
+        title="MouseBase: Persistent Memory API for AI Agents"
+        description="Store, search, inspect, and delete long-term memory for AI agents with a simple Python, JavaScript, or REST API backed by PostgreSQL and pgvector."
         path="/"
         jsonLd={softwareSchema}
       />
@@ -158,14 +158,14 @@ export default function Landing() {
           color: "var(--text-primary)", maxWidth: 700, margin: "0 auto"
         }}>
           Persistent Memory<br />
-          <span style={{ color: "var(--accent)" }}>for AI Applications</span>
+          <span style={{ color: "var(--accent)" }}>for Production AI Agents</span>
         </h1>
 
         <p style={{
           marginTop: 20, fontSize: 17, color: "var(--text-secondary)",
           lineHeight: 1.6, maxWidth: 480, marginLeft: "auto", marginRight: "auto"
         }}>
-          Store, search, and retrieve long-term memory for AI agents and applications.
+          Store, retrieve, inspect, and delete scoped memories through one API. MouseBase gives Python and JavaScript applications semantic search, project isolation, metadata, and memory lifecycle controls — without building the storage layer yourself.
         </p>
 
         {/* Install snippet */}
