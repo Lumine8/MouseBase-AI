@@ -1,0 +1,86 @@
+name: Database Backup
+
+on:
+  schedule:
+    # Daily at 02:00 UTC
+    - cron: "0 2 * * *"
+  workflow_dispatch:
+
+jobs:
+  backup:
+    name: Backup Neon Database
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
+      - name: Create backup
+        run: |
+          TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+          BACKUP_FILE="neon_backup_${TIMESTAMP}.sql.gz"
+
+          pg_dump "$DATABASE_URL" \
+            --no-owner \
+            --no-privileges \
+            --verbose \
+            2>/dev/null | gzip > "$BACKUP_FILE"
+
+          echo "BACKUP_FILE=$BACKUP_FILE" >> $GITHUB_ENV
+          echo "Backup created: $BACKUP_FILE"
+          ls -lh "$BACKUP_FILE"
+
+      - name: Upload backup artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: db-backup-${{ github.run_id }}
+          path: ${{ env.BACKUP_FILE }}
+          retention-days: 30
+
+      - name: Cleanup old artifacts (keep last 7)
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const artifacts = await github.rest.actions.listArtifactsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              per_page: 100,
+            });
+
+            const backups = artifacts.data.artifacts
+              .filter(a => a.name.startsWith('db-backup-'))
+              .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+            // Keep the 7 most recent, delete the rest
+            for (const backup of backups.slice(7)) {
+              console.log(`Deleting old backup: ${backup.name}`);
+              await github.rest.actions.deleteArtifact({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                artifact_id: backup.id,
+              });
+            }
+
+      - name: Verify backup integrity
+        run: |
+          echo "Verifying backup file..."
+          if [ ! -f "$BACKUP_FILE" ]; then
+            echo "ERROR: Backup file not found"
+            exit 1
+          fi
+
+          # Check file is not empty
+          if [ ! -s "$BACKUP_FILE" ]; then
+            echo "ERROR: Backup file is empty"
+            exit 1
+          fi
+
+          # Check gzip is valid
+          if ! gzip -t "$BACKUP_FILE"; then
+            echo "ERROR: Backup file is corrupted"
+            exit 1
+          fi
+
+          echo "Backup verification passed"
+          echo "File size: $(ls -lh "$BACKUP_FILE" | awk '{print $5}')"
