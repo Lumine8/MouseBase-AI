@@ -119,10 +119,10 @@ final_score =
 
 Weights are internal first, evaluated on a fixed dataset, not hard-coded as product truth.
 
-- [ ] Add PostgreSQL full-text search (tsvector / tsquery) alongside pgvector
-- [ ] Combine semantic + keyword scores with configurable weights
-- [ ] Metadata filter API (exact match, contains, range)
-- [ ] Recency weighting (newer memories rank higher, configurable decay)
+- [x] Add PostgreSQL full-text search (tsvector / tsquery) alongside pgvector
+- [x] Combine semantic + keyword scores with configurable weights (0.60 semantic, 0.25 keyword, 0.10 metadata, 0.05 recency)
+- [x] Metadata filter API (exact match via JSONB operators)
+- [x] Recency weighting (exponential decay, half-life ~30 days)
 - [ ] Importance field (user-defined, affects ranking)
 - [ ] Deterministic tie-breaking (by created_at, then id)
 - [ ] Public evaluation suite with fixed dataset

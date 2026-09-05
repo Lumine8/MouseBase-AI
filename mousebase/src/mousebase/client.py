@@ -171,8 +171,11 @@ class MouseBase:
         self,
         query: str,
         top_k: int = 10,
+        metadata_filters: dict[str, Any] | None = None,
     ) -> SearchResponse:
-        body = {"query": query, "top_k": top_k}
+        body: dict[str, Any] = {"query": query, "top_k": top_k}
+        if metadata_filters is not None:
+            body["metadata_filters"] = metadata_filters
         data = self._request("POST", "/search/", json=body)
         return SearchResponse.model_validate(data)
 

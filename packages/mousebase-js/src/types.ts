@@ -16,6 +16,7 @@ export interface RememberResponse {
 export interface SearchOptions {
   query: string;
   top_k?: number;
+  metadata_filters?: Record<string, unknown>;
 }
 
 export interface SearchResult {

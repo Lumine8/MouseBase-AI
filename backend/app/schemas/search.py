@@ -16,6 +16,10 @@ class SearchRequest(BaseModel):
         le=100,
         description="The maximum number of relevant memories to return.",
     )
+    metadata_filters: dict[str, Any] | None = Field(
+        default=None,
+        description="Filter results by metadata key-value pairs. Supports exact match.",
+    )
 
     @field_validator("query")
     @classmethod

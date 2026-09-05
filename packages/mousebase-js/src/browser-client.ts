@@ -83,10 +83,14 @@ export class MouseBaseBrowser {
   }
 
   async search(options: SearchOptions): Promise<SearchResponse> {
-    return this._request("POST", "/search/", {
+    const body: Record<string, unknown> = {
       query: options.query,
       top_k: options.top_k ?? 10,
-    });
+    };
+    if (options.metadata_filters !== undefined) {
+      body.metadata_filters = options.metadata_filters;
+    }
+    return this._request("POST", "/search/", body);
   }
 
   async get(memoryId: string): Promise<MemoryResponse> {

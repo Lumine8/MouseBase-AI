@@ -60,9 +60,12 @@ async def search(
     await usage.increment_requests(project.id)
     await usage.increment_searches(project.id)
     activity = ActivityService(db)
+    log_details = {"query": request.query[:200], "top_k": request.top_k}
+    if request.metadata_filters:
+        log_details["metadata_filters"] = request.metadata_filters
     await activity.log(
         project_id=project.id,
         action="search",
-        details={"query": request.query[:200], "top_k": request.top_k},
+        details=log_details,
     )
     return result
