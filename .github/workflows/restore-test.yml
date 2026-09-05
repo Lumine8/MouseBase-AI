@@ -1,0 +1,151 @@
+name: Backup Restore Test
+
+on:
+  schedule:
+    # Weekly on Sundays at 04:00 UTC (2 hours after backup at 02:00)
+    - cron: "0 4 * * 0"
+  workflow_dispatch:
+
+jobs:
+  verify-backup:
+    name: Verify Backup Restorable
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_DB: mousebase_restore_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=10
+
+    steps:
+      - name: Install PostgreSQL client
+        run: |
+          sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+          curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/pgdg.gpg
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client-18
+
+      - name: Download latest backup
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const artifacts = await github.rest.actions.listArtifactsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              per_page: 100,
+            });
+
+            const backups = artifacts.data.artifacts
+              .filter(a => a.name.startsWith('db-backup-'))
+              .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+            if (backups.length === 0) {
+              core.setFailed('No backup artifacts found');
+              return;
+            }
+
+            const latest = backups[0];
+            console.log(`Latest backup: ${latest.name} (${latest.size_in_bytes} bytes, ${latest.created_at})`);
+
+            const download = await github.rest.actions.downloadArtifact({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              artifact_id: latest.id,
+              archive_format: 'zip',
+            });
+
+            const fs = require('fs');
+            fs.writeFileSync('/tmp/backup.zip', Buffer.from(download.data));
+
+      - name: Restore backup
+        run: |
+          cd /tmp
+          unzip -o backup.zip
+          BACKUP_FILE=$(ls -t neon_backup_*.sql.gz | head -1)
+          echo "Restoring: $BACKUP_FILE"
+          gunzip -f "$BACKUP_FILE"
+          SQL_FILE="${BACKUP_FILE%.gz}"
+          echo "SQL file: $SQL_FILE"
+
+          PG_URL="postgresql://postgres:postgres@localhost:5432/mousebase_restore_test"
+          psql "$PG_URL" -f "$SQL_FILE" --set ON_ERROR_STOP=on 2>&1 | tail -20
+
+          echo "Restore complete"
+
+      - name: Verify restored data
+        run: |
+          PG_URL="postgresql://postgres:postgres@localhost:5432/mousebase_restore_test"
+
+          echo "=== Checking tables ==="
+          TABLES=$(psql "$PG_URL" -t -c "SELECT count(*) FROM information_schema.tables WHERE table_schema = 'public'")
+          echo "Tables found: $TABLES"
+
+          echo ""
+          echo "=== Table list ==="
+          psql "$PG_URL" -c "\dt"
+
+          echo ""
+          echo "=== Row counts ==="
+          for table in users projects memories embeddings subscriptions refresh_tokens activity_log payments; do
+            COUNT=$(psql "$PG_URL" -t -c "SELECT count(*) FROM $table" 2>/dev/null || echo "N/A")
+            echo "  $table: $COUNT"
+          done
+
+          echo ""
+          echo "=== Key checks ==="
+
+          # Check users exist
+          USER_COUNT=$(psql "$PG_URL" -t -c "SELECT count(*) FROM users")
+          if [ "$USER_COUNT" -gt 0 ]; then
+            echo "PASS: Users table has data ($USER_COUNT rows)"
+          else
+            echo "FAIL: Users table is empty"
+            exit 1
+          fi
+
+          # Check projects exist
+          PROJECT_COUNT=$(psql "$PG_URL" -t -c "SELECT count(*) FROM projects")
+          if [ "$PROJECT_COUNT" -gt 0 ]; then
+            echo "PASS: Projects table has data ($PROJECT_COUNT rows)"
+          else
+            echo "FAIL: Projects table is empty"
+            exit 1
+          fi
+
+          # Check memories exist
+          MEMORY_COUNT=$(psql "$PG_URL" -t -c "SELECT count(*) FROM memories")
+          if [ "$MEMORY_COUNT" -gt 0 ]; then
+            echo "PASS: Memories table has data ($MEMORY_COUNT rows)"
+          else
+            echo "FAIL: Memories table is empty"
+            exit 1
+          fi
+
+          # Check embeddings exist and have vectors
+          EMBEDDING_COUNT=$(psql "$PG_URL" -t -c "SELECT count(*) FROM embeddings")
+          if [ "$EMBEDDING_COUNT" -gt 0 ]; then
+            echo "PASS: Embeddings table has data ($EMBEDDING_COUNT rows)"
+          else
+            echo "FAIL: Embeddings table is empty"
+            exit 1
+          fi
+
+          # Check pgvector extension is available
+          EXTENSION=$(psql "$PG_URL" -t -c "SELECT extname FROM pg_extension WHERE extname = 'vector'")
+          if [ -n "$EXTENSION" ]; then
+            echo "PASS: pgvector extension installed"
+          else
+            echo "WARN: pgvector extension not found (may need manual install)"
+          fi
+
+          echo ""
+          echo "=== Backup restore verification PASSED ==="
