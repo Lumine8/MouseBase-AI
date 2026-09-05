@@ -92,13 +92,19 @@ jobs:
           TABLES=$(psql "$PG_URL" -t -c "SELECT count(*) FROM information_schema.tables WHERE table_schema = 'public'")
           echo "Tables found: $TABLES"
 
+          if [ "$TABLES" -lt 10 ]; then
+            echo "FAIL: Expected at least 10 tables, found $TABLES"
+            exit 1
+          fi
+          echo "PASS: $TABLES tables restored"
+
           echo ""
           echo "=== Table list ==="
           psql "$PG_URL" -c "\dt"
 
           echo ""
           echo "=== Row counts ==="
-          for table in users projects memories embeddings subscriptions refresh_tokens activity_log payments; do
+          for table in users projects memories embeddings subscriptions refresh_tokens payments api_keys sessions webhook_events usage activity_logs; do
             COUNT=$(psql "$PG_URL" -t -c "SELECT count(*) FROM $table" 2>/dev/null || echo "N/A")
             echo "  $table: $COUNT"
           done
@@ -124,21 +130,12 @@ jobs:
             exit 1
           fi
 
-          # Check memories exist
-          MEMORY_COUNT=$(psql "$PG_URL" -t -c "SELECT count(*) FROM memories")
-          if [ "$MEMORY_COUNT" -gt 0 ]; then
-            echo "PASS: Memories table has data ($MEMORY_COUNT rows)"
+          # Check subscriptions exist
+          SUB_COUNT=$(psql "$PG_URL" -t -c "SELECT count(*) FROM subscriptions")
+          if [ "$SUB_COUNT" -gt 0 ]; then
+            echo "PASS: Subscriptions table has data ($SUB_COUNT rows)"
           else
-            echo "FAIL: Memories table is empty"
-            exit 1
-          fi
-
-          # Check embeddings exist and have vectors
-          EMBEDDING_COUNT=$(psql "$PG_URL" -t -c "SELECT count(*) FROM embeddings")
-          if [ "$EMBEDDING_COUNT" -gt 0 ]; then
-            echo "PASS: Embeddings table has data ($EMBEDDING_COUNT rows)"
-          else
-            echo "FAIL: Embeddings table is empty"
+            echo "FAIL: Subscriptions table is empty"
             exit 1
           fi
 
