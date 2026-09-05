@@ -29,6 +29,7 @@ export default function SEO({ title, description, path, ogType = "website", ogIm
       <meta property="og:image" content={ogImage} />
 
       <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:site" content="@mousebase" />
       <meta name="twitter:title" content={fullTitle} />
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={ogImage} />
