@@ -67,7 +67,7 @@ Before broad community promotion, complete these reliability and trust requireme
 - [x] **Secret rotation** — JWT signing secret rotation via `JWT_SECRET_PREVIOUS` env var (accepts tokens signed with either secret). API key rotation with 24-hour grace period (old key remains valid after rotation). Migration adds `previous_api_key_hash` and `key_rotated_at` columns.
 
 ### Reliability
-- [x] **Automated backups** — daily DB dumps via GitHub Actions (pg_dump-18 matching Neon PG 18.6), 30-day retention, integrity verification, 7 backups retained. Restore testing still needed.
+- [x] **Automated backups** — daily DB dumps via GitHub Actions (pg_dump-18 matching Neon PG 18.6), 30-day retention, integrity verification, 7 backups retained. Weekly restore test verifies backups restore to a fresh PG 16 instance with all tables intact.
 - [x] Database indexes — 13 indexes across all tables
 - [x] Connection pooling — pool_size=20, max_overflow=10, pool_pre_ping=True
 - [x] Health endpoints — `GET /health/` with DB check + latency
