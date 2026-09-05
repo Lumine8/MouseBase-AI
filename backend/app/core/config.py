@@ -31,6 +31,7 @@ class Settings(BaseSettings):
     MIN_SCORE: float = Field(default=0.65, ge=0.0, le=1.0)
 
     JWT_SECRET: str = "dev-jwt-secret-do-not-use-in-production"
+    JWT_SECRET_PREVIOUS: str = ""
     JWT_EXPIRY_HOURS: int = 72
 
     REDIS_URL: str = "redis://localhost:6379/0"

@@ -35,6 +35,12 @@ class Project(Base):
         String(16), unique=True, nullable=False, index=True
     )
     api_key_encrypted: Mapped[Optional[str]] = mapped_column(String(512), nullable=True)
+    previous_api_key_hash: Mapped[Optional[str]] = mapped_column(
+        String(255), nullable=True
+    )
+    key_rotated_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
     plan: Mapped[str] = mapped_column(String(20), nullable=False, default="free")
     status: Mapped[ProjectStatus] = mapped_column(
         String(20), nullable=False, default=ProjectStatus.ACTIVE

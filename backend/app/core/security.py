@@ -106,9 +106,19 @@ def create_password_reset_token(user_id: UUID) -> str:
     return jwt.encode(payload, settings.JWT_SECRET, algorithm="HS256")
 
 
+def _decode_jwt(token: str) -> dict:
+    """Try current secret, fall back to previous for grace period."""
+    try:
+        return jwt.decode(token, settings.JWT_SECRET, algorithms=["HS256"])
+    except (jwt.InvalidTokenError, jwt.ExpiredSignatureError):
+        if settings.JWT_SECRET_PREVIOUS:
+            return jwt.decode(token, settings.JWT_SECRET_PREVIOUS, algorithms=["HS256"])
+        raise
+
+
 def verify_access_token(token: str) -> UUID:
     try:
-        payload = jwt.decode(token, settings.JWT_SECRET, algorithms=["HS256"])
+        payload = _decode_jwt(token)
         if payload.get("type", "access") not in ("access",):
             from app.exceptions.auth import InvalidTokenError
 
@@ -122,7 +132,7 @@ def verify_access_token(token: str) -> UUID:
 
 def verify_email_token(token: str) -> UUID:
     try:
-        payload = jwt.decode(token, settings.JWT_SECRET, algorithms=["HS256"])
+        payload = _decode_jwt(token)
         if payload.get("type") != "email":
             from app.exceptions.auth import InvalidTokenError
 
@@ -136,7 +146,7 @@ def verify_email_token(token: str) -> UUID:
 
 def verify_password_reset_token(token: str) -> UUID:
     try:
-        payload = jwt.decode(token, settings.JWT_SECRET, algorithms=["HS256"])
+        payload = _decode_jwt(token)
         if payload.get("type") != "password_reset":
             from app.exceptions.auth import InvalidTokenError
 

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime, timezone
 from uuid import UUID
 
 from sqlalchemy import select
@@ -113,6 +114,11 @@ class ProjectService:
 
     async def rotate_key(self, owner_id: UUID, project_id: UUID) -> ProjectKeyResponse:
         project = await self._get_owned_project(owner_id, project_id)
+
+        # Save current hash as previous for grace period overlap
+        project.previous_api_key_hash = project.api_key_hash
+        project.key_rotated_at = datetime.now(timezone.utc)
+
         api_key = generate_api_key()
         _, secret = parse_api_key(api_key.key)
         project.api_key_id = api_key.key_id

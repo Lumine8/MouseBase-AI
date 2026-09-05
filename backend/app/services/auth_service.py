@@ -244,6 +244,7 @@ class AuthService:
         return user
 
     async def authenticate_api_key(self, api_key: str) -> Project:
+        from datetime import datetime, timezone, timedelta
         from app.core.security import parse_api_key, verify_api_key
 
         key_id, secret = parse_api_key(api_key)
@@ -255,10 +256,21 @@ class AuthService:
         if project is None:
             raise InvalidAPIKeyError()
 
-        if not verify_api_key(secret, project.api_key_hash):
-            raise InvalidAPIKeyError()
+        # Check current key
+        if verify_api_key(secret, project.api_key_hash):
+            return project
 
-        return project
+        # Grace period: accept previous key for 24 hours after rotation
+        if (
+            project.previous_api_key_hash
+            and project.key_rotated_at
+            and datetime.now(timezone.utc) - project.key_rotated_at
+            < timedelta(hours=24)
+            and verify_api_key(secret, project.previous_api_key_hash)
+        ):
+            return project
+
+        raise InvalidAPIKeyError()
 
     async def _send_verification_email(self, user: User) -> None:
         token = create_email_token(user.id)
