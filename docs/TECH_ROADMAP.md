@@ -30,8 +30,6 @@
 - Optional memory type field
 - Operational relationships (supersedes, contradicts, derived_from, duplicate_of)
 - Provenance and confidence metadata
-- External uptime monitoring and status page
-- Automated database backups
 - Automated secret rotation
 
 ---
@@ -69,7 +67,7 @@ Before broad community promotion, complete these reliability and trust requireme
 - [ ] **Secret rotation** — automated API key rotation; JWT signing secret rotation with overlapping verification window so active sessions are not broken
 
 ### Reliability
-- [x] **Automated backups** — daily DB dumps via GitHub Actions, 30-day retention, integrity verification. Restore testing still needed.
+- [x] **Automated backups** — daily DB dumps via GitHub Actions (pg_dump-18 matching Neon PG 18.6), 30-day retention, integrity verification, 7 backups retained. Restore testing still needed.
 - [x] Database indexes — 13 indexes across all tables
 - [x] Connection pooling — pool_size=20, max_overflow=10, pool_pre_ping=True
 - [x] Health endpoints — `GET /health/` with DB check + latency
