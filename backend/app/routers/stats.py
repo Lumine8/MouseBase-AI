@@ -3,13 +3,18 @@ from fastapi import APIRouter
 
 router = APIRouter(prefix="/stats", tags=["stats"])
 
+HEADERS = {
+    "User-Agent": "MouseBase/0.1.0 (https://mousebase.dev)",
+}
+
 
 @router.get("/downloads")
 async def get_download_stats():
     pypi_data = {}
-    npm_data = {}
+    npm_week = 0
+    npm_month = 0
 
-    async with httpx.AsyncClient(timeout=10) as client:
+    async with httpx.AsyncClient(timeout=10, headers=HEADERS) as client:
         try:
             resp = await client.get(
                 "https://pypistats.org/api/packages/mousebase/recent"
@@ -24,7 +29,7 @@ async def get_download_stats():
                 "https://api.npmjs.org/downloads/point/last-week/mousebase"
             )
             if resp.status_code == 200:
-                npm_data = resp.json()
+                npm_week = resp.json().get("downloads", 0)
         except Exception:
             pass
 
@@ -33,7 +38,7 @@ async def get_download_stats():
                 "https://api.npmjs.org/downloads/point/last-month/mousebase"
             )
             if resp.status_code == 200:
-                npm_data["last_month"] = resp.json().get("downloads", 0)
+                npm_month = resp.json().get("downloads", 0)
         except Exception:
             pass
 
@@ -44,11 +49,10 @@ async def get_download_stats():
             "last_month": pypi_data.get("last_month", 0),
         },
         "npm": {
-            "last_week": npm_data.get("downloads", 0),
-            "last_month": npm_data.get("last_month", 0),
+            "last_week": npm_week,
+            "last_month": npm_month,
         },
         "total": {
-            "last_month": pypi_data.get("last_month", 0)
-            + npm_data.get("last_month", 0),
+            "last_month": pypi_data.get("last_month", 0) + npm_month,
         },
     }
