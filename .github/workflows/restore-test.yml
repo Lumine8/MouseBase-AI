@@ -76,6 +76,9 @@ jobs:
           SQL_FILE="${BACKUP_FILE%.gz}"
           echo "SQL file: $SQL_FILE"
 
+          # Strip PG 18-specific settings not supported by PG 16
+          sed -i 's/^SET transaction_timeout.*$//' "$SQL_FILE"
+
           PG_URL="postgresql://postgres:postgres@localhost:5432/mousebase_restore_test"
           psql "$PG_URL" -f "$SQL_FILE" --set ON_ERROR_STOP=on 2>&1 | tail -20
 
