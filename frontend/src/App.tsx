@@ -31,6 +31,11 @@ import Security from "./pages/legal/Security";
 import Subprocessors from "./pages/legal/Subprocessors";
 import About from "./pages/company/About";
 import Contact from "./pages/company/Contact";
+import WhatIsMouseBase from "./pages/content/WhatIsMouseBase";
+import AIMemory from "./pages/content/AIMemory";
+import CompareMem0 from "./pages/content/CompareMem0";
+import CompareZep from "./pages/content/CompareZep";
+import CompareVectorDB from "./pages/content/CompareVectorDB";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
 
@@ -92,6 +97,13 @@ export default function App() {
       <Route path="/refund" element={<RefundPolicy />} />
       <Route path="/about" element={<About />} />
       <Route path="/contact" element={<Contact />} />
+
+      {/* Content */}
+      <Route path="/what-is-mousebase" element={<WhatIsMouseBase />} />
+      <Route path="/ai-memory" element={<AIMemory />} />
+      <Route path="/comparisons/mem0" element={<CompareMem0 />} />
+      <Route path="/comparisons/zep" element={<CompareZep />} />
+      <Route path="/comparisons/vector-database" element={<CompareVectorDB />} />
 
       {/* Legal */}
       <Route path="/legal/privacy" element={<Privacy />} />
