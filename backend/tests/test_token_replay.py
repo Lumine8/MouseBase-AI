@@ -125,6 +125,8 @@ async def test_expired_refresh_token_rejected(client):
     # but we can verify that a malformed token is rejected
     resp = await client.post(
         "/api/v1/auth/refresh",
-        json={"refresh_token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.expired"},
+        json={
+            "refresh_token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.expired"
+        },
     )
     assert resp.status_code == 401

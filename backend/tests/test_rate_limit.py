@@ -22,7 +22,9 @@ def test_rate_limiter_blocks_at_limit():
     key = f"test_{uuid.uuid4().hex[:8]}"
 
     for i in range(5):
-        allowed, count = limiter.check_rate_limit(key, max_requests=5, window_seconds=3600)
+        allowed, count = limiter.check_rate_limit(
+            key, max_requests=5, window_seconds=3600
+        )
         assert allowed is True
 
     allowed, count = limiter.check_rate_limit(key, max_requests=5, window_seconds=3600)
