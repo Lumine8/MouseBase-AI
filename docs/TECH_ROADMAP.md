@@ -135,31 +135,31 @@ Make MouseBase discoverable by AI systems and search engines. This runs in paral
 
 ### P1 — Entity Understanding
 
-- [ ] Consistent entity description across all surfaces: "Persistent memory infrastructure for AI applications and agents"
-- [ ] Verify homepage H1, title, meta description, and first paragraph all clearly answer "What is MouseBase?"
-- [ ] Verify GitHub README immediately explains what, why, who, how (currently good — verify consistency)
-- [ ] Ensure package descriptions (PyPI, npm) match the canonical product description
-- [ ] Add `twitter:card` summary_large_image to all public pages (not just summary)
+- [x] Consistent entity description across all surfaces: "Persistent memory infrastructure for AI applications and agents"
+- [x] Homepage H1, title, meta description, and first paragraph clearly answer "What is MouseBase?"
+- [x] GitHub README immediately explains what, why, who, how (verified — 452 lines, comprehensive)
+- [x] Package descriptions (PyPI, npm) match canonical product description
+- [x] Add `twitter:card` summary_large_image to all public pages (via SEO component)
 
 ### P2 — High-Value Content Pages
 
 Each page: clear title, H1, answer-first structure (first paragraph answers the query), technical depth, code examples, canonical URL, structured data.
 
-- [ ] `/what-is-mousebase` — "What is MouseBase?" (answer: persistent memory infrastructure for AI)
-- [ ] `/ai-memory` — "What is AI memory?" (educational, positions MouseBase)
+- [x] `/what-is-mousebase` — "What is MouseBase?" (answer: persistent memory infrastructure for AI)
+- [x] `/ai-memory` — "What is AI memory?" (educational, positions MouseBase)
+- [x] `/comparisons/mem0` — "MouseBase vs Mem0" (honest technical comparison)
+- [x] `/comparisons/zep` — "MouseBase vs Zep" (honest technical comparison)
+- [x] `/comparisons/vector-database` — "MouseBase vs vector databases" (explains the difference)
 - [ ] `/persistent-memory-for-ai` — "Persistent memory for AI agents and applications"
-- [ ] `/comparisons/mem0` — "MouseBase vs Mem0" (honest technical comparison)
-- [ ] `/comparisons/zep` — "MouseBase vs Zep" (honest technical comparison)
-- [ ] `/comparisons/vector-database` — "MouseBase vs vector databases" (explains the difference)
 - [ ] `/blog` — fix to support individual posts (currently 2 hardcoded placeholders)
 - [ ] Blog post: "How to Add Persistent Memory to an AI Agent" (Python + JS examples)
 
 ### P3 — Documentation & Authority
 
-- [ ] Export OpenAPI/Swagger spec from FastAPI and host as static file
+- [x] Export OpenAPI/Swagger spec from FastAPI to `docs/openapi.json`
 - [ ] Improve VitePress docs: add architecture page, data model page, security page
-- [ ] Publish `llms.txt` at root AND at `.well-known/llms.txt` (currently only at root)
-- [ ] Create honest comparison content (not "MouseBase is better" — "here are the tradeoffs")
+- [x] Publish `llms.txt` at root AND at `.well-known/llms.txt`
+- [x] Create honest comparison content (not "MouseBase is better" — "here are the tradeoffs")
 - [ ] Knowledge base: "What Is Persistent Memory for AI Agents?", "Long-Term Memory vs RAG vs Context Window"
 
 ---
