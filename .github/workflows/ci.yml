@@ -45,6 +45,8 @@ jobs:
       EMBEDDING_MODEL: text-embedding-004
       EMBEDDING_DIMENSIONS: 768
 
+      MIN_SCORE: "0.0"
+
       TEST_API_KEY_FILE: /tmp/test_api_key.txt
 
     steps:
