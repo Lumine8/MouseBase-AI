@@ -62,6 +62,8 @@ async def remember(
         ),
         {"content": request.content, "id": str(memory.id)},
     )
+    # Refresh to pick up the trigger/SQL-set search_vector
+    await db.refresh(memory, ["search_vector"])
 
     embedding = Embedding(
         memory=memory,
@@ -69,7 +71,6 @@ async def remember(
         dimensions=settings.EMBEDDING_DIMENSIONS,
         vector=vector,
     )
-    db.add(memory)
     db.add(embedding)
     await db.commit()
     await db.refresh(memory)
