@@ -55,7 +55,7 @@ Before broad community promotion, complete these reliability and trust requireme
 - [x] **Sentry** — error tracking, 0.1% sample rate, PII disabled
 - [x] **Structured logging** — `structlog`, JSON in production, colorized in dev
 - [x] **Request IDs** — `X-Request-ID` on every request
-- [ ] **External uptime monitoring** — BetterStack or UptimeRobot with public status page. A memory service needs visible availability and incident communication.
+- [x] **External uptime monitoring** — GitHub Actions workflow pings health endpoint every 5 minutes, auto-creates incident issues on failure. Enhanced health endpoint checks DB latency and memory count.
 
 ### Security
 - [x] Email verification — token-based, 24-hour expiry
