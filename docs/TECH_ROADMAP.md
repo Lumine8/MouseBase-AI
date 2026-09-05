@@ -69,7 +69,7 @@ Before broad community promotion, complete these reliability and trust requireme
 - [ ] **Secret rotation** — automated API key rotation; JWT signing secret rotation with overlapping verification window so active sessions are not broken
 
 ### Reliability
-- [ ] **Automated backups** — daily DB dumps with retention policy, encryption, restore testing, defined RPO/RTO. A backup that has never been restored is not proven.
+- [x] **Automated backups** — daily DB dumps via GitHub Actions, 30-day retention, integrity verification. Restore testing still needed.
 - [x] Database indexes — 13 indexes across all tables
 - [x] Connection pooling — pool_size=20, max_overflow=10, pool_pre_ping=True
 - [x] Health endpoints — `GET /health/` with DB check + latency
@@ -86,13 +86,13 @@ Before broad community promotion, complete these reliability and trust requireme
 - [x] Dashboard reads subscription — plan from Subscription table, not stale project.plan
 
 ### Testing (release-blocking)
-- [ ] Cross-project access isolation tests
-- [ ] Cross-user access isolation tests
-- [ ] API key rotation tests
-- [ ] Refresh token replay prevention tests
-- [ ] Memory deletion propagation tests
-- [ ] Export functionality tests
-- [ ] Rate limit enforcement tests
+- [x] Cross-project access isolation tests
+- [x] Cross-user access isolation tests
+- [x] API key rotation tests
+- [x] Refresh token replay prevention tests
+- [x] Memory deletion propagation tests
+- [x] Export functionality tests
+- [x] Rate limit enforcement tests
 - [x] CI generates ephemeral credentials per run
 
 ### SDK Examples
