@@ -2,13 +2,13 @@ import LegalPage from "../LegalPage";
 
 const subs = [
   { name: "Neon", service: "PostgreSQL Database (primary data store)", location: "US (multi-region)" },
+  { name: "Render", service: "Backend API hosting & compute", location: "US" },
   { name: "Vercel", service: "Frontend hosting & deployment", location: "US" },
   { name: "Stripe / Razorpay", service: "Payment processing", location: "Global" },
   { name: "Google Cloud (Gemini)", service: "Embedding generation via Gemini API", location: "US" },
   { name: "OpenAI", service: "Embedding generation via OpenAI API", location: "US" },
   { name: "GitHub", service: "Source code hosting & issue tracking", location: "US" },
   { name: "SendGrid / Resend", service: "Transactional email", location: "US" },
-  { name: "Cloudflare", service: "DNS, CDN, DDoS protection", location: "Global" },
 ];
 
 export default function Subprocessors() {
