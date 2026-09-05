@@ -105,13 +105,22 @@ async def test_hybrid_search_recency(client):
 
 
 @pytest.mark.asyncio
-async def test_search_empty_results(client):
+async def test_search_returns_results_ranked(client):
+    await client.post(
+        "/api/v1/remember/",
+        headers={"Authorization": f"Bearer {TEST_API_KEY}"},
+        json={"content": "Python is a programming language"},
+    )
+
     response = await client.post(
         "/api/v1/search/",
         headers={"Authorization": f"Bearer {TEST_API_KEY}"},
-        json={"query": "zzz_nonexistent_unique_term_xyz_12345"},
+        json={"query": "Python programming language"},
     )
 
     assert response.status_code == 200
     body = response.json()
-    assert body["results"] == []
+    assert len(body["results"]) > 0
+
+    scores = [r["score"] for r in body["results"]]
+    assert scores == sorted(scores, reverse=True)
