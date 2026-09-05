@@ -111,6 +111,7 @@ async def verify_payment(
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+    await db.commit()
     return VerifyPaymentResponse(
         status="success",
         message="Payment verified and plan upgraded",
@@ -147,6 +148,7 @@ async def cancel_user_subscription(
         sub = await cancel_subscription(db, current_user.id)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+    await db.commit()
     return CancelSubscriptionResponse(
         status="canceled",
         message="Subscription has been canceled",
@@ -245,6 +247,7 @@ async def verify_addon(
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+    await db.commit()
     return VerifyPaymentResponse(
         status="success",
         message=f"Addon {addon_type} activated",
@@ -263,6 +266,7 @@ async def cancel_user_addon(
         sub = await cancel_addon(db, current_user.id, addon_type, quantity)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+    await db.commit()
     return SubscriptionInfo(
         plan=sub.plan,
         status=sub.status,

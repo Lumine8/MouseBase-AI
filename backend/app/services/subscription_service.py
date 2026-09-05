@@ -90,8 +90,6 @@ async def upgrade_subscription(
         razorpay_order_id=razorpay_order_id,
     )
     db.add(payment_record)
-    await db.commit()
-    await db.refresh(sub)
     return sub
 
 
@@ -114,8 +112,6 @@ async def cancel_subscription(db: AsyncSession, user_id: uuid.UUID) -> Subscript
     )
     for project in projects_result.scalars().all():
         project.plan = "free"
-    await db.commit()
-    await db.refresh(sub)
     return sub
 
 
@@ -190,8 +186,6 @@ async def add_addon(
         razorpay_order_id=razorpay_order_id,
     )
     db.add(payment_record)
-    await db.commit()
-    await db.refresh(sub)
     return sub
 
 
@@ -221,8 +215,6 @@ async def cancel_addon(
         if sub.max_projects - quantity < base:
             raise ValueError(f"Cannot remove addon below base plan limit of {base}")
         sub.max_projects -= quantity
-    await db.commit()
-    await db.refresh(sub)
     return sub
 
 
