@@ -36,14 +36,10 @@ class SearchService:
 
         semantic_score = (1.0 - distance).label("semantic_score")
 
-        # Include memories that match FTS or are semantically close
-        fts_match = safe_search_vector.op("@@")(tsquery)
-        semantic_match = distance < 0.5
-
+        # Include memories that match FTS or have any embedding
         where_clauses = [
             Memory.project_id == project.id,
             Embedding.model == settings.EMBEDDING_MODEL,
-            fts_match | semantic_match,
         ]
 
         if request.metadata_filters:
