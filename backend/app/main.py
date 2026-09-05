@@ -150,6 +150,10 @@ def root():
 
 @app.get("/health/")
 async def health():
+    checks = {}
+    all_ok = True
+
+    # Database check
     db_ok = False
     db_latency = None
     try:
@@ -160,9 +164,28 @@ async def health():
             db_ok = True
     except Exception as e:
         logger.error("health check db failed", error=str(e))
+        all_ok = False
 
-    status = "healthy" if db_ok else "degraded"
-    status_code = 200 if db_ok else 503
+    checks["database"] = {
+        "status": "up" if db_ok else "down",
+        "latency_ms": db_latency,
+    }
+
+    # Memory count check (approximate, via direct query)
+    if db_ok:
+        try:
+            async with AsyncSessionLocal() as session:
+                result = await session.execute(text("SELECT COUNT(*) FROM memories"))
+                count = result.scalar()
+                checks["memories"] = {
+                    "status": "up",
+                    "count": count,
+                }
+        except Exception:
+            checks["memories"] = {"status": "unknown"}
+
+    status = "healthy" if all_ok else "degraded"
+    status_code = 200 if all_ok else 503
 
     return JSONResponse(
         status_code=status_code,
@@ -170,11 +193,6 @@ async def health():
             "status": status,
             "service": "MouseBase Memory API",
             "version": "0.1.0",
-            "checks": {
-                "database": {
-                    "status": "up" if db_ok else "down",
-                    "latency_ms": db_latency,
-                }
-            },
+            "checks": checks,
         },
     )
