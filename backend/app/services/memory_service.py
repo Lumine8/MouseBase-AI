@@ -2,7 +2,7 @@ from datetime import date, datetime, timezone
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import func, select
+from sqlalchemy import func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.project import Project
@@ -52,6 +52,17 @@ async def remember(
         metadata_=request.metadata,
         external_id=request.external_id,
     )
+    db.add(memory)
+    await db.flush()
+
+    # Set search_vector via SQL (works with or without trigger)
+    await db.execute(
+        text(
+            "UPDATE memories SET search_vector = to_tsvector('english', coalesce(:content, '')) WHERE id = :id"
+        ),
+        {"content": request.content, "id": str(memory.id)},
+    )
+
     embedding = Embedding(
         memory=memory,
         model=settings.EMBEDDING_MODEL,
@@ -176,6 +187,14 @@ class MemoryService:
 
             memory.content = request.content
             embedding.vector = await self.embedding_service.embed(request.content)
+
+            # Update search_vector when content changes
+            await self.db.execute(
+                text(
+                    "UPDATE memories SET search_vector = to_tsvector('english', coalesce(:content, '')) WHERE id = :id"
+                ),
+                {"content": request.content, "id": str(memory.id)},
+            )
 
         if request.metadata is not None:
             memory.metadata_ = request.metadata

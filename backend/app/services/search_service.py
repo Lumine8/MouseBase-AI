@@ -24,20 +24,28 @@ class SearchService:
 
         tsquery = func.plainto_tsquery("english", request.query)
         distance = Embedding.vector.cosine_distance(query_vector)
-        fts_rank = func.ts_rank_cd(Memory.search_vector, tsquery)
+
+        # Handle null search_vector gracefully with coalesce
+        safe_search_vector = func.coalesce(
+            Memory.search_vector, func.to_tsvector("english", "")
+        )
+        fts_rank = func.ts_rank_cd(safe_search_vector, tsquery)
 
         days_old = func.extract("epoch", func.now() - Memory.created_at) / 86400.0
         recency_score = func.exp(-days_old / 30.0)
 
         semantic_score = (1.0 - distance).label("semantic_score")
 
+        # Include memories that match FTS or are semantically close
+        fts_match = safe_search_vector.op("@@")(tsquery)
+        semantic_match = distance < 0.5
+
         where_clauses = [
             Memory.project_id == project.id,
             Embedding.model == settings.EMBEDDING_MODEL,
-            Memory.search_vector.op("@@")(tsquery) | (distance < 0.5),
+            fts_match | semantic_match,
         ]
 
-        # Apply metadata filters if provided
         if request.metadata_filters:
             for key, value in request.metadata_filters.items():
                 where_clauses.append(Memory.metadata_[key].astext == str(value))
