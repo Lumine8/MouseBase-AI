@@ -17,6 +17,8 @@ jobs:
           sudo apt-get install -y postgresql-client
 
       - name: Create backup
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
           TIMESTAMP=$(date +%Y%m%d_%H%M%S)
           BACKUP_FILE="neon_backup_${TIMESTAMP}.sql.gz"
@@ -24,8 +26,7 @@ jobs:
           pg_dump "$DATABASE_URL" \
             --no-owner \
             --no-privileges \
-            --verbose \
-            2>/dev/null | gzip > "$BACKUP_FILE"
+            | gzip > "$BACKUP_FILE"
 
           echo "BACKUP_FILE=$BACKUP_FILE" >> $GITHUB_ENV
           echo "Backup created: $BACKUP_FILE"
@@ -63,6 +64,8 @@ jobs:
             }
 
       - name: Verify backup integrity
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
           echo "Verifying backup file..."
           if [ ! -f "$BACKUP_FILE" ]; then

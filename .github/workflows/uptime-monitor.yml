@@ -6,6 +6,9 @@ on:
     - cron: "*/5 * * * *"
   workflow_dispatch:
 
+permissions:
+  issues: write
+
 jobs:
   check-api:
     name: Check API Health
@@ -15,7 +18,7 @@ jobs:
         id: health
         run: |
           for i in 1 2 3; do
-            response=$(curl -s -w "\n%{http_code}" --max-time 60 https://api.mousebase.dev/health/ || echo -e "\n000")
+            response=$(curl -s -w "\n%{http_code}" --max-time 90 https://api.mousebase.dev/health/ || echo -e "\n000")
             http_code=$(echo "$response" | tail -n1)
             body=$(echo "$response" | sed '$d')
 
@@ -27,7 +30,7 @@ jobs:
               exit 0
             fi
 
-            sleep 30
+            sleep 60
           done
 
           echo "status=unhealthy" >> $GITHUB_OUTPUT
@@ -41,7 +44,6 @@ jobs:
           script: |
             const title = `API Health Check Failed - ${new Date().toISOString().slice(0, 16)}`;
 
-            // Check for existing open issue with same title
             const issues = await github.rest.issues.listForRepo({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -76,7 +78,6 @@ jobs:
         if: success()
         run: |
           echo "✅ API healthy at $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-          echo "Response: ${{ steps.health.outputs.body }}"
 
   check-frontend:
     name: Check Frontend
@@ -84,7 +85,7 @@ jobs:
     steps:
       - name: Ping frontend
         run: |
-          status=$(curl -s -o /dev/null -w "%{http_code}" --max-time 30 https://mousebase.dev/ || echo "000")
+          status=$(curl -s -o /dev/null -w "%{http_code}" -L --max-time 30 https://mousebase.dev/ || echo "000")
           echo "Frontend status: HTTP $status"
           if [ "$status" != "200" ]; then
             exit 1
