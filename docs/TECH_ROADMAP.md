@@ -64,7 +64,7 @@ Before broad community promotion, complete these reliability and trust requireme
 - [x] Security headers — HSTS, XFO, XSS, Referrer-Policy, Permissions-Policy
 - [x] Hardcoded secrets removed from codebase and CI
 - [x] Dynamic CI key generation — bootstrap script generates valid keys
-- [ ] **Secret rotation** — automated API key rotation; JWT signing secret rotation with overlapping verification window so active sessions are not broken
+- [x] **Secret rotation** — JWT signing secret rotation via `JWT_SECRET_PREVIOUS` env var (accepts tokens signed with either secret). API key rotation with 24-hour grace period (old key remains valid after rotation). Migration adds `previous_api_key_hash` and `key_rotated_at` columns.
 
 ### Reliability
 - [x] **Automated backups** — daily DB dumps via GitHub Actions (pg_dump-18 matching Neon PG 18.6), 30-day retention, integrity verification, 7 backups retained. Restore testing still needed.
