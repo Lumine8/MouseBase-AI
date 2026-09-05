@@ -125,5 +125,4 @@ async def delete_memory(
     await activity.log(
         project_id=project.id,
         action="delete",
-        memory_id=memory_id,
     )
