@@ -25,7 +25,6 @@ async def test_export_json_format(client):
     project_id = proj.json()["id"]
     api_key = proj.json()["api_key"]
 
-    # Create memories
     mem1 = await client.post(
         "/api/v1/remember/",
         headers={"Authorization": f"Bearer {api_key}"},
@@ -38,9 +37,8 @@ async def test_export_json_format(client):
     )
     memory_ids = [mem1.json()["id"], mem2.json()["id"]]
 
-    # Export as JSON
     resp = await client.post(
-        f"/api/v1/explorer/export?project_id={project_id}",
+        f"/api/v1/projects/{project_id}/memories/export",
         headers={"Authorization": f"Bearer {jwt}"},
         json={"memory_ids": memory_ids, "format": "json"},
     )
@@ -50,12 +48,10 @@ async def test_export_json_format(client):
     assert data["count"] == 2
     assert len(data["memories"]) == 2
 
-    # Verify content is present
     contents = [m.get("content", "") for m in data["memories"]]
     assert "Export test memory 1" in contents
     assert "Export test memory 2" in contents
 
-    # Cleanup
     await client.delete(
         f"/api/v1/projects/{project_id}",
         headers={"Authorization": f"Bearer {jwt}"},
@@ -91,7 +87,7 @@ async def test_export_csv_format(client):
     memory_ids = [mem.json()["id"]]
 
     resp = await client.post(
-        f"/api/v1/explorer/export?project_id={project_id}",
+        f"/api/v1/projects/{project_id}/memories/export",
         headers={"Authorization": f"Bearer {jwt}"},
         json={"memory_ids": memory_ids, "format": "csv"},
     )
@@ -100,7 +96,6 @@ async def test_export_csv_format(client):
     assert data["format"] == "csv"
     assert data["count"] == 1
 
-    # Cleanup
     await client.delete(
         f"/api/v1/projects/{project_id}",
         headers={"Authorization": f"Bearer {jwt}"},
@@ -136,7 +131,7 @@ async def test_export_ndjson_format(client):
     memory_ids = [mem.json()["id"]]
 
     resp = await client.post(
-        f"/api/v1/explorer/export?project_id={project_id}",
+        f"/api/v1/projects/{project_id}/memories/export",
         headers={"Authorization": f"Bearer {jwt}"},
         json={"memory_ids": memory_ids, "format": "ndjson"},
     )
@@ -145,7 +140,6 @@ async def test_export_ndjson_format(client):
     assert data["format"] == "ndjson"
     assert data["count"] == 1
 
-    # Cleanup
     await client.delete(
         f"/api/v1/projects/{project_id}",
         headers={"Authorization": f"Bearer {jwt}"},
@@ -173,13 +167,12 @@ async def test_export_empty_list_rejected(client):
     project_id = proj.json()["id"]
 
     resp = await client.post(
-        f"/api/v1/explorer/export?project_id={project_id}",
+        f"/api/v1/projects/{project_id}/memories/export",
         headers={"Authorization": f"Bearer {jwt}"},
         json={"memory_ids": [], "format": "json"},
     )
     assert resp.status_code == 422
 
-    # Cleanup
     await client.delete(
         f"/api/v1/projects/{project_id}",
         headers={"Authorization": f"Bearer {jwt}"},
@@ -215,13 +208,12 @@ async def test_export_invalid_format_rejected(client):
     memory_ids = [mem.json()["id"]]
 
     resp = await client.post(
-        f"/api/v1/explorer/export?project_id={project_id}",
+        f"/api/v1/projects/{project_id}/memories/export",
         headers={"Authorization": f"Bearer {jwt}"},
         json={"memory_ids": memory_ids, "format": "xml"},
     )
     assert resp.status_code == 422
 
-    # Cleanup
     await client.delete(
         f"/api/v1/projects/{project_id}",
         headers={"Authorization": f"Bearer {jwt}"},
@@ -261,7 +253,6 @@ async def test_export_cross_project_denied(client):
         json={"name": f"Export Attacker {_uid()}"},
     )
 
-    # Create memory in project A
     mem = await client.post(
         "/api/v1/remember/",
         headers={"Authorization": f"Bearer {api_key_a}"},
@@ -269,16 +260,13 @@ async def test_export_cross_project_denied(client):
     )
     memory_id = mem.json()["id"]
 
-    # User B tries to export User A's memory using B's project
     resp = await client.post(
-        f"/api/v1/explorer/export?project_id={proj_b.json()['id']}",
+        f"/api/v1/projects/{proj_b.json()['id']}/memories/export",
         headers={"Authorization": f"Bearer {jwt_b}"},
         json={"memory_ids": [memory_id], "format": "json"},
     )
-    # Should either 404 (memory not found in B's project) or 403
     assert resp.status_code in (404, 403)
 
-    # Cleanup
     await client.delete(
         f"/api/v1/projects/{proj_a.json()['id']}",
         headers={"Authorization": f"Bearer {jwt_a}"},

@@ -117,13 +117,13 @@ async def delete_memory(
 ) -> None:
     limits = await get_effective_limits(db, project.owner_id)
     await enforce_rate_limit(project.owner_id, limits["requests_per_hour"])
+    memory_service = MemoryService(db=db)
+    usage = UsageService(db)
+    await usage.increment_requests(project.id)
+    await memory_service.delete_memory(memory_id, project)
     activity = ActivityService(db)
     await activity.log(
         project_id=project.id,
         action="delete",
         memory_id=memory_id,
     )
-    memory_service = MemoryService(db=db)
-    usage = UsageService(db)
-    await usage.increment_requests(project.id)
-    await memory_service.delete_memory(memory_id, project)
