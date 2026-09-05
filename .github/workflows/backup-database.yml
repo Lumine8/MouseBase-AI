@@ -23,7 +23,11 @@ jobs:
           TIMESTAMP=$(date +%Y%m%d_%H%M%S)
           BACKUP_FILE="neon_backup_${TIMESTAMP}.sql.gz"
 
-          pg_dump "$DATABASE_URL" \
+          # Strip SQLAlchemy driver suffix (postgresql+psycopg:// -> postgresql://)
+          # Also strip channel_binding param (not supported by pg_dump)
+          PG_URL=$(echo "$DATABASE_URL" | sed 's|postgresql+psycopg://|postgresql://|; s|&channel_binding=require||g; s|\?channel_binding=require||g')
+
+          pg_dump "$PG_URL" \
             --no-owner \
             --no-privileges \
             | gzip > "$BACKUP_FILE"
@@ -64,8 +68,6 @@ jobs:
             }
 
       - name: Verify backup integrity
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
           echo "Verifying backup file..."
           if [ ! -f "$BACKUP_FILE" ]; then
