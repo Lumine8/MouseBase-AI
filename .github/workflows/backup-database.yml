@@ -29,7 +29,7 @@ jobs:
           # Also strip channel_binding param (not supported by pg_dump)
           PG_URL=$(echo "$DATABASE_URL" | sed 's|postgresql+psycopg://|postgresql://|; s|&channel_binding=require||g; s|\?channel_binding=require||g')
 
-          pg_dump "$PG_URL" \
+          pg_dump-18 "$PG_URL" \
             --no-owner \
             --no-privileges \
             | gzip > "$BACKUP_FILE"
