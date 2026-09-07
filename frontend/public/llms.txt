@@ -13,8 +13,8 @@ MouseBase is not a vector database. It is a complete memory infrastructure layer
 - Website: https://mousebase.dev
 - API: https://api.mousebase.dev/api/v1
 - Dashboard: https://mousebase.dev
-- Python SDK: https://pypi.org/project/mousebase/
-- JavaScript SDK: https://www.npmjs.com/package/mousebase
+- Python SDK: https://pypi.org/project/mousebase/ (15 releases, v0.3.2)
+- JavaScript SDK: https://www.npmjs.com/package/mousebase (370+ monthly downloads)
 - GitHub: https://github.com/Lumine8/MouseBase-AI
 - Documentation: https://mousebase.dev/docs
 
