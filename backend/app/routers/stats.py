@@ -33,7 +33,7 @@ async def _fetch_pypi_stats() -> dict:
                     _pypi_cache_ts = now
                     return _pypi_cache
                 if resp.status_code == 429:
-                    await asyncio.sleep(2 ** attempt)
+                    await asyncio.sleep(2**attempt)
         except Exception:
             await asyncio.sleep(1)
 
