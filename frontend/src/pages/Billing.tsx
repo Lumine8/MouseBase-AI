@@ -1,52 +1,6 @@
 import { useEffect, useState } from "react";
 import { FiX, FiPlus, FiDownload } from "react-icons/fi";
-
-const BASE = import.meta.env.VITE_API_URL ?? "/api/v1";
-
-interface Plan {
-  id: string; name: string; price: number; max_projects: number;
-  max_memories: number; max_searches_per_month: number;
-  requests_per_hour: number; description: string;
-}
-
-interface SubscriptionInfo {
-  plan: string; status: string; renewal_date: string | null;
-  cancel_at_period_end: boolean; max_projects: number;
-  max_memories: number; max_searches_per_month: number; requests_per_hour: number;
-}
-
-interface PaymentRecord {
-  id: string; amount: number; currency: string; status: string; created_at: string;
-}
-
-interface PlanLimits {
-  max_memories: number; max_searches_per_month: number;
-  max_projects: number; requests_per_hour: number;
-}
-
-interface BillingUsage {
-  monthly_requests: number; monthly_searches: number;
-  monthly_embeddings: number; total_storage_bytes: number;
-  total_memories: number; total_projects: number;
-  plan_limits: PlanLimits | null;
-}
-
-async function fetchJson<T>(path: string, method = "GET", body?: unknown): Promise<T> {
-  const token = localStorage.getItem("mb_token") || localStorage.getItem("mb_api_key");
-  const headers: Record<string, string> = { "Content-Type": "application/json" };
-  if (token) headers["Authorization"] = `Bearer ${token}`;
-  const res = await fetch(`${BASE}${path}`, { method, headers, body: body ? JSON.stringify(body) : undefined });
-  let data: any;
-  try { data = await res.json(); } catch { data = {}; }
-  if (res.status === 401) {
-    localStorage.removeItem("mb_token");
-    localStorage.removeItem("mb_api_key");
-    window.location.href = "/login";
-    throw new Error("Unauthorized");
-  }
-  if (!res.ok) throw new Error(data?.error?.message || data?.detail || "Request failed");
-  return data as T;
-}
+import { payments, dashboard, type PlanInfo, type SubscriptionInfo, type PaymentHistoryItem, type BillingUsage } from "../lib/api";
 
 declare global {
   interface Window { Razorpay: new (options: Record<string, unknown>) => { open: () => void }; }
@@ -55,8 +9,8 @@ declare global {
 export default function Billing() {
   const [sub, setSub] = useState<SubscriptionInfo | null>(null);
   const [usage, setUsage] = useState<BillingUsage | null>(null);
-  const [plans, setPlans] = useState<Plan[]>([]);
-  const [history, setHistory] = useState<PaymentRecord[]>([]);
+  const [plans, setPlans] = useState<PlanInfo[]>([]);
+  const [history, setHistory] = useState<PaymentHistoryItem[]>([]);
   const [addons, setAddons] = useState<Record<string, { price: number; description: string }>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -86,14 +40,14 @@ export default function Billing() {
     const load = async () => {
       try {
         const [p, rateData, s, h, u, a] = await Promise.all([
-          fetchJson<Plan[]>("/payments/plans"),
+          payments.listPlans(),
           userCurrency !== "USD"
-            ? fetchJson<{ rate: number }>(`/payments/exchange-rate?currency=${userCurrency}`)
+            ? payments.exchangeRate(userCurrency)
             : Promise.resolve(null),
-          fetchJson<SubscriptionInfo>("/payments/subscription").catch(() => null),
-          fetchJson<{ payments: PaymentRecord[] }>("/payments/history").catch(() => ({ payments: [] })),
-          fetchJson<BillingUsage>("/dashboard/billing-usage").catch(() => null),
-          fetchJson<Record<string, { price: number; description: string }>>("/payments/addons").catch(() => ({})),
+          payments.getSubscription().catch(() => null),
+          payments.getHistory().catch(() => ({ payments: [] as PaymentHistoryItem[] })),
+          dashboard.billingUsage().catch(() => null),
+          payments.listAddons().catch(() => ({})),
         ]);
         setPlans(p);
         if (rateData) setExchangeRate(rateData.rate);
@@ -136,9 +90,7 @@ export default function Billing() {
     setUpgrading(planId);
     setError("");
     try {
-      const order = await fetchJson<{ order_id: string; amount: number; currency: string; key_id: string }>(
-        "/payments/create-order", "POST", { plan_id: planId, currency: userCurrency }
-      );
+      const order = await payments.createOrder(planId, userCurrency);
       if (typeof window.Razorpay === "undefined") throw new Error("Razorpay SDK not loaded");
       const rzp = new window.Razorpay({
         key: order.key_id,
@@ -149,15 +101,15 @@ export default function Billing() {
         order_id: order.order_id,
         prefill: { email: "" },
         handler: async (response: { razorpay_payment_id: string; razorpay_order_id: string; razorpay_signature: string }) => {
-          await fetchJson("/payments/verify", "POST", {
+          await payments.verify({
             razorpay_order_id: response.razorpay_order_id,
             razorpay_payment_id: response.razorpay_payment_id,
             razorpay_signature: response.razorpay_signature,
             plan_id: planId,
           });
           const [s, h] = await Promise.all([
-            fetchJson<SubscriptionInfo>("/payments/subscription"),
-            fetchJson<{ payments: PaymentRecord[] }>("/payments/history").catch(() => ({ payments: [] })),
+            payments.getSubscription(),
+            payments.getHistory().catch(() => ({ payments: [] as PaymentHistoryItem[] })),
           ]);
           setSub(s);
           setHistory(h.payments);
@@ -174,8 +126,8 @@ export default function Billing() {
   const handleCancel = async () => {
     if (!confirm("Are you sure you want to cancel your subscription?")) return;
     try {
-      await fetchJson("/payments/cancel", "POST");
-      const s = await fetchJson<SubscriptionInfo>("/payments/subscription");
+      await payments.cancel();
+      const s = await payments.getSubscription();
       setSub(s);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Cancel failed");
@@ -187,9 +139,7 @@ export default function Billing() {
     try {
       const addonInfo = addons[addonType];
       if (!addonInfo) return;
-      const order = await fetchJson<{ order_id: string; amount: number; currency: string; key_id: string }>(
-        "/payments/create-addon-order", "POST", { addon_type: addonType, quantity: 1, currency: userCurrency }
-      );
+      const order = await payments.createAddonOrder(addonType, 1, userCurrency);
       if (typeof window.Razorpay === "undefined") throw new Error("Razorpay SDK not loaded");
       const rzp = new window.Razorpay({
         key: order.key_id,
@@ -199,7 +149,7 @@ export default function Billing() {
         description: `Add-on: ${addonInfo.description}`,
         order_id: order.order_id,
         handler: async (response: { razorpay_payment_id: string; razorpay_order_id: string; razorpay_signature: string }) => {
-          await fetchJson("/payments/verify-addon", "POST", {
+          await payments.verifyAddon({
             razorpay_order_id: response.razorpay_order_id,
             razorpay_payment_id: response.razorpay_payment_id,
             razorpay_signature: response.razorpay_signature,
@@ -207,9 +157,9 @@ export default function Billing() {
             quantity: 1,
           });
           const [s, u, h] = await Promise.all([
-            fetchJson<SubscriptionInfo>("/payments/subscription"),
-            fetchJson<BillingUsage>("/dashboard/billing-usage").catch(() => null),
-            fetchJson<{ payments: PaymentRecord[] }>("/payments/history").catch(() => ({ payments: [] })),
+            payments.getSubscription(),
+            dashboard.billingUsage().catch(() => null),
+            payments.getHistory().catch(() => ({ payments: [] as PaymentHistoryItem[] })),
           ]);
           setSub(s);
           if (u) setUsage(u);
@@ -443,7 +393,7 @@ export default function Billing() {
                           style={{ fontSize: 12, display: "flex", alignItems: "center", gap: 4 }}
                           onClick={async () => {
                             try {
-                              const data = await fetchJson<{ receipt_url: string }>(`/payments/invoice/${pmt.id}`);
+                              const data = await payments.invoice(pmt.id);
                               window.open(data.receipt_url, "_blank");
                             } catch {
                               const win = window.open("", "_blank");

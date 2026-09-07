@@ -34,18 +34,7 @@ function formatDate(d: string) {
   return dt.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
-function formatBytes(bytes: number): string {
-  if (bytes >= 1_000_000_000) return `${(bytes / 1_000_000_000).toFixed(1)} GB`;
-  if (bytes >= 1_000_000) return `${(bytes / 1_000_000).toFixed(1)} MB`;
-  if (bytes >= 1_000) return `${(bytes / 1_000).toFixed(1)} KB`;
-  return `${bytes} B`;
-}
-
-function formatNum(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
-  return String(n);
-}
+import { formatBytes, formatNum } from "../lib/utils";
 
 export default function MemoryExplorer() {
   const { id: projectId } = useParams<{ id: string }>();

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import uuid
+
 from fastapi import APIRouter, Body, Depends, HTTPException, Request
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -324,15 +326,8 @@ async def razorpay_webhook(
 
 
 async def _handle_payment_captured(db: AsyncSession, payload: dict) -> None:
-    notes = (
-        payload.get("payload", {}).get("payment", {}).get("entity", {}).get("notes", {})
-    )
-    user_id = notes.get("user_id")
-    if not user_id:
-        return
-    try:
-        uid = __import__("uuid").UUID(user_id)
-    except (ValueError, AttributeError):
+    uid = _extract_user_id(payload, "payment")
+    if not uid:
         return
     sub = await get_subscription(db, uid)
     if sub:
@@ -341,18 +336,8 @@ async def _handle_payment_captured(db: AsyncSession, payload: dict) -> None:
 
 
 async def _handle_subscription_cancelled(db: AsyncSession, payload: dict) -> None:
-    notes = (
-        payload.get("payload", {})
-        .get("subscription", {})
-        .get("entity", {})
-        .get("notes", {})
-    )
-    user_id = notes.get("user_id")
-    if not user_id:
-        return
-    try:
-        uid = __import__("uuid").UUID(user_id)
-    except (ValueError, AttributeError):
+    uid = _extract_user_id(payload, "subscription")
+    if not uid:
         return
     sub = await get_subscription(db, uid)
     if sub and sub.status != SubscriptionStatus.CANCELED:
@@ -360,20 +345,23 @@ async def _handle_subscription_cancelled(db: AsyncSession, payload: dict) -> Non
 
 
 async def _handle_subscription_charged(db: AsyncSession, payload: dict) -> None:
-    notes = (
-        payload.get("payload", {})
-        .get("subscription", {})
-        .get("entity", {})
-        .get("notes", {})
-    )
-    user_id = notes.get("user_id")
-    if not user_id:
-        return
-    try:
-        uid = __import__("uuid").UUID(user_id)
-    except (ValueError, AttributeError):
+    uid = _extract_user_id(payload, "subscription")
+    if not uid:
         return
     sub = await get_subscription(db, uid)
     if sub:
         sub.status = SubscriptionStatus.ACTIVE
         sub.renewal_date = datetime.now(timezone.utc) + timedelta(days=30)
+
+
+def _extract_user_id(payload: dict, entity_type: str) -> uuid.UUID | None:
+    notes = (
+        payload.get("payload", {}).get(entity_type, {}).get("entity", {}).get("notes", {})
+    )
+    user_id = notes.get("user_id")
+    if not user_id:
+        return None
+    try:
+        return uuid.UUID(user_id)
+    except (ValueError, AttributeError):
+        return None

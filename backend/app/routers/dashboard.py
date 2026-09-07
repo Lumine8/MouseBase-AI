@@ -58,7 +58,6 @@ async def dashboard_metrics(
         total_searches = row[0] or 0
         total_requests = row[1] or 0
         total_embeddings = row[2] or 0
-        _ = row[3] or 0
 
     plan = project_list[0].plan if project_list else "free"
 
@@ -92,40 +91,46 @@ async def dashboard_analytics(
 
     today = date.today()
     days = 7
-    daily_usage = []
 
-    for i in range(days - 1, -1, -1):
-        d = today - timedelta(days=i)
-        day_label = d.strftime("%a")
-        if project_ids:
-            row = await db.execute(
-                select(
-                    func.coalesce(func.sum(Usage.requests), 0),
-                    func.coalesce(func.sum(Usage.searches), 0),
-                    func.coalesce(func.sum(Usage.embeddings), 0),
-                    func.coalesce(func.sum(Usage.storage_bytes), 0),
-                ).where(Usage.project_id.in_(project_ids), Usage.date == d)
-            )
-            r = row.one()
-            daily_usage.append(
-                {
-                    "day": day_label,
-                    "requests": r[0] or 0,
-                    "searches": r[1] or 0,
-                    "embeddings": r[2] or 0,
-                    "storage_bytes": r[3] or 0,
-                }
-            )
-        else:
-            daily_usage.append(
-                {
-                    "day": day_label,
-                    "requests": 0,
-                    "searches": 0,
-                    "embeddings": 0,
-                    "storage_bytes": 0,
-                }
-            )
+    daily_usage = []
+    if project_ids:
+        start_date = today - timedelta(days=days - 1)
+        rows = await db.execute(
+            select(
+                Usage.date,
+                func.coalesce(func.sum(Usage.requests), 0),
+                func.coalesce(func.sum(Usage.searches), 0),
+                func.coalesce(func.sum(Usage.embeddings), 0),
+                func.coalesce(func.sum(Usage.storage_bytes), 0),
+            ).where(
+                Usage.project_id.in_(project_ids),
+                Usage.date >= start_date,
+                Usage.date <= today,
+            ).group_by(Usage.date).order_by(Usage.date)
+        )
+        usage_by_date = {r[0]: r for r in rows.all()}
+
+        for i in range(days - 1, -1, -1):
+            d = today - timedelta(days=i)
+            day_label = d.strftime("%a")
+            r = usage_by_date.get(d)
+            daily_usage.append({
+                "day": day_label,
+                "requests": r[1] if r else 0,
+                "searches": r[2] if r else 0,
+                "embeddings": r[3] if r else 0,
+                "storage_bytes": r[4] if r else 0,
+            })
+    else:
+        for i in range(days - 1, -1, -1):
+            d = today - timedelta(days=i)
+            daily_usage.append({
+                "day": d.strftime("%a"),
+                "requests": 0,
+                "searches": 0,
+                "embeddings": 0,
+                "storage_bytes": 0,
+            })
 
     total = await db.execute(
         select(

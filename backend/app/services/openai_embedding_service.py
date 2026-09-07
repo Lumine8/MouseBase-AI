@@ -19,6 +19,5 @@ class OpenAIEmbeddingService(EmbeddingService):
             raise RuntimeError(
                 f"Expected embedding dimensions: {settings.EMBEDDING_DIMENSIONS}, but got: {len(vector)}"
             )
-        print(f"Embedding dimensions: {len(vector)}")
 
         return vector

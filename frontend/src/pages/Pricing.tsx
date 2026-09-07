@@ -4,28 +4,18 @@ import { FiCheck, FiArrowRight, FiClock } from "react-icons/fi";
 import PublicNav from "../components/PublicNav";
 import SEO from "../components/SEO";
 import { SkeletonLine } from "../components/Skeleton";
-
-interface Plan {
-  id: string;
-  name: string;
-  price: number;
-  max_projects: number;
-  max_memories: number;
-  max_searches_per_month: number;
-  requests_per_hour: number;
-  description: string;
-}
+import { payments, type PlanInfo } from "../lib/api";
 
 export default function Pricing() {
   const navigate = useNavigate();
-  const [plans, setPlans] = useState<Plan[] | null>(null);
+  const [plans, setPlans] = useState<PlanInfo[] | null>(null);
   const [loading, setLoading] = useState(true);
   const loggedIn = !!(localStorage.getItem("mb_token") || localStorage.getItem("mb_api_key"));
 
   useEffect(() => {
     const load = async () => {
       try {
-        const p = await fetchJson<Plan[]>("/payments/plans");
+        const p = await payments.listPlans();
         if (p && p.length > 0) {
           setPlans(p);
         }
@@ -36,12 +26,8 @@ export default function Pricing() {
     load();
   }, []);
 
-  const handlePlanClick = (planId: string) => {
-    if (planId === "FREE") {
-      navigate(loggedIn ? "/billing" : "/signup");
-    } else {
-      navigate(loggedIn ? "/billing" : "/signup");
-    }
+  const handlePlanClick = (_planId: string) => {
+    navigate(loggedIn ? "/billing" : "/signup");
   };
 
   return (
@@ -138,20 +124,4 @@ export default function Pricing() {
       </div>
     </>
   );
-}
-
-const API_BASE = import.meta.env.VITE_API_URL ?? "/api/v1";
-
-async function fetchJson<T>(path: string): Promise<T> {
-  const token = localStorage.getItem("mb_token") || localStorage.getItem("mb_api_key");
-  const headers: Record<string, string> = { "Content-Type": "application/json" };
-  if (token) headers["Authorization"] = `Bearer ${token}`;
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 10_000);
-  const res = await fetch(`${API_BASE}${path}`, { method: "GET", headers, signal: controller.signal });
-  clearTimeout(timer);
-  let data: any;
-  try { data = await res.json(); } catch { data = {}; }
-  if (!res.ok) throw new Error(data?.error?.message || data?.detail || "Request failed");
-  return data as T;
 }

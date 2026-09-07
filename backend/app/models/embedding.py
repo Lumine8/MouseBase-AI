@@ -1,13 +1,9 @@
 import uuid
 
-# from datetime import datetime, timezone
-# from typing import Optional
 from typing import TYPE_CHECKING
 
 from sqlalchemy import ForeignKey, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, relationship, mapped_column
-
-# from sqlalchemy.dialects.postgresql import JSONB
 
 from pgvector.sqlalchemy import Vector
 

@@ -255,11 +255,36 @@ export interface AnalyticsResponse {
   totals: AnalyticsTotals;
 }
 
+export interface BillingUsage {
+  monthly_requests: number;
+  monthly_searches: number;
+  monthly_embeddings: number;
+  total_storage_bytes: number;
+  total_memories: number;
+  total_projects: number;
+  plan_limits: {
+    max_memories: number;
+    max_searches_per_month: number;
+    max_projects: number;
+    requests_per_hour: number;
+  } | null;
+}
+
+export interface ExchangeRateResponse {
+  rate: number;
+}
+
+export interface InvoiceResponse {
+  receipt_url: string;
+}
+
 export const dashboard = {
   metrics: () =>
     request<DashboardMetrics>("GET", "/dashboard/metrics"),
   analytics: () =>
     request<AnalyticsResponse>("GET", "/dashboard/analytics"),
+  billingUsage: () =>
+    request<BillingUsage>("GET", "/dashboard/billing-usage"),
 };
 
 export interface PlanInfo {
@@ -322,8 +347,8 @@ export const payments = {
     request<PlanInfo[]>("GET", "/payments/plans"),
   listAddons: () =>
     request<Record<string, { price: number; description: string }>>("GET", "/payments/addons"),
-  createOrder: (planId: string) =>
-    request<CreateOrderResponse>("POST", "/payments/create-order", { plan_id: planId }),
+  createOrder: (planId: string, currency?: string) =>
+    request<CreateOrderResponse>("POST", "/payments/create-order", { plan_id: planId, ...(currency ? { currency } : {}) }),
   verify: (data: VerifyPaymentRequest) =>
     request<VerifyPaymentResponse>("POST", "/payments/verify", data),
   getSubscription: () =>
@@ -332,12 +357,16 @@ export const payments = {
     request<{ status: string; message: string }>("POST", "/payments/cancel"),
   getHistory: () =>
     request<BillingHistoryResponse>("GET", "/payments/history"),
-  createAddonOrder: (addonType: string, quantity: number = 1) =>
-    request<CreateOrderResponse>("POST", "/payments/create-addon-order", { addon_type: addonType, quantity }),
+  createAddonOrder: (addonType: string, quantity: number = 1, currency?: string) =>
+    request<CreateOrderResponse>("POST", "/payments/create-addon-order", { addon_type: addonType, quantity, ...(currency ? { currency } : {}) }),
   verifyAddon: (data: Record<string, unknown>) =>
     request<VerifyPaymentResponse>("POST", "/payments/verify-addon", data),
   cancelAddon: (addonType: string, quantity: number = 1) =>
     request<SubscriptionInfo>("POST", "/payments/cancel-addon", { addon_type: addonType, quantity }),
+  exchangeRate: (currency: string) =>
+    request<ExchangeRateResponse>("GET", `/payments/exchange-rate?currency=${currency}`),
+  invoice: (paymentId: string) =>
+    request<InvoiceResponse>("GET", `/payments/invoice/${paymentId}`),
 };
 
 export interface MemoryListItem {

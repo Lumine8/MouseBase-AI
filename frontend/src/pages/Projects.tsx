@@ -32,8 +32,8 @@ export default function Projects() {
 
   const handleCopyKey = async (p: Project) => {
     try {
-      const full: any = await api.projects.rotateKey(p.id);
-      navigator.clipboard.writeText(full.api_key);
+      const full = await api.projects.rotateKey(p.id);
+      navigator.clipboard.writeText(full.api_key!);
       setCopyMsg("Copied!");
       setTimeout(() => setCopyMsg(""), 2000);
     } catch {}

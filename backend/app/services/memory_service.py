@@ -117,9 +117,7 @@ class MemoryService:
         return memory
 
     async def _to_response(self, memory: Memory) -> MemoryResponse:
-        emb_stmt = select(Embedding).where(Embedding.memory_id == memory.id)
-        emb_result = await self.db.execute(emb_stmt)
-        embedding = emb_result.scalar_one_or_none()
+        embedding = memory.embeddings[0] if memory.embeddings else None
 
         return MemoryResponse(
             id=memory.id,
@@ -411,9 +409,7 @@ class MemoryService:
 
         rows = []
         for m in memories:
-            emb_stmt = select(Embedding).where(Embedding.memory_id == m.id)
-            emb_result = await self.db.execute(emb_stmt)
-            emb = emb_result.scalar_one_or_none()
+            emb = m.embeddings[0] if m.embeddings else None
 
             row = {
                 "id": str(m.id),

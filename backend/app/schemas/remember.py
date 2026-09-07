@@ -1,5 +1,4 @@
 from datetime import datetime
-from uuid import UUID
 from typing import Any
 
 from pydantic import BaseModel, Field, field_validator
@@ -42,12 +41,3 @@ class RememberRequest(BaseModel):
 
         value = value.strip()
         return value or None
-
-
-class RememberResponse(BaseModel):
-    memory_id: UUID = Field(
-        ..., description="The unique identifier for the stored memory."
-    )
-    created_at: datetime = Field(
-        ..., description="The timestamp when the memory was created."
-    )
