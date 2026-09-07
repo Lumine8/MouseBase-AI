@@ -107,9 +107,14 @@ result = client.remember(
 | `external_id` | `str` | No | Your own identifier for this memory |
 | `metadata` | `dict` | No | Arbitrary key-value metadata |
 
-### `search()` — Semantic Search
+### `search()` — Hybrid Search
 
-Finds memories that are semantically similar to your query.
+Finds memories using **hybrid search** — combining four signals for best results:
+
+1. **Semantic** (60%) — vector embedding cosine similarity
+2. **Keyword** (25%) — PostgreSQL full-text search (tsvector/tsquery)
+3. **Metadata** (10%) — exact metadata key/value matching
+4. **Recency** (5%) — exponential decay favoring newer memories
 
 ```python
 results = client.search("What do I know about the user?", top_k=10)
@@ -125,6 +130,27 @@ for r in results.results:
 |---|---|---|---|---|
 | `query` | `str` | Yes | — | The search query |
 | `top_k` | `int` | No | `10` | Number of results to return |
+| `metadata_filters` | `dict` | No | `None` | Filter by metadata key/value pairs |
+
+**Metadata Filters:**
+
+Filter search results by exact metadata matches. Only memories matching all provided filters are returned.
+
+```python
+# Search only in a specific category
+results = client.search(
+    "What are the user's preferences?",
+    top_k=5,
+    metadata_filters={"category": "preferences"}
+)
+
+# Filter by multiple keys
+results = client.search(
+    "What did the user buy?",
+    top_k=10,
+    metadata_filters={"source": "shopify", "user_id": "123"}
+)
+```
 
 **Response:** `SearchResponse.results` is a list of `SearchResult` objects with: `id`, `content`, `score`, `metadata`, `external_id`.
 
