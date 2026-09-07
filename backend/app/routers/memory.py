@@ -107,8 +107,8 @@ async def update_memory(
 @router.delete(
     "/{memory_id}",
     status_code=status.HTTP_204_NO_CONTENT,
-    summary="Delete a memory.",
-    description="Deletes a memory belonging to the authenticated project.",
+    summary="Delete a memory (soft-delete).",
+    description="Soft-deletes a memory by setting its status to 'deleted'. It will no longer appear in search or list results.",
 )
 async def delete_memory(
     memory_id: UUID,
@@ -125,4 +125,59 @@ async def delete_memory(
     await activity.log(
         project_id=project.id,
         action="delete",
+        memory_id=memory_id,
     )
+
+
+@router.post(
+    "/{memory_id}/archive",
+    response_model=MemoryResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Archive a memory.",
+    description="Archives a memory. Archived memories are excluded from search results but can be restored.",
+)
+async def archive_memory(
+    memory_id: UUID,
+    project: Project = Depends(get_current_project),
+    db: AsyncSession = Depends(get_db),
+) -> MemoryResponse:
+    limits = await get_effective_limits(db, project.owner_id)
+    await enforce_rate_limit(project.owner_id, limits["requests_per_hour"])
+    memory_service = MemoryService(db=db)
+    usage = UsageService(db)
+    await usage.increment_requests(project.id)
+    result = await memory_service.archive_memory(memory_id, project)
+    activity = ActivityService(db)
+    await activity.log(
+        project_id=project.id,
+        action="archive",
+        memory_id=memory_id,
+    )
+    return result
+
+
+@router.post(
+    "/{memory_id}/restore",
+    response_model=MemoryResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Restore an archived memory.",
+    description="Restores an archived memory back to active status.",
+)
+async def restore_memory(
+    memory_id: UUID,
+    project: Project = Depends(get_current_project),
+    db: AsyncSession = Depends(get_db),
+) -> MemoryResponse:
+    limits = await get_effective_limits(db, project.owner_id)
+    await enforce_rate_limit(project.owner_id, limits["requests_per_hour"])
+    memory_service = MemoryService(db=db)
+    usage = UsageService(db)
+    await usage.increment_requests(project.id)
+    result = await memory_service.restore_memory(memory_id, project)
+    activity = ActivityService(db)
+    await activity.log(
+        project_id=project.id,
+        action="restore",
+        memory_id=memory_id,
+    )
+    return result

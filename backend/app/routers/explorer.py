@@ -44,6 +44,7 @@ async def list_memories(
     model: str | None = Query(default=None),
     sort_by: str = Query(default="created_at"),
     sort_order: str = Query(default="desc", pattern="^(asc|desc)$"),
+    status: str | None = Query(default=None, description="Filter by status: active, archived, deleted"),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> MemoryListResponse:
@@ -63,6 +64,7 @@ async def list_memories(
         model=model,
         sort_by=sort_by,
         sort_order=sort_order,
+        status=status,
     )
 
 

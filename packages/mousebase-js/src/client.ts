@@ -134,6 +134,9 @@ export class MouseBase {
     if (options.metadata !== undefined) {
       body.metadata = options.metadata;
     }
+    if (options.expiresAt !== undefined && options.expiresAt !== null) {
+      body.expires_at = options.expiresAt;
+    }
     return this._request("POST", "/remember/", body);
   }
 
@@ -159,6 +162,14 @@ export class MouseBase {
 
   async delete(memoryId: string): Promise<void> {
     await this._request("DELETE", `/memory/${memoryId}`);
+  }
+
+  async archive(memoryId: string): Promise<MemoryResponse> {
+    return this._request("POST", `/memory/${memoryId}/archive`);
+  }
+
+  async restore(memoryId: string): Promise<MemoryResponse> {
+    return this._request("POST", `/memory/${memoryId}/restore`);
   }
 
   async signup(email: string, password: string, fullName?: string): Promise<AuthResponse> {

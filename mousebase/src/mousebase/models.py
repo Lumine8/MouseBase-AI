@@ -11,6 +11,7 @@ class RememberResponse(BaseModel):
     metadata: dict[str, Any] = Field(default_factory=dict)
     created_at: datetime
     updated_at: datetime | None = None
+    expires_at: datetime | None = None
 
 
 class SearchResult(BaseModel):
@@ -19,6 +20,7 @@ class SearchResult(BaseModel):
     content: str
     metadata: dict[str, Any] = Field(default_factory=dict)
     score: float
+    created_at: datetime | None = None
 
 
 class SearchResponse(BaseModel):
@@ -30,6 +32,8 @@ class MemoryResponse(BaseModel):
     external_id: str | None = None
     content: str
     metadata: dict[str, Any] = Field(default_factory=dict)
+    status: str = "active"
+    expires_at: datetime | None = None
     created_at: datetime
     updated_at: datetime
 

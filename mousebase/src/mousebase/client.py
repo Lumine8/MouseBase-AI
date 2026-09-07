@@ -158,12 +158,15 @@ class MouseBase:
         content: str,
         external_id: str | None = None,
         metadata: dict[str, Any] | None = None,
+        expires_at: str | None = None,
     ) -> RememberResponse:
-        body = {"content": content}
+        body: dict[str, Any] = {"content": content}
         if external_id is not None:
             body["external_id"] = external_id
         if metadata is not None:
             body["metadata"] = metadata
+        if expires_at is not None:
+            body["expires_at"] = expires_at
         data = self._request("POST", "/remember/", json=body)
         return RememberResponse.model_validate(data)
 
@@ -202,6 +205,14 @@ class MouseBase:
 
     def delete(self, memory_id: str) -> None:
         self._request("DELETE", f"/memory/{memory_id}")
+
+    def archive(self, memory_id: str) -> MemoryResponse:
+        data = self._request("POST", f"/memory/{memory_id}/archive")
+        return MemoryResponse.model_validate(data)
+
+    def restore(self, memory_id: str) -> MemoryResponse:
+        data = self._request("POST", f"/memory/{memory_id}/restore")
+        return MemoryResponse.model_validate(data)
 
     def signup(
         self, email: str, password: str, full_name: str | None = None

@@ -18,6 +18,14 @@ class MemoryResponse(BaseModel):
     metadata: dict[str, Any] = Field(
         default_factory=dict, description="Metadata associated with the memory"
     )
+    status: str = Field(
+        default="active",
+        description="Memory status: active, archived, or deleted",
+    )
+    expires_at: datetime | None = Field(
+        default=None,
+        description="When the memory expires and is automatically deleted. None means never.",
+    )
     created_at: datetime = Field(
         ..., description="Timestamp when the memory was created"
     )

@@ -14,7 +14,7 @@ from app.exceptions.update import EmptyUpdateError
 from app.exceptions.embedding import EmbeddingServiceUnavailableError
 
 
-from app.models.memory import Memory
+from app.models.memory import Memory, MemoryStatus
 from app.schemas.memory import MemoryResponse
 from app.schemas.update import UpdateMemoryRequest
 from app.schemas.explorer import (
@@ -49,6 +49,7 @@ async def remember(
         content=request.content,
         metadata_=request.metadata,
         external_id=request.external_id,
+        expires_at=request.expires_at,
     )
     db.add(memory)
     await db.flush()
@@ -78,6 +79,8 @@ async def remember(
         external_id=memory.external_id,
         content=memory.content,
         metadata=memory.metadata_,
+        status=memory.status,
+        expires_at=memory.expires_at,
         created_at=memory.created_at,
         updated_at=memory.updated_at,
         embedding_model=embedding.model,
@@ -92,15 +95,25 @@ class MemoryService:
         self.db = db
         self.embedding_service = embedding_service
 
-    async def _get_memory(self, memory_id: UUID, project: Project) -> Memory:
+    async def _get_memory(
+        self, memory_id: UUID, project: Project, include_deleted: bool = False
+    ) -> Memory:
         stmt = select(Memory).where(
             Memory.id == memory_id, Memory.project_id == project.id
         )
+        if not include_deleted:
+            stmt = stmt.where(Memory.status != MemoryStatus.DELETED.value)
         result = await self.db.execute(stmt)
         memory = result.scalar_one_or_none()
 
         if memory is None:
             raise MemoryNotFoundError()
+
+        # Check expiration on access
+        if memory.is_expired:
+            memory.status = MemoryStatus.DELETED.value
+            await self.db.flush()
+
         return memory
 
     async def _to_response(self, memory: Memory) -> MemoryResponse:
@@ -113,6 +126,8 @@ class MemoryService:
             external_id=memory.external_id,
             content=memory.content,
             metadata=memory.metadata_,
+            status=memory.status,
+            expires_at=memory.expires_at,
             created_at=memory.created_at,
             updated_at=memory.updated_at,
             embedding_model=embedding.model if embedding else None,
@@ -174,9 +189,28 @@ class MemoryService:
 
     async def delete_memory(self, memory_id: UUID, project: Project) -> None:
         memory = await self._get_memory(memory_id, project)
-
-        await self.db.delete(memory)
+        memory.status = MemoryStatus.DELETED.value
+        memory.updated_at = datetime.now(timezone.utc)
         await self.db.commit()
+
+    async def archive_memory(self, memory_id: UUID, project: Project) -> MemoryResponse:
+        memory = await self._get_memory(memory_id, project)
+        memory.status = MemoryStatus.ARCHIVED.value
+        memory.updated_at = datetime.now(timezone.utc)
+        await self.db.commit()
+        await self.db.refresh(memory)
+        return await self._to_response(memory)
+
+    async def restore_memory(self, memory_id: UUID, project: Project) -> MemoryResponse:
+        memory = await self._get_memory(memory_id, project, include_deleted=True)
+        if memory.status == MemoryStatus.DELETED.value:
+            # Cannot restore from deleted — only from archived
+            raise MemoryNotFoundError()
+        memory.status = MemoryStatus.ACTIVE.value
+        memory.updated_at = datetime.now(timezone.utc)
+        await self.db.commit()
+        await self.db.refresh(memory)
+        return await self._to_response(memory)
 
     async def list_memories(
         self,
@@ -191,8 +225,16 @@ class MemoryService:
         model: str | None = None,
         sort_by: str = "created_at",
         sort_order: str = "desc",
+        status: str | None = None,
     ) -> MemoryListResponse:
         base_query = select(Memory).where(Memory.project_id == project.id)
+
+        # Filter by status
+        if status:
+            base_query = base_query.where(Memory.status == status)
+        else:
+            # Default: exclude deleted
+            base_query = base_query.where(Memory.status != MemoryStatus.DELETED.value)
 
         if external_id:
             base_query = base_query.where(Memory.external_id == external_id)
@@ -261,13 +303,17 @@ class MemoryService:
 
     async def get_memory_stats(self, project: Project) -> MemoryStatsResponse:
         mem_count = await self.db.execute(
-            select(func.count(Memory.id)).where(Memory.project_id == project.id)
+            select(func.count(Memory.id)).where(
+                Memory.project_id == project.id,
+                Memory.status != MemoryStatus.DELETED.value,
+            )
         )
         total = mem_count.scalar() or 0
 
         avg_length = await self.db.execute(
             select(func.avg(func.length(Memory.content))).where(
-                Memory.project_id == project.id
+                Memory.project_id == project.id,
+                Memory.status != MemoryStatus.DELETED.value,
             )
         )
         avg = round(avg_length.scalar() or 0, 1)
@@ -277,6 +323,7 @@ class MemoryService:
             select(func.count(Memory.id)).where(
                 Memory.project_id == project.id,
                 func.date(Memory.created_at) == today,
+                Memory.status != MemoryStatus.DELETED.value,
             )
         )
         created_today_count = created_today.scalar() or 0
@@ -302,6 +349,7 @@ class MemoryService:
             .where(
                 Memory.project_id == project.id,
                 Memory.external_id.isnot(None),
+                Memory.status != MemoryStatus.DELETED.value,
             )
             .group_by(Memory.external_id)
             .order_by(func.count(Memory.id).desc())
@@ -317,6 +365,7 @@ class MemoryService:
             .where(
                 Memory.project_id == project.id,
                 Memory.metadata_.isnot(None),
+                Memory.status != MemoryStatus.DELETED.value,
             )
             .group_by(func.jsonb_object_keys(Memory.metadata_))
             .order_by(func.count(Memory.id).desc())

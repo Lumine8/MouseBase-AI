@@ -40,6 +40,14 @@ export class ExpressMouseBase {
     return this.client.delete(memoryId);
   }
 
+  async archive(memoryId: string): Promise<MemoryResponse> {
+    return this.client.archive(memoryId);
+  }
+
+  async restore(memoryId: string): Promise<MemoryResponse> {
+    return this.client.restore(memoryId);
+  }
+
   get projects() {
     return this.client.projects;
   }

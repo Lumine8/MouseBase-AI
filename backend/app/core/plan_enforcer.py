@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.limits import PLAN_LIMITS
 from app.models.subscription import Subscription, PlanType
-from app.models.memory import Memory
+from app.models.memory import Memory, MemoryStatus
 from app.models.project import Project
 
 
@@ -34,7 +34,8 @@ async def check_memory_limit(
         select(func.count(Memory.id)).where(
             Memory.project_id.in_(
                 select(Project.id).where(Project.owner_id == project.owner_id)
-            )
+            ),
+            Memory.status != MemoryStatus.DELETED.value,
         )
     )
     total = count_result.scalar() or 0

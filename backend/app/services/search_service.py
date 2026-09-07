@@ -5,7 +5,7 @@ from app.core.config import settings
 from app.services.embedding_service import EmbeddingService
 from app.schemas.search import SearchRequest, SearchResponse, SearchResult
 from app.models.project import Project
-from app.models.memory import Memory
+from app.models.memory import Memory, MemoryStatus
 from app.models.embedding import Embedding
 
 WEIGHT_SEMANTIC = 0.60
@@ -39,6 +39,7 @@ class SearchService:
         # Include memories that match FTS or have any embedding
         where_clauses = [
             Memory.project_id == project.id,
+            Memory.status != MemoryStatus.DELETED.value,
             Embedding.model == settings.EMBEDDING_MODEL,
         ]
 

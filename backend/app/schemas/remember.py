@@ -19,6 +19,10 @@ class RememberRequest(BaseModel):
         default_factory=dict,
         description="Optional developer-defined metadata to associate with the memory.",
     )
+    expires_at: datetime | None = Field(
+        default=None,
+        description="Optional expiration timestamp. Memory will be automatically deleted after this time.",
+    )
 
     @field_validator("content")
     @classmethod

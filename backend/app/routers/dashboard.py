@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.dependencies import get_db
 from app.dependencies.auth import get_current_user_or_project as get_current_user
-from app.models.memory import Memory
+from app.models.memory import Memory, MemoryStatus
 from app.models.project import Project
 from app.models.subscription import Subscription
 from app.models.usage import Usage
@@ -35,7 +35,10 @@ async def dashboard_metrics(
 
     if project_ids:
         mem_count = await db.execute(
-            select(func.count(Memory.id)).where(Memory.project_id.in_(project_ids))
+            select(func.count(Memory.id)).where(
+                Memory.project_id.in_(project_ids),
+                Memory.status != MemoryStatus.DELETED.value,
+            )
         )
         total_memories = mem_count.scalar() or 0
 
@@ -141,6 +144,7 @@ async def dashboard_analytics(
     mem_count = await db.execute(
         select(func.count(Memory.id)).where(
             Memory.project_id.in_(project_ids) if project_ids else literal(False),
+            Memory.status != MemoryStatus.DELETED.value,
         )
     )
     total_memories = mem_count.scalar() or 0
@@ -181,6 +185,7 @@ async def billing_usage(
     mem_count = await db.execute(
         select(func.count(Memory.id)).where(
             Memory.project_id.in_(project_ids) if project_ids else literal(False),
+            Memory.status != MemoryStatus.DELETED.value,
         )
     )
     total_memories = mem_count.scalar() or 0

@@ -1,4 +1,5 @@
 import uuid
+import enum
 from datetime import datetime, timezone
 from typing import Optional, Any, TYPE_CHECKING
 
@@ -13,10 +14,18 @@ if TYPE_CHECKING:
     from app.models.project import Project
 
 
+class MemoryStatus(str, enum.Enum):
+    ACTIVE = "active"
+    ARCHIVED = "archived"
+    DELETED = "deleted"
+
+
 class Memory(Base):
     __tablename__ = "memories"
     __table_args__ = (
         Index("ix_memories_search_vector", "search_vector", postgresql_using="gin"),
+        Index("ix_memories_status", "status"),
+        Index("ix_memories_expires_at", "expires_at"),
     )
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
@@ -28,6 +37,18 @@ class Memory(Base):
     search_vector: Mapped[Optional[Any]] = mapped_column(TSVECTOR, nullable=True)
     metadata_: Mapped[dict[str, Any] | None] = mapped_column(
         "metadata", JSONB, nullable=True, default=dict
+    )
+    status: Mapped[str] = mapped_column(
+        String(20),
+        nullable=False,
+        default=MemoryStatus.ACTIVE.value,
+        index=True,
+    )
+    expires_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True,
+        default=None,
+        index=True,
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
@@ -44,3 +65,9 @@ class Memory(Base):
     embeddings: Mapped[list["Embedding"]] = relationship(
         back_populates="memory", cascade="all, delete-orphan", lazy="selectin"
     )
+
+    @property
+    def is_expired(self) -> bool:
+        if self.expires_at is None:
+            return False
+        return datetime.now(timezone.utc) > self.expires_at

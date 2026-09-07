@@ -149,4 +149,12 @@ export class CloudflareMouseBase {
   async delete(memoryId: string): Promise<void> {
     await this._request("DELETE", `/memory/${memoryId}`);
   }
+
+  async archive(memoryId: string): Promise<MemoryResponse> {
+    return this._request("POST", `/memory/${memoryId}/archive`);
+  }
+
+  async restore(memoryId: string): Promise<MemoryResponse> {
+    return this._request("POST", `/memory/${memoryId}/restore`);
+  }
 }
