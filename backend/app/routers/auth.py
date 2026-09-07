@@ -18,7 +18,6 @@ from app.schemas.auth import (
     SessionResponse,
     SignupRequest,
     UserResponse,
-    VerifyEmailRequest,
 )
 from app.services.auth_service import AuthService
 
@@ -63,34 +62,6 @@ async def refresh(
 ) -> RefreshResponse:
     service = AuthService(db)
     return await service.refresh(request.refresh_token)
-
-
-@router.post(
-    "/verify-email",
-    response_model=dict,
-    summary="Verify email address",
-)
-async def verify_email(
-    request: VerifyEmailRequest = Body(...),
-    db: AsyncSession = Depends(get_db),
-) -> dict:
-    service = AuthService(db)
-    await service.verify_email(request.token)
-    return {"message": "Email verified successfully"}
-
-
-@router.post(
-    "/resend-verification",
-    response_model=dict,
-    summary="Resend verification email",
-)
-async def resend_verification(
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
-) -> dict:
-    service = AuthService(db)
-    await service.resend_verification(current_user.id)
-    return {"message": "Verification email sent"}
 
 
 @router.post(

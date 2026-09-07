@@ -44,10 +44,6 @@ class UserResponse(BaseModel):
     updated_at: datetime
 
 
-class VerifyEmailRequest(BaseModel):
-    token: str
-
-
 class ForgotPasswordRequest(BaseModel):
     email: str
 

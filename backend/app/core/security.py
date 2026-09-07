@@ -84,17 +84,6 @@ def hash_token(token: str) -> str:
     return hashlib.sha256(token.encode()).hexdigest()
 
 
-def create_email_token(user_id: UUID) -> str:
-    expire = datetime.now(timezone.utc) + timedelta(hours=24)
-    payload = {
-        "sub": str(user_id),
-        "exp": expire,
-        "iat": datetime.now(timezone.utc),
-        "type": "email",
-    }
-    return jwt.encode(payload, settings.JWT_SECRET, algorithm="HS256")
-
-
 def create_password_reset_token(user_id: UUID) -> str:
     expire = datetime.now(timezone.utc) + timedelta(hours=1)
     payload = {
@@ -120,20 +109,6 @@ def verify_access_token(token: str) -> UUID:
     try:
         payload = _decode_jwt(token)
         if payload.get("type", "access") not in ("access",):
-            from app.exceptions.auth import InvalidTokenError
-
-            raise InvalidTokenError()
-        return UUID(payload["sub"])
-    except (jwt.ExpiredSignatureError, jwt.InvalidTokenError, ValueError):
-        from app.exceptions.auth import InvalidTokenError
-
-        raise InvalidTokenError()
-
-
-def verify_email_token(token: str) -> UUID:
-    try:
-        payload = _decode_jwt(token)
-        if payload.get("type") != "email":
             from app.exceptions.auth import InvalidTokenError
 
             raise InvalidTokenError()

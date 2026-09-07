@@ -10,12 +10,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.config import settings
 from app.core.security import (
     create_access_token,
-    create_email_token,
     create_password_reset_token,
     create_refresh_token,
     hash_token,
     verify_access_token,
-    verify_email_token,
     verify_password_reset_token,
 )
 from app.exceptions.auth import (
@@ -65,10 +63,7 @@ class AuthService:
         self.db.add(user)
         await self.db.flush()
 
-        if settings.ENVIRONMENT == "development":
-            user.email_verified = True
-        else:
-            await self._send_verification_email(user)
+        user.email_verified = True
 
         await create_subscription(self.db, user.id, PlanType.FREE)
         await self.db.flush()
@@ -133,26 +128,6 @@ class AuthService:
             token=create_access_token(token.user_id),
             refresh_token=new_refresh,
         )
-
-    async def verify_email(self, token: str) -> None:
-        user_id = verify_email_token(token)
-        result = await self.db.execute(select(User).where(User.id == user_id))
-        user = result.scalar_one_or_none()
-        if user is None:
-            raise InvalidTokenError()
-        if user.email_verified:
-            return
-        user.email_verified = True
-        await self.db.commit()
-
-    async def resend_verification(self, user_id: UUID) -> None:
-        result = await self.db.execute(select(User).where(User.id == user_id))
-        user = result.scalar_one_or_none()
-        if user is None:
-            raise InvalidTokenError()
-        if user.email_verified:
-            return
-        await self._send_verification_email(user)
 
     async def forgot_password(self, request: ForgotPasswordRequest) -> None:
         result = await self.db.execute(select(User).where(User.email == request.email))
@@ -271,17 +246,6 @@ class AuthService:
             return project
 
         raise InvalidAPIKeyError()
-
-    async def _send_verification_email(self, user: User) -> None:
-        token = create_email_token(user.id)
-        self.mailer.send(
-            to=user.email,
-            subject="Verify your email — MouseBase",
-            body=f"Welcome to MouseBase!\n\n"
-            f"Verify your email using this link:\n\n"
-            f"{settings.FRONTEND_URL}/verify-email?token={token}\n\n"
-            f"This link expires in 24 hours.",
-        )
 
     async def _store_refresh_token(self, user_id: UUID, refresh_token_str: str) -> None:
         token_hash = hash_token(refresh_token_str)
