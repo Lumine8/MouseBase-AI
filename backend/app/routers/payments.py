@@ -356,7 +356,10 @@ async def _handle_subscription_charged(db: AsyncSession, payload: dict) -> None:
 
 def _extract_user_id(payload: dict, entity_type: str) -> uuid.UUID | None:
     notes = (
-        payload.get("payload", {}).get(entity_type, {}).get("entity", {}).get("notes", {})
+        payload.get("payload", {})
+        .get(entity_type, {})
+        .get("entity", {})
+        .get("notes", {})
     )
     user_id = notes.get("user_id")
     if not user_id:
