@@ -4,8 +4,10 @@ from fastapi import APIRouter
 
 router = APIRouter(prefix="/stats", tags=["stats"])
 
+APP_VERSION = "0.1.0"
+
 HEADERS = {
-    "User-Agent": "MouseBase/0.1.0 (https://mousebase.dev)",
+    "User-Agent": f"MouseBase/{APP_VERSION} (https://mousebase.dev)",
 }
 
 # Cache to avoid hammering pypistats.org (aggressive rate limits)

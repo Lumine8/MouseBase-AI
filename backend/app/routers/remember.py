@@ -52,9 +52,9 @@ async def remember_endpoint(
     project: Project = Depends(get_current_project),
     db: AsyncSession = Depends(get_db),
 ) -> MemoryResponse:
-    result = await remember(project=project, request=request, db=db)
     limits = await get_effective_limits(db, project.owner_id)
     await enforce_rate_limit(project.owner_id, limits["requests_per_hour"])
+    result = await remember(project=project, request=request, db=db)
     usage = UsageService(db)
     await usage.increment_requests(project.id)
     await usage.increment_embeddings(project.id)

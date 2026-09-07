@@ -94,7 +94,7 @@ Set up the environment:
 python -m venv .venv
 source .venv/bin/activate  # Linux/Mac
 .venv\\Scripts\\activate     # Windows
-pip install -r requirements.txt
+pip install -e ".[dev]"
 \`\`\`
 
 Configure environment variables:
@@ -238,7 +238,7 @@ PostgreSQL with the pgvector extension. This gives you the reliability of Postgr
 
 ## Is there a hosted version?
 
-Cloud hosting is coming soon. For now, self-host using Docker.
+Yes. MouseBase is hosted at [mousebase.dev](https://mousebase.dev) with the API at [api.mousebase.dev](https://api.mousebase.dev). You can also self-host using Docker.
 
 ## How do I get an API key?
 

@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field, field_validator
 from uuid import UUID
 from typing import Any
+from datetime import datetime
 
 
 class SearchRequest(BaseModel):
@@ -50,6 +51,10 @@ class SearchResult(BaseModel):
         ...,
         description="The similarity score between the query and the memory.",
         examples=[0.89],
+    )
+    created_at: datetime | None = Field(
+        default=None,
+        description="When the memory was created. Used for tie-breaking.",
     )
 
 

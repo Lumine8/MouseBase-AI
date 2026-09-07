@@ -93,8 +93,16 @@ class SearchService:
                     content=memory.content,
                     metadata=memory.metadata_ or {},
                     score=round(final_score, 4),
+                    created_at=memory.created_at,
                 )
             )
 
-        scored_results.sort(key=lambda r: (-r.score,))
+        # Sort by score desc, then created_at desc (newer first), then id asc (deterministic)
+        scored_results.sort(
+            key=lambda r: (
+                -r.score,
+                -(r.created_at.timestamp() if r.created_at else 0),
+                str(r.id),
+            )
+        )
         return SearchResponse(results=scored_results[: request.top_k])

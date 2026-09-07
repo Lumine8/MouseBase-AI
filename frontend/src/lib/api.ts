@@ -170,6 +170,7 @@ export interface SearchResponse {
 export interface SearchRequest {
   query: string;
   top_k?: number;
+  metadata_filters?: Record<string, unknown>;
 }
 
 export interface UserResponse {

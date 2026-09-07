@@ -1,4 +1,4 @@
-from datetime import date, datetime, timezone
+from datetime import datetime, timezone
 from typing import Any
 from uuid import UUID
 
@@ -30,8 +30,6 @@ from app.core.plan_enforcer import check_memory_limit
 from app.exceptions.memory import MemoryLimitError
 from app.exceptions.project import ProjectNotFoundError
 from app.services import create_embedding_service
-
-# from app.routers import memory
 
 
 async def remember(
@@ -93,40 +91,6 @@ class MemoryService:
     ):
         self.db = db
         self.embedding_service = embedding_service
-
-    async def remember(
-        self, project: Project, request: RememberRequest
-    ) -> MemoryResponse:
-
-        if self.embedding_service is None:
-            raise RuntimeError("Embedding service is not initialized.")
-
-        limited, msg = await check_memory_limit(self.db, project)
-        if limited:
-            raise MemoryLimitError(msg)
-
-        vector = await self.embedding_service.embed(request.content)
-
-        memory = Memory(
-            project=project,
-            content=request.content,
-            metadata_=request.metadata,
-            external_id=request.external_id,
-        )
-
-        embedding = Embedding(
-            memory=memory,
-            model=settings.EMBEDDING_MODEL,
-            dimensions=settings.EMBEDDING_DIMENSIONS,
-            vector=vector,
-        )
-
-        self.db.add(memory)
-        self.db.add(embedding)
-        await self.db.commit()
-        await self.db.refresh(memory)
-
-        return await self._to_response(memory)
 
     async def _get_memory(self, memory_id: UUID, project: Project) -> Memory:
         stmt = select(Memory).where(
@@ -263,6 +227,9 @@ class MemoryService:
 
         offset = (page - 1) * per_page
 
+        ALLOWED_SORT_FIELDS = {"created_at", "updated_at", "external_id"}
+        if sort_by not in ALLOWED_SORT_FIELDS:
+            sort_by = "created_at"
         sort_col = getattr(Memory, sort_by, Memory.created_at)
         order_fn = sort_col.desc if sort_order == "desc" else sort_col.asc
         base_query = base_query.order_by(order_fn())
@@ -305,7 +272,7 @@ class MemoryService:
         )
         avg = round(avg_length.scalar() or 0, 1)
 
-        today = date.today()
+        today = datetime.now(timezone.utc).date()
         created_today = await self.db.execute(
             select(func.count(Memory.id)).where(
                 Memory.project_id == project.id,
