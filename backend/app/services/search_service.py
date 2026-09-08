@@ -8,10 +8,11 @@ from app.models.project import Project
 from app.models.memory import Memory, MemoryStatus
 from app.models.embedding import Embedding
 
-WEIGHT_SEMANTIC = 0.60
-WEIGHT_KEYWORD = 0.25
+WEIGHT_SEMANTIC = 0.50
+WEIGHT_KEYWORD = 0.20
 WEIGHT_METADATA = 0.10
 WEIGHT_RECENCY = 0.05
+WEIGHT_IMPORTANCE = 0.15
 
 
 class SearchService:
@@ -68,6 +69,7 @@ class SearchService:
             sem_score = max(0.0, min(1.0, float(sem_score)))
             kw_score = max(0.0, min(1.0, float(kw_score)))
             rec_score = max(0.0, min(1.0, float(rec_score)))
+            imp_score = max(0.0, min(1.0, float(memory.importance)))
 
             meta_bonus = 0.0
             if memory.metadata_ and request.query:
@@ -81,6 +83,7 @@ class SearchService:
                 + WEIGHT_KEYWORD * kw_score
                 + WEIGHT_METADATA * meta_bonus
                 + WEIGHT_RECENCY * rec_score
+                + WEIGHT_IMPORTANCE * imp_score
             )
             final_score = max(0.0, min(1.0, final_score))
 

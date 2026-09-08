@@ -22,6 +22,12 @@ class RememberRequest(BaseModel):
         default=None,
         description="Optional expiration timestamp. Memory will be automatically deleted after this time.",
     )
+    importance: float = Field(
+        default=0.5,
+        ge=0.0,
+        le=1.0,
+        description="Importance weight for search ranking (0.0–1.0). Higher values rank memories higher in results.",
+    )
 
     @field_validator("content")
     @classmethod

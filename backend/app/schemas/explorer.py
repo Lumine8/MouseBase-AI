@@ -12,6 +12,7 @@ class MemoryListItem(BaseModel):
     external_id: str | None = Field(default=None)
     content: str = Field(...)
     metadata: dict[str, Any] = Field(default_factory=dict)
+    importance: float = Field(default=0.5)
     created_at: datetime = Field(...)
     updated_at: datetime = Field(...)
 

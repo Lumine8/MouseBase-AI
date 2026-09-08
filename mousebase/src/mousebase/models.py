@@ -9,6 +9,7 @@ class RememberResponse(BaseModel):
     content: str = ""
     external_id: str | None = None
     metadata: dict[str, Any] = Field(default_factory=dict)
+    importance: float = 0.5
     created_at: datetime
     updated_at: datetime | None = None
     expires_at: datetime | None = None
@@ -34,6 +35,7 @@ class MemoryResponse(BaseModel):
     metadata: dict[str, Any] = Field(default_factory=dict)
     status: str = "active"
     expires_at: datetime | None = None
+    importance: float = 0.5
     created_at: datetime
     updated_at: datetime
 

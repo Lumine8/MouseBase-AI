@@ -161,8 +161,9 @@ class AsyncMouseBase:
         external_id: str | None = None,
         metadata: dict[str, Any] | None = None,
         expires_at: str | None = None,
+        importance: float = 0.5,
     ) -> RememberResponse:
-        body: dict[str, Any] = {"content": content}
+        body: dict[str, Any] = {"content": content, "importance": importance}
         if external_id is not None:
             body["external_id"] = external_id
         if metadata is not None:

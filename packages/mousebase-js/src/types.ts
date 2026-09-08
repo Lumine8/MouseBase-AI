@@ -3,6 +3,7 @@ export interface RememberOptions {
   externalId?: string | null;
   metadata?: Record<string, unknown>;
   expiresAt?: string | null;
+  importance?: number;
 }
 
 export interface RememberResponse {
@@ -10,6 +11,7 @@ export interface RememberResponse {
   content: string;
   external_id: string | null;
   metadata: Record<string, unknown>;
+  importance: number;
   created_at: string;
   updated_at: string;
 }
@@ -39,6 +41,7 @@ export interface MemoryResponse {
   metadata: Record<string, unknown>;
   status: string;
   expires_at: string | null;
+  importance: number;
   created_at: string;
   updated_at: string;
 }

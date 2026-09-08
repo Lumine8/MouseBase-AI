@@ -44,7 +44,7 @@ export class MouseBaseMastraMemory {
         source: "mastra",
       },
     });
-    return res.memory_id;
+    return res.id;
   }
 
   async retrieve(threadId?: string): Promise<MastraMemoryEntry[]> {

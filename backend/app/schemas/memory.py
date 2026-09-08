@@ -26,6 +26,10 @@ class MemoryResponse(BaseModel):
         default=None,
         description="When the memory expires and is automatically deleted. None means never.",
     )
+    importance: float = Field(
+        default=0.5,
+        description="Importance weight for search ranking (0.0–1.0).",
+    )
     created_at: datetime = Field(
         ..., description="Timestamp when the memory was created"
     )

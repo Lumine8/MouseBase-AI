@@ -50,6 +50,11 @@ class Memory(Base):
         default=None,
         index=True,
     )
+    importance: Mapped[float] = mapped_column(
+        nullable=False,
+        default=0.5,
+        index=True,
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,

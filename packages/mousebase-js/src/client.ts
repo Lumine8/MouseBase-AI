@@ -127,7 +127,10 @@ export class MouseBase {
   }
 
   async remember(options: RememberOptions): Promise<RememberResponse> {
-    const body: Record<string, unknown> = { content: options.content };
+    const body: Record<string, unknown> = {
+      content: options.content,
+      importance: options.importance ?? 0.5,
+    };
     if (options.externalId !== undefined && options.externalId !== null) {
       body.external_id = options.externalId;
     }
