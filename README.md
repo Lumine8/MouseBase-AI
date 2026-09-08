@@ -3,6 +3,9 @@
   <br /><br />
   <p><strong>Persistent memory infrastructure for AI agents.</strong></p>
   <p>
+    <a href="https://www.producthunt.com/products/mousebase?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-mousebase" target="_blank" rel="noopener noreferrer"><img alt="MouseBase - Persistent memory for you AI agent | Product Hunt" width="250" height="54" src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1244028&theme=light&t=1788842550040" /></a>
+  </p>
+  <p>
     <a href="https://pypi.org/project/mousebase/"><img src="https://img.shields.io/pypi/v/mousebase?style=flat-square&label=PyPI&color=f59e0b" alt="PyPI" /></a>
     <a href="https://www.npmjs.com/package/mousebase"><img src="https://img.shields.io/npm/v/mousebase?style=flat-square&label=npm&color=d97706" alt="npm" /></a>
     <a href="https://pypi.org/project/mousebase/"><img src="https://img.shields.io/pypi/pyversions/mousebase?style=flat-square&label=Python&color=b45309" alt="Python" /></a>
@@ -19,6 +22,8 @@
 MouseBase gives your AI agents **persistent memory**. Store, retrieve, and semantically search memories with a simple API — backed by vector embeddings and PostgreSQL.
 
 Unlike traditional databases that match exact keywords, MouseBase finds memories by **meaning**. Your AI can remember user preferences, conversation context, and past decisions without you writing complex query logic.
+
+**Built for production:** hybrid search (semantic + keyword + metadata + recency), memory lifecycle management (archive, soft-delete, expiration), plan-based rate limiting, and SDKs for Python, JavaScript, and TypeScript.
 
 🌐 **[mousebase.dev](https://mousebase.dev)** — Official website & dashboard
 
@@ -58,6 +63,13 @@ print(result.memory_id)
 results = client.search("What theme does the user want?")
 for r in results.results:
     print(f"{r.content} (score: {r.score})")
+
+# Archive old memories
+client.archive(result.memory_id)
+
+# Set expiration (auto-deletes after 30 days)
+from datetime import datetime, timedelta, timezone
+client.remember("Temp note", expires_at=(datetime.now(timezone.utc) + timedelta(days=30)).isoformat())
 ```
 
 ## TypeScript / JavaScript SDK
@@ -77,6 +89,10 @@ await client.remember({ content: "Alice prefers dark mode" });
 // Search semantically
 const results = await client.search({ query: "UI preferences" });
 console.log(results.results);
+
+// Archive / restore
+await client.archive("memory-id");
+await client.restore("memory-id");
 ```
 
 ### Browser SDK
@@ -116,6 +132,37 @@ npx mousebase projects list
 
 ---
 
+## Features
+
+### Hybrid Search
+
+MouseBase combines four ranking signals for accurate retrieval:
+
+| Signal | Weight | How it works |
+|--------|--------|--------------|
+| Semantic | 60% | Vector cosine similarity via pgvector |
+| Keyword | 25% | PostgreSQL full-text search (tsvector/tsquery) |
+| Metadata | 10% | Exact metadata key-value matching |
+| Recency | 5% | Exponential decay (30-day half-life) |
+
+### Memory Lifecycle
+
+Full control over memory lifecycle — no data loss, no clutter.
+
+| Status | Description |
+|--------|-------------|
+| **Active** | Included in search results, counts toward limits |
+| **Archived** | Excluded from search, preserved for audit/restoration |
+| **Deleted** | Soft-deleted, hidden from all queries, recoverable |
+
+Set `expires_at` on any memory for automatic cleanup on access.
+
+### Project Isolation
+
+Every memory is scoped to a project. Multiple projects, each with its own API key, memory store, and usage tracking.
+
+---
+
 ## Pricing
 
 | Plan | Price | Memories | Projects | Searches/mo | Requests/hr |
@@ -139,17 +186,19 @@ All endpoints are available at `https://api.mousebase.dev/api/v1`.
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
-| `POST` | `/remember/` | API key | Store a memory |
-| `POST` | `/search/` | API key | Search memories semantically |
+| `POST` | `/remember/` | API key | Store a memory (supports `expires_at`) |
+| `POST` | `/search/` | API key | Hybrid search (semantic + keyword + metadata) |
 | `GET` | `/memory/{id}` | API key | Get a memory by ID |
 | `PATCH` | `/memory/{id}` | API key | Update a memory |
-| `DELETE` | `/memory/{id}` | API key | Delete a memory |
+| `DELETE` | `/memory/{id}` | API key | Soft-delete a memory |
+| `POST` | `/memory/{id}/archive` | API key | Archive a memory |
+| `POST` | `/memory/{id}/restore` | API key | Restore an archived memory |
 
 ### Memory Explorer
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
-| `GET` | `/projects/{id}/memories` | JWT | Paginated list with filters |
+| `GET` | `/projects/{id}/memories` | JWT | Paginated list with filters (supports `status` filter) |
 | `GET` | `/projects/{id}/memories/stats` | JWT | Per-project analytics |
 | `GET` | `/projects/{id}/memories/timeline` | JWT | Activity timeline |
 | `POST` | `/projects/{id}/memories/batch-delete` | JWT | Delete multiple memories |
@@ -169,11 +218,9 @@ All endpoints are available at `https://api.mousebase.dev/api/v1`.
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `POST` | `/auth/signup` | Create account |
+| `POST` | `/auth/signup` | Create account (auto-verified) |
 | `POST` | `/auth/login` | Sign in (returns access + refresh tokens) |
 | `POST` | `/auth/refresh` | Refresh access token |
-| `POST` | `/auth/verify-email` | Verify email with token |
-| `POST` | `/auth/resend-verification` | Resend verification email |
 | `POST` | `/auth/forgot-password` | Send password reset email |
 | `POST` | `/auth/reset-password` | Reset password with token |
 | `GET` | `/auth/me` | Get current user |
@@ -190,7 +237,7 @@ All endpoints are available at `https://api.mousebase.dev/api/v1`.
 | `GET` | `/projects/{id}` | Get project |
 | `PATCH` | `/projects/{id}` | Update project |
 | `DELETE` | `/projects/{id}` | Delete project |
-| `POST` | `/projects/{id}/rotate-key` | Rotate API key |
+| `POST` | `/projects/{id}/rotate-key` | Rotate API key (24h grace period) |
 
 ### Dashboard & Analytics
 
@@ -234,7 +281,7 @@ MouseBase is built with production security from day one.
 - **JWT access tokens**: 15-minute expiry, signed with HS256
 - **JWT refresh tokens**: 30-day expiry, one-time rotation on use, stored hashed
 - **API keys**: `mb_live_{key_id}_{secret}` format, hashed with argon2, encrypted at rest
-- **Email verification**: Token-based verification with 24-hour expiry
+- **Key rotation**: 24-hour grace period for old keys after rotation
 - **Password reset**: Token-based with 1-hour expiry, invalidates all sessions on reset
 
 ### Session Management
@@ -339,13 +386,17 @@ client = MouseBase(api_key="mb_live_...")
 # Remember
 result = client.remember("content", external_id="opt", metadata={})
 
-# Search
-results = client.search("query", top_k=10)
+# Search (hybrid: semantic + keyword + metadata + recency)
+results = client.search("query", top_k=10, metadata_filters={"source": "chat"})
+
+# Archive / Restore
+client.archive("memory-id")
+client.restore("memory-id")
 
 # Get / Update / Delete
 memory = client.get("id")
 client.update("id", content="new content")
-client.delete("id")
+client.delete("id")  # soft-delete
 
 # Auth
 auth = client.signup("email", "password")
@@ -386,8 +437,8 @@ See the [examples directory](mousebase/examples/) for complete runnable scripts:
 
 ```
 Frontend (Vercel)  ──▶  API (Render)  ──▶  PostgreSQL (Neon)
-  mousebase-ai.         api.mousebase.dev     ep-quiet-tooth-...
-  vercel.app                                      (connection pooled)
+  mousebase.dev          api.mousebase.dev     ep-quiet-tooth-...
+                                               (connection pooled)
        │                       │
        │                       ├── Sentry (error tracking)
        │                       ├── In-memory rate limiting
@@ -442,10 +493,10 @@ alembic upgrade head
 
 MouseBase is in active development. The API is stable and ready for production use.
 
-- **Python SDK**: v0.3.2 ([PyPI](https://pypi.org/project/mousebase/))
-- **JavaScript SDK**: v0.1.7 ([npm](https://www.npmjs.com/package/mousebase))
+- **Python SDK**: v0.3.3 ([PyPI](https://pypi.org/project/mousebase/))
+- **JavaScript SDK**: v0.1.8 ([npm](https://www.npmjs.com/package/mousebase))
 - **Backend API**: v0.1.0 ([api.mousebase.dev](https://api.mousebase.dev))
-- **Dashboard**: [mousebase-ai.vercel.app](https://mousebase-ai.vercel.app)
+- **Dashboard**: [mousebase.dev](https://mousebase.dev)
 
 ## License
 
