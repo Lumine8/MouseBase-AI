@@ -216,6 +216,10 @@ export default function Landing() {
           </a>
         </div>
 
+        <a href="https://www.producthunt.com/products/mousebase?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-mousebase" target="_blank" rel="noopener noreferrer" style={{ marginTop: 24 }}>
+          <img alt="MouseBase - Persistent memory for you AI agent | Product Hunt" width="250" height="54" src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1244028&theme=light&t=1788842550040" />
+        </a>
+
         {/* Code block */}
         <div style={{
           marginTop: 64, width: "100%", maxWidth: 560,
