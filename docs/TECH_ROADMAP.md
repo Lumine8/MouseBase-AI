@@ -127,7 +127,7 @@ Make MouseBase discoverable by AI systems and search engines. This runs in paral
 ### P0 — Critical (crawlability / indexing)
 
 - [x] Create `.well-known/security.txt`
-- [ ] Fix OG image — currently an SVG logo, needs a 1200x630 PNG social card
+- [x] Fix OG image — currently an SVG logo, needs a 1200x630 PNG social card
 - [x] Add `twitter:site` meta tag to all pages
 - [x] Update softwareVersion in JSON-LD to 0.3.2
 - [x] Add `llms.txt` at `.well-known/llms.txt`
@@ -150,7 +150,7 @@ Each page: clear title, H1, answer-first structure (first paragraph answers the 
 - [x] `/comparisons/mem0` — "MouseBase vs Mem0" (honest technical comparison)
 - [x] `/comparisons/zep` — "MouseBase vs Zep" (honest technical comparison)
 - [x] `/comparisons/vector-database` — "MouseBase vs vector databases" (explains the difference)
-- [ ] `/persistent-memory-for-ai` — "Persistent memory for AI agents and applications"
+- [x] `/persistent-memory-for-ai` — "Persistent memory for AI agents and applications"
 - [ ] `/blog` — fix to support individual posts (currently 2 hardcoded placeholders)
 - [ ] Blog post: "How to Add Persistent Memory to an AI Agent" (Python + JS examples)
 

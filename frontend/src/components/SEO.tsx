@@ -10,7 +10,7 @@ interface SEOProps {
 }
 
 const SITE = "https://mousebase.dev";
-const DEFAULT_IMAGE = `${SITE}/assets/logo_mousebase.svg`;
+const DEFAULT_IMAGE = `${SITE}/assets/og-default.svg`;
 
 export default function SEO({ title, description, path, ogType = "website", ogImage = DEFAULT_IMAGE, jsonLd }: SEOProps) {
   const url = `${SITE}${path}`;

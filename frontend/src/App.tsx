@@ -36,6 +36,7 @@ import AIMemory from "./pages/content/AIMemory";
 import CompareMem0 from "./pages/content/CompareMem0";
 import CompareZep from "./pages/content/CompareZep";
 import CompareVectorDB from "./pages/content/CompareVectorDB";
+import PersistentMemoryForAI from "./pages/content/PersistentMemoryForAI";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
 
@@ -104,6 +105,7 @@ export default function App() {
       <Route path="/comparisons/mem0" element={<CompareMem0 />} />
       <Route path="/comparisons/zep" element={<CompareZep />} />
       <Route path="/comparisons/vector-database" element={<CompareVectorDB />} />
+      <Route path="/persistent-memory-for-ai" element={<PersistentMemoryForAI />} />
 
       {/* Legal */}
       <Route path="/legal/privacy" element={<Privacy />} />

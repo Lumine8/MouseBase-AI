@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#090909"/>
+      <stop offset="100%" style="stop-color:#111111"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#F5C542"/>
+      <stop offset="100%" style="stop-color:#FFD54A"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <!-- Subtle grid pattern -->
+  <g opacity="0.04" stroke="#F5C542" stroke-width="1">
+    <line x1="0" y1="105" x2="1200" y2="105"/>
+    <line x1="0" y1="210" x2="1200" y2="210"/>
+    <line x1="0" y1="315" x2="1200" y2="315"/>
+    <line x1="0" y1="420" x2="1200" y2="420"/>
+    <line x1="0" y1="525" x2="1200" y2="525"/>
+    <line x1="200" y1="0" x2="200" y2="630"/>
+    <line x1="400" y1="0" x2="400" y2="630"/>
+    <line x1="600" y1="0" x2="600" y2="630"/>
+    <line x1="800" y1="0" x2="800" y2="630"/>
+    <line x1="1000" y1="0" x2="1000" y2="630"/>
+  </g>
+  <!-- Logo icon -->
+  <g transform="translate(100, 200)">
+    <rect width="64" height="64" rx="14" fill="url(#accent)"/>
+    <g transform="translate(14, 14)">
+      <circle cx="18" cy="18" r="5" fill="#090909"/>
+      <circle cx="18" cy="18" r="2" fill="#090909"/>
+      <path d="M18 10 L18 6" stroke="#090909" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M18 30 L18 26" stroke="#090909" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M10 18 L6 18" stroke="#090909" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M30 18 L26 18" stroke="#090909" stroke-width="2.5" stroke-linecap="round"/>
+      <circle cx="18" cy="18" r="12" fill="none" stroke="#090909" stroke-width="2"/>
+    </g>
+  </g>
+  <!-- Title -->
+  <text x="100" y="320" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif" font-size="64" font-weight="700" fill="#FFFFFF" letter-spacing="-2">MouseBase</text>
+  <!-- Tagline -->
+  <text x="100" y="380" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif" font-size="28" font-weight="400" fill="#B3B3B3">Persistent memory infrastructure for AI agents</text>
+  <!-- Accent bar -->
+  <rect x="100" y="410" width="120" height="4" rx="2" fill="url(#accent)"/>
+  <!-- URL -->
+  <text x="100" y="560" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif" font-size="18" font-weight="500" fill="#707070">mousebase.dev</text>
+</svg>
