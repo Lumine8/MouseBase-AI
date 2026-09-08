@@ -1,4 +1,5 @@
 import os
+import secrets
 from pydantic import Field, model_validator
 from pathlib import Path
 
@@ -86,6 +87,8 @@ class Settings(BaseSettings):
     def _validate_production_secrets(self) -> "Settings":
         if self.ENVIRONMENT == "production" and not self.JWT_SECRET:
             raise ValueError("JWT_SECRET must be set in production")
+        if not self.JWT_SECRET:
+            self.JWT_SECRET = secrets.token_hex(32)
         return self
 
 
