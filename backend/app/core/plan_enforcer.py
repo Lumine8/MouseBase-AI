@@ -114,7 +114,9 @@ async def check_search_limit(
         max_searches = plan_limits["max_searches_per_month"]
     else:
         plan_limits = PLAN_LIMITS.get(sub.plan, PLAN_LIMITS[PlanType.FREE])
-        max_searches = max(sub.max_searches_per_month, plan_limits["max_searches_per_month"])
+        max_searches = max(
+            sub.max_searches_per_month, plan_limits["max_searches_per_month"]
+        )
 
     usage_service = UsageService(db)
     used = await usage_service.get_monthly_searches(owner_id)
