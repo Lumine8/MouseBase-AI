@@ -463,6 +463,48 @@ export const data = {
     request<{ table: string; count: number }>("GET", `/data/${table}/count`),
 };
 
+export interface BlogPostListItem {
+  id: string;
+  slug: string;
+  title: string;
+  excerpt: string;
+  tags: string;
+  published: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface BlogPostResponse {
+  id: string;
+  slug: string;
+  title: string;
+  excerpt: string;
+  content: string;
+  tags: string;
+  published: boolean;
+  author_id: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface BlogPostCreateRequest {
+  slug: string;
+  title: string;
+  excerpt: string;
+  content: string;
+  tags: string;
+  published: boolean;
+}
+
+export interface BlogPostUpdateRequest {
+  slug?: string;
+  title?: string;
+  excerpt?: string;
+  content?: string;
+  tags?: string;
+  published?: boolean;
+}
+
 export const api = {
   projects: {
     list: () =>
@@ -518,5 +560,18 @@ export const api = {
   auth: {
     delete: () => request<void>("DELETE", "/auth/delete"),
     export: () => request<Blob>("GET", "/auth/export", undefined, null, false, true),
+  },
+
+  blog: {
+    list: (publishedOnly: boolean = true) =>
+      request<BlogPostListItem[]>("GET", `/blog?published_only=${publishedOnly}`),
+    get: (slug: string) =>
+      request<BlogPostResponse>("GET", `/blog/${slug}`),
+    create: (data: BlogPostCreateRequest) =>
+      request<BlogPostResponse>("POST", "/blog", data),
+    update: (id: string, data: BlogPostUpdateRequest) =>
+      request<BlogPostResponse>("PUT", `/blog/${id}`, data),
+    delete: (id: string) =>
+      request<void>("DELETE", `/blog/${id}`),
   },
 };

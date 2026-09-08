@@ -151,8 +151,8 @@ Each page: clear title, H1, answer-first structure (first paragraph answers the 
 - [x] `/comparisons/zep` — "MouseBase vs Zep" (honest technical comparison)
 - [x] `/comparisons/vector-database` — "MouseBase vs vector databases" (explains the difference)
 - [x] `/persistent-memory-for-ai` — "Persistent memory for AI agents and applications"
-- [ ] `/blog` — fix to support individual posts (currently 2 hardcoded placeholders)
-- [ ] Blog post: "How to Add Persistent Memory to an AI Agent" (Python + JS examples)
+- [x] `/blog` — fix to support individual posts (currently 2 hardcoded placeholders)
+- [x] Blog post: "How to Add Persistent Memory to an AI Agent" (Python + JS examples)
 
 ### P3 — Documentation & Authority
 

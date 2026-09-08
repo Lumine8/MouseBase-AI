@@ -18,6 +18,7 @@ import Billing from "./pages/Billing";
 import NotFound from "./pages/NotFound";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
+import BlogAdmin from "./pages/BlogAdmin";
 import Status from "./pages/Status";
 import Changelog from "./pages/Changelog";
 import Roadmap from "./pages/Roadmap";
@@ -129,6 +130,7 @@ export default function App() {
       <Route path="/data" element={<ProtectedRoute><Data /></ProtectedRoute>} />
       <Route path="/billing" element={<ProtectedRoute><Billing /></ProtectedRoute>} />
       <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+      <Route path="/admin/blog" element={<ProtectedRoute><BlogAdmin /></ProtectedRoute>} />
 
       {/* 404 */}
       <Route path="*" element={<NotFound />} />
