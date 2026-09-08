@@ -11,14 +11,15 @@ import {
 const ALL_COLUMNS = [
   { key: "content" as const, label: "Content" },
   { key: "external_id" as const, label: "External ID" },
+  { key: "importance" as const, label: "Importance" },
   { key: "created_at" as const, label: "Created" },
   { key: "updated_at" as const, label: "Updated" },
   { key: "metadata" as const, label: "Metadata" },
 ];
 
-type ColumnKey = "content" | "external_id" | "created_at" | "updated_at" | "metadata";
+type ColumnKey = "content" | "external_id" | "importance" | "created_at" | "updated_at" | "metadata";
 
-const COLUMN_KEYS: ColumnKey[] = ["content", "external_id", "created_at", "updated_at", "metadata"];
+const COLUMN_KEYS: ColumnKey[] = ["content", "external_id", "importance", "created_at", "updated_at", "metadata"];
 
 function formatDate(d: string) {
   const dt = new Date(d);
@@ -61,7 +62,7 @@ export default function MemoryExplorer() {
   const [selectAll, setSelectAll] = useState(false);
   const [inspectorMemory, setInspectorMemory] = useState<MemoryListItem | null>(null);
   const [showColumnSettings, setShowColumnSettings] = useState(false);
-  const [visibleColumns, setVisibleColumns] = useState<ColumnKey[]>(["content", "external_id", "created_at"]);
+  const [visibleColumns, setVisibleColumns] = useState<ColumnKey[]>(["content", "external_id", "importance", "created_at"]);
   const [busy, setBusy] = useState(false);
   const [view, setView] = useState<"memories" | "timeline">("memories");
   const [timeline, setTimeline] = useState<TimelineEntry[]>([]);
@@ -224,6 +225,10 @@ export default function MemoryExplorer() {
     switch (key) {
       case "content": return <span className="explorer-cell-content">{m.content}</span>;
       case "external_id": return <span className="font-mono text-xs">{m.external_id || "—"}</span>;
+      case "importance":
+        const pct = Math.round((m.importance ?? 0.5) * 100);
+        const color = pct >= 80 ? "var(--green)" : pct >= 50 ? "var(--yellow, #eab308)" : "var(--text-muted)";
+        return <span style={{ color, fontWeight: 600 }}>{pct}%</span>;
       case "created_at": return <span className="explorer-cell-date">{formatDate(m.created_at)}</span>;
       case "updated_at": return <span className="explorer-cell-date">{formatDate(m.updated_at)}</span>;
       case "metadata":

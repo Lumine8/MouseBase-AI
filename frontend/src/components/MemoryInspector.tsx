@@ -122,6 +122,15 @@ export default function MemoryInspector({ memory, onClose, onDelete, onUpdated }
                     <div className="inspector-value">{memory.external_id || <span className="text-gray-400">—</span>}</div>
                   </div>
                   <div className="inspector-field">
+                    <label className="inspector-label">Importance</label>
+                    <div className="inspector-value">
+                      {Math.round((memory.importance ?? 0.5) * 100)}%
+                      <span style={{ marginLeft: 8, fontSize: 11, color: "var(--text-muted)" }}>
+                        (0–1 scale, default 0.5)
+                      </span>
+                    </div>
+                  </div>
+                  <div className="inspector-field">
                     <label className="inspector-label">Metadata</label>
                     <pre className="inspector-json">{JSON.stringify(memory.metadata, null, 2)}</pre>
                   </div>

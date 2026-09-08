@@ -3,6 +3,19 @@ import { SearchResult } from "../lib/api";
 import SearchBox from "../components/SearchBox";
 import { FiSearch } from "react-icons/fi";
 
+function ScoreBar({ score }: { score: number }) {
+  const pct = Math.round(score * 100);
+  const color = pct >= 80 ? "var(--green)" : pct >= 60 ? "var(--yellow, #eab308)" : "var(--text-muted)";
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 120 }}>
+      <div style={{ flex: 1, height: 6, background: "var(--bg-secondary)", borderRadius: 3, overflow: "hidden" }}>
+        <div style={{ width: `${pct}%`, height: "100%", background: color, borderRadius: 3, transition: "width 0.3s" }} />
+      </div>
+      <span style={{ fontSize: 12, fontWeight: 600, color, minWidth: 36, textAlign: "right" }}>{pct}%</span>
+    </div>
+  );
+}
+
 export default function SearchPage() {
   const [results, setResults] = useState<SearchResult[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -37,13 +50,22 @@ export default function SearchPage() {
         <div className="results-list">
           {results.map((r) => (
             <div key={r.id} className="result-card">
-              <p>{r.content}</p>
+              <p style={{ marginBottom: 8 }}>{r.content}</p>
               {r.metadata && Object.keys(r.metadata).length > 0 && (
-                <pre>{JSON.stringify(r.metadata, null, 2)}</pre>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginBottom: 8 }}>
+                  {Object.entries(r.metadata).slice(0, 4).map(([k, v]) => (
+                    <span key={k} style={{ fontSize: 11, padding: "2px 8px", background: "var(--bg-secondary)", borderRadius: 12, color: "var(--text-muted)" }}>
+                      {k}: {String(v).slice(0, 30)}
+                    </span>
+                  ))}
+                </div>
               )}
-              <div className="result-card-footer">
-                <span>Score: {(r.score * 100).toFixed(1)}%</span>
-                <span>{r.external_id ? `ID: ${r.external_id}` : ""}</span>
+              <div className="result-card-footer" style={{ justifyContent: "space-between" }}>
+                <ScoreBar score={r.score} />
+                <div style={{ display: "flex", gap: 12, fontSize: 12, color: "var(--text-muted)" }}>
+                  {r.external_id && <span>ID: {r.external_id}</span>}
+                  {r.created_at && <span>{new Date(r.created_at).toLocaleDateString()}</span>}
+                </div>
               </div>
             </div>
           ))}

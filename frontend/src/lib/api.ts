@@ -136,6 +136,7 @@ export interface RememberRequest {
   content: string;
   external_id?: string | null;
   metadata?: Record<string, unknown>;
+  importance?: number;
 }
 
 export interface Memory {
@@ -161,6 +162,7 @@ export interface SearchResult {
   content: string;
   metadata: Record<string, unknown>;
   score: number;
+  created_at?: string;
 }
 
 export interface SearchResponse {
@@ -374,6 +376,7 @@ export interface MemoryListItem {
   external_id: string | null;
   content: string;
   metadata: Record<string, unknown>;
+  importance: number;
   created_at: string;
   updated_at: string;
   embedding_model?: string;
