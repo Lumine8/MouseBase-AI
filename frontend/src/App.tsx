@@ -17,6 +17,7 @@ import Pricing from "./pages/Pricing";
 import Billing from "./pages/Billing";
 import NotFound from "./pages/NotFound";
 import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
 import Status from "./pages/Status";
 import Changelog from "./pages/Changelog";
 import Roadmap from "./pages/Roadmap";
@@ -91,6 +92,7 @@ export default function App() {
       <Route path="/docs" element={<Documentation />} />
       <Route path="/docs/:section" element={<Documentation />} />
       <Route path="/blog" element={<Blog />} />
+      <Route path="/blog/:slug" element={<BlogPost />} />
       <Route path="/status" element={<Status />} />
       <Route path="/changelog" element={<Changelog />} />
       <Route path="/roadmap" element={<Roadmap />} />
