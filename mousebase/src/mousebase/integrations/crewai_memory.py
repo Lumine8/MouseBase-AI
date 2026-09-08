@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import time
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
 
 __all__ = ["MouseBaseMemory"]
@@ -451,7 +451,7 @@ class MouseBaseMemory:
             ``session``, ``timestamp``).
         """
         meta = dict(metadata or {})
-        meta.setdefault("timestamp", datetime.utcnow().isoformat())
+        meta.setdefault("timestamp", datetime.now(timezone.utc).isoformat())
         client = self._lazy_client()
         resp = client.remember(
             content=context,

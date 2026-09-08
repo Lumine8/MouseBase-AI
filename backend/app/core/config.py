@@ -1,5 +1,5 @@
 import os
-from pydantic import Field
+from pydantic import Field, model_validator
 from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -7,6 +7,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from enum import Enum
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
+
+APP_VERSION = "0.3.4"
 
 
 class EmbeddingProvider(str, Enum):
@@ -30,7 +32,7 @@ class Settings(BaseSettings):
 
     MIN_SCORE: float = Field(default=0.65, ge=0.0, le=1.0)
 
-    JWT_SECRET: str = "dev-jwt-secret-do-not-use-in-production"
+    JWT_SECRET: str = ""
     JWT_SECRET_PREVIOUS: str = ""
     JWT_EXPIRY_HOURS: int = 72
 
@@ -79,6 +81,12 @@ class Settings(BaseSettings):
         env_file=BASE_DIR / ".env",
         extra="ignore",
     )
+
+    @model_validator(mode="after")
+    def _validate_production_secrets(self) -> "Settings":
+        if self.ENVIRONMENT == "production" and not self.JWT_SECRET:
+            raise ValueError("JWT_SECRET must be set in production")
+        return self
 
 
 settings = Settings()

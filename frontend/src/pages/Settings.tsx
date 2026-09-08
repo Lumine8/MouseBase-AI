@@ -21,8 +21,8 @@ export default function Settings() {
 
   useEffect(() => {
     if (localStorage.getItem("mb_token")) {
-      auth.me().then(setUser).catch(() => {});
-      api.projects.list().then(setProjects).catch(() => {});
+      auth.me().then(setUser).catch((err) => console.error("Failed to load user:", err));
+      api.projects.list().then(setProjects).catch((err) => console.error("Failed to load projects:", err));
     }
   }, []);
 
@@ -213,7 +213,9 @@ export default function Settings() {
                             try {
                               const result = await api.projects.rotateKey(p.id);
                               setProjects((prev) => prev.map((x) => x.id === p.id ? result : x));
-                            } catch {}
+                            } catch (err) {
+                              console.error("Key rotation failed:", err);
+                            }
                           }}
                           className="btn-ghost btn-sm"
                           style={{ fontSize: 12 }}
@@ -267,7 +269,7 @@ export default function Settings() {
           Store, retrieve, and search semantic memories using vector
           embeddings. Built for developers who need their AI to remember.
         </p>
-        <p className="about-version">MouseBase v0.1.0 &middot; API v1</p>
+        <p className="about-version">MouseBase v0.3.4 &middot; API v1</p>
       </div>
 
       {showDeleteModal && (

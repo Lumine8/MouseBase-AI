@@ -2,9 +2,9 @@ import asyncio
 import httpx
 from fastapi import APIRouter
 
-router = APIRouter(prefix="/stats", tags=["stats"])
+from app.core.config import APP_VERSION
 
-APP_VERSION = "0.1.0"
+router = APIRouter(prefix="/stats", tags=["stats"])
 
 HEADERS = {
     "User-Agent": f"MouseBase/{APP_VERSION} (https://mousebase.dev)",

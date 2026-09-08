@@ -17,7 +17,7 @@ from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 from sqlalchemy import text
 
-from app.core.config import settings
+from app.core.config import settings, APP_VERSION
 from app.core.log_config import get_logger, setup_logging
 from app.core.middleware import (
     RequestIDMiddleware,
@@ -88,7 +88,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     logger.info("shutting down")
 
 
-app = FastAPI(title="MouseBase Memory API", version="0.1.0", lifespan=lifespan)
+app = FastAPI(title="MouseBase Memory API", version=APP_VERSION, lifespan=lifespan)
 
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)

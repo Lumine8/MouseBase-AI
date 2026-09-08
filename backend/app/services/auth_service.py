@@ -13,7 +13,9 @@ from app.core.security import (
     create_password_reset_token,
     create_refresh_token,
     hash_token,
+    parse_api_key,
     verify_access_token,
+    verify_api_key,
     verify_password_reset_token,
 )
 from app.exceptions.auth import (
@@ -219,9 +221,6 @@ class AuthService:
         return user
 
     async def authenticate_api_key(self, api_key: str) -> Project:
-        from datetime import datetime, timezone, timedelta
-        from app.core.security import parse_api_key, verify_api_key
-
         key_id, secret = parse_api_key(api_key)
         result = await self.db.execute(
             select(Project).where(Project.api_key_id == key_id)

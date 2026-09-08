@@ -4,18 +4,6 @@ from typing import Any
 from datetime import datetime
 
 
-class MetadataFilter(BaseModel):
-    """Advanced metadata filter supporting exact match, range queries, and IN lists.
-
-    Exact match: {"key": "value"}
-    Range queries: {"key": {"$gt": 25}}, {"key": {"$lt": 100}}, {"key": {"$gte": 25}}, {"key": {"$lte": 100}}
-    IN lists: {"key": {"$in": ["a", "b", "c"]}}
-    Nested keys: {"user.name": "John"}
-    """
-
-    pass
-
-
 class SearchRequest(BaseModel):
     query: str = Field(
         ...,

@@ -19,7 +19,7 @@ export class MissingApiKeyError extends MouseBaseError {
 
 export class AuthenticationError extends MouseBaseError {
   constructor(message: string = "Invalid or expired API key") {
-    super(message, "authentication_error", 401);
+    super(message, "invalid_api_key", 401);
     this.name = "AuthenticationError";
   }
 }
@@ -40,7 +40,7 @@ export class ConflictError extends MouseBaseError {
 
 export class RateLimitError extends MouseBaseError {
   constructor(message: string = "Too many requests") {
-    super(message, "rate_limit_error", 429);
+    super(message, "rate_limited", 429);
     this.name = "RateLimitError";
   }
 }

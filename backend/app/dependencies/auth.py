@@ -9,6 +9,10 @@ from app.models.project import Project
 from app.models.user import User
 from app.services.auth_service import AuthService
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 security = HTTPBearer(auto_error=False)
 
 
@@ -67,8 +71,10 @@ async def get_current_user_or_project(
             user = result.scalar_one_or_none()
             if user is not None:
                 return user
+        except InvalidTokenError:
+            raise
         except Exception:
-            pass
+            logger.exception("JWT verification failed")
         raise InvalidTokenError()
 
     try:
@@ -77,7 +83,9 @@ async def get_current_user_or_project(
         user = result.scalar_one_or_none()
         if user is not None:
             return user
+    except InvalidAPIKeyError:
+        raise
     except Exception:
-        pass
+        logger.exception("API key authentication failed")
 
     raise InvalidAPIKeyError()

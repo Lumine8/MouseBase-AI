@@ -1,4 +1,4 @@
-import type { RememberOptions, RememberResponse, SearchOptions, SearchResponse, MemoryResponse, UpdateOptions } from "../types.js";
+import type { RememberOptions, RememberResponse, SearchOptions, SearchResponse, MemoryResponse, UpdateOptions, MemoryVersionResponse } from "../types.js";
 import { MouseBaseError, translateError } from "../errors.js";
 
 const DEFAULT_BASE_URL = "https://api.mousebase.dev/api/v1";
@@ -123,6 +123,12 @@ export class CloudflareMouseBase {
     if (options.metadata !== undefined) {
       body.metadata = options.metadata;
     }
+    if (options.importance !== undefined) {
+      body.importance = options.importance;
+    }
+    if (options.expiresAt !== undefined) {
+      body.expires_at = options.expiresAt;
+    }
     return this._request("POST", "/remember/", body);
   }
 
@@ -156,5 +162,13 @@ export class CloudflareMouseBase {
 
   async restore(memoryId: string): Promise<MemoryResponse> {
     return this._request("POST", `/memory/${memoryId}/restore`);
+  }
+
+  async versions(memoryId: string): Promise<MemoryVersionResponse[]> {
+    return this._request("GET", `/memory/${memoryId}/versions`);
+  }
+
+  async restoreVersion(memoryId: string, versionId: string): Promise<MemoryResponse> {
+    return this._request("POST", `/memory/${memoryId}/restore/${versionId}`);
   }
 }

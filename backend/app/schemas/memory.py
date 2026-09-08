@@ -54,3 +54,16 @@ class MemoryResponse(BaseModel):
     embedding_dimensions: int | None = Field(
         default=None, description="Number of dimensions in the embedding vector"
     )
+
+
+class MemoryVersionResponse(BaseModel):
+    id: str
+    memory_id: str
+    version: int
+    content: str
+    metadata: dict | None
+    external_id: str | None
+    importance: float
+    source: str | None
+    confidence: float | None
+    created_at: str

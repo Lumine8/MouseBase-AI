@@ -30,8 +30,8 @@ export default function Login() {
       localStorage.setItem("mb_token", res.token);
       localStorage.setItem("mb_refresh_token", res.refresh_token);
       navigate("/dashboard");
-    } catch (err: any) {
-      setError(err?.message ?? "Login failed. Please try again.");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Login failed. Please try again.");
     } finally {
       setLoading(false);
     }

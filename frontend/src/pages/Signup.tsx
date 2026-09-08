@@ -43,8 +43,8 @@ export default function Signup() {
       const project: Project = await projects.create({ name: "demo-project" });
       localStorage.setItem("mb_api_key", project.api_key!);
       setApiKeyModal({ key: project.api_key!, projectId: project.id, projectName: project.name });
-    } catch (err: any) {
-      setError(err?.message ?? "Signup failed. Please try again.");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Signup failed. Please try again.");
     } finally {
       setLoading(false);
     }

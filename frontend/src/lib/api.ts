@@ -95,7 +95,9 @@ async function request<T>(
           localStorage.removeItem("mb_token");
           localStorage.removeItem("mb_refresh_token");
         }
-      } catch {}
+      } catch (refreshErr) {
+        console.error("Token refresh failed:", refreshErr);
+      }
     }
   }
 

@@ -108,7 +108,7 @@ def _decode_jwt(token: str) -> dict:
 def verify_access_token(token: str) -> UUID:
     try:
         payload = _decode_jwt(token)
-        if payload.get("type", "access") not in ("access",):
+        if payload.get("type") != "access":
             from app.exceptions.auth import InvalidTokenError
 
             raise InvalidTokenError()

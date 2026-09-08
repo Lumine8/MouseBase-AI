@@ -41,9 +41,14 @@ class SMTPEmailSender:
             server.send_message(msg)
 
     def send(self, to: str, subject: str, body: str) -> None:
-        asyncio.get_event_loop().run_in_executor(
-            None, self._send_sync, to, subject, body
-        )
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            loop = None
+        if loop and loop.is_running():
+            asyncio.ensure_future(asyncio.to_thread(self._send_sync, to, subject, body))
+        else:
+            asyncio.run(self._send_sync(to, subject, body))
 
 
 class AsyncEmailSender:
@@ -51,13 +56,16 @@ class AsyncEmailSender:
         self._sync = sync_sender
 
     def send(self, to: str, subject: str, body: str) -> None:
-        loop = asyncio.get_event_loop()
-        if loop.is_running():
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            loop = None
+        if loop and loop.is_running():
             asyncio.ensure_future(
                 asyncio.to_thread(self._sync._send_sync, to, subject, body)
             )
         else:
-            loop.run_in_executor(None, self._sync._send_sync, to, subject, body)
+            asyncio.run(self._sync._send_sync(to, subject, body))
 
 
 def get_email_sender() -> EmailSender:

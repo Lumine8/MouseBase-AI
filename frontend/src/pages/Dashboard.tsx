@@ -38,7 +38,7 @@ export default function Dashboard() {
   useEffect(() => {
     const load = async () => {
       if (localStorage.getItem("mb_token")) {
-        auth.me().then(setUser).catch(() => {});
+        auth.me().then(setUser).catch((err) => console.error("Failed to load user:", err));
       }
       const results = await Promise.allSettled([
         api.projects.list(),

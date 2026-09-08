@@ -15,11 +15,9 @@ from app.services.usage_service import UsageService
 from app.services.rate_limiter import enforce_rate_limit
 from app.core.plan_enforcer import get_effective_limits
 
-from app.schemas.memory import MemoryResponse
+from app.schemas.memory import MemoryResponse, MemoryVersionResponse
 from app.schemas.update import UpdateMemoryRequest
 from app.services import create_embedding_service
-
-from pydantic import BaseModel
 
 router = APIRouter(prefix="/memory", tags=["memory"])
 
@@ -185,19 +183,6 @@ async def restore_memory(
         memory_id=memory_id,
     )
     return result
-
-
-class MemoryVersionResponse(BaseModel):
-    id: str
-    memory_id: str
-    version: int
-    content: str
-    metadata: dict | None
-    external_id: str | None
-    importance: float
-    source: str | None
-    confidence: float | None
-    created_at: str
 
 
 @router.get(
