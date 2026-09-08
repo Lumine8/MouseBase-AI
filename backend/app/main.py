@@ -1,11 +1,10 @@
 import sys
 import time
+import asyncio
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
 if sys.platform == "win32":
-    import asyncio
-
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 import sentry_sdk
@@ -41,6 +40,7 @@ from app.routers.stats import router as stats_router
 from app.routers.blog import router as blog_router
 
 from app.exceptions.base import APIException
+from app.workers import memory_lifecycle_worker
 
 logger = get_logger(__name__)
 
@@ -70,11 +70,21 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     db_ok = await check_db()
     if db_ok:
         logger.info("database connection healthy")
+        # Start memory lifecycle worker in background
+        worker_task = asyncio.create_task(memory_lifecycle_worker())
+        logger.info("memory lifecycle worker started")
     else:
         logger.warning("database connection failed during startup")
 
     yield
 
+    # Cancel worker on shutdown
+    if db_ok:
+        worker_task.cancel()
+        try:
+            await worker_task
+        except asyncio.CancelledError:
+            pass
     logger.info("shutting down")
 
 

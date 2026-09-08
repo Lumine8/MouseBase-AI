@@ -92,14 +92,14 @@ Most likely source of user pain: stale, duplicated, contradictory, or undeletabl
 | `expired` | Automatically excluded and removed according to TTL policy. |
 | `deleted` | Hidden immediately, hard-deleted after retention period. |
 
-- [ ] `expires_at` field — TTL-based auto-removal (background worker or query-time filter)
-- [ ] `status` field — enum: `active`, `archived`, `deleted`
-- [ ] Archive endpoint — `PATCH /memory/{id}/archive` (sets status=archived, excluded from search)
-- [ ] Restore endpoint — `PATCH /memory/{id}/restore` (sets status=active)
-- [ ] Soft-delete — `DELETE /memory/{id}` sets status=deleted, not hard-delete
-- [ ] Hard-delete worker — removes memories with status=deleted after configurable retention (default 30 days)
-- [ ] Expiry worker — queries `expires_at < now()` and marks as deleted
-- [ ] Search excludes `archived` and `deleted` by default, with optional `include_archived` flag
+- [x] `expires_at` field — TTL-based auto-removal (background worker or query-time filter)
+- [x] `status` field — enum: `active`, `archived`, `deleted`
+- [x] Archive endpoint — `PATCH /memory/{id}/archive` (sets status=archived, excluded from search)
+- [x] Restore endpoint — `PATCH /memory/{id}/restore` (sets status=active)
+- [x] Soft-delete — `DELETE /memory/{id}` sets status=deleted, not hard-delete
+- [x] Hard-delete worker — removes memories with status=deleted after configurable retention (default 30 days)
+- [x] Expiry worker — queries `expires_at < now()` and marks as deleted
+- [x] Search excludes `archived` and `deleted` by default, with optional `include_archived` flag
 
 ### 1D — Provenance & Confidence (MEDIUM priority)
 

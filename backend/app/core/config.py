@@ -71,6 +71,10 @@ class Settings(BaseSettings):
     JWT_REFRESH_EXPIRY_DAYS: int = 30
     JWT_ACCESS_EXPIRY_MINUTES: int = 15
 
+    # Memory lifecycle settings
+    HARD_DELETE_RETENTION_DAYS: int = 30
+    WORKER_INTERVAL_SECONDS: int = 300  # 5 minutes
+
     model_config = SettingsConfigDict(
         env_file=BASE_DIR / ".env",
         extra="ignore",
