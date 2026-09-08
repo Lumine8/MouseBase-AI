@@ -17,6 +17,7 @@ export default function Settings() {
   const [deleting, setDeleting] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [exportDone, setExportDone] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (localStorage.getItem("mb_token")) {
@@ -56,13 +57,14 @@ export default function Settings() {
 
   const handleDeleteAccount = async () => {
     setDeleting(true);
+    setError("");
     try {
-      const token = localStorage.getItem("mb_token");
-      await fetch("/api/v1/auth/delete", {
-        method: "DELETE",
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
-    } catch {}
+      await api.auth.delete();
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Failed to delete account");
+      setDeleting(false);
+      return;
+    }
     localStorage.removeItem("mb_token");
     localStorage.removeItem("mb_api_key");
     setDeleting(false);
@@ -72,28 +74,17 @@ export default function Settings() {
 
   const handleExport = async () => {
     setExporting(true);
+    setError("");
     try {
-      const token = localStorage.getItem("mb_token") || localStorage.getItem("mb_api_key");
-      const res = await fetch("/api/v1/auth/export", {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
-      if (!res.ok) throw new Error("Export failed");
-      const blob = await res.blob();
+      const blob = await api.auth.export();
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
       a.download = `mousebase-export-${new Date().toISOString().split("T")[0]}.json`;
       a.click();
       URL.revokeObjectURL(url);
-    } catch {
-      const memories = JSON.parse(localStorage.getItem("mb_memories") || "[]");
-      const blob = new Blob([JSON.stringify({ exported_at: new Date().toISOString(), memories }, null, 2)], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `mousebase-export-${new Date().toISOString().split("T")[0]}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Export failed");
     } finally {
       setExporting(false);
       setExportDone(true);
@@ -109,6 +100,8 @@ export default function Settings() {
           <p>Manage your account preferences.</p>
         </div>
       </div>
+
+      {error && <div className="error-banner">{error}</div>}
 
       <div className="card" style={{ padding: 24 }}>
         {user && (

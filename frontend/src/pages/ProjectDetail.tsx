@@ -15,6 +15,7 @@ export default function ProjectDetail() {
   const [newDesc, setNewDesc] = useState("");
   const [showApiKey, setShowApiKey] = useState<string | null>(null);
   const [copyMsg, setCopyMsg] = useState("");
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (!id) return;
@@ -27,27 +28,31 @@ export default function ProjectDetail() {
   const handleUpdate = async () => {
     if (!project || !newName.trim()) return;
     setRenaming(true);
+    setError("");
     try {
       const updated = await api.projects.update(project.id, { name: newName.trim(), description: newDesc.trim() || null });
       setProject(updated);
-    } catch {} finally { setRenaming(false); }
+    } catch (e: unknown) { setError(e instanceof Error ? e.message : "Failed to update project"); }
+    finally { setRenaming(false); }
   };
 
   const handleRotate = async () => {
     if (!project) return;
+    setError("");
     try {
       const result = await api.projects.rotateKey(project.id);
       setProject(result);
       setShowApiKey(result.api_key ?? null);
-    } catch {}
+    } catch (e: unknown) { setError(e instanceof Error ? e.message : "Failed to rotate key"); }
   };
 
   const handleDelete = async () => {
     if (!project) return;
     if (!window.confirm(`Delete project "${project.name}"? This cannot be undone.`)) return;
     setDeleting(true);
+    setError("");
     try { await api.projects.delete(project.id); navigate("/projects"); }
-    catch { setDeleting(false); }
+    catch (e: unknown) { setError(e instanceof Error ? e.message : "Failed to delete project"); setDeleting(false); }
   };
 
   const copyKeyId = () => {
@@ -67,6 +72,7 @@ export default function ProjectDetail() {
       </button>
 
       <div className="card" style={{ padding: 24 }}>
+        {error && <div className="error-banner" style={{ marginBottom: 16 }}>{error}</div>}
         <div style={{ marginBottom: 24 }}>
           <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
             <div>

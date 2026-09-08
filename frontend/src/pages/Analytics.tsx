@@ -21,15 +21,17 @@ import { formatNum, formatBytes } from "../lib/utils";
 export default function Analytics() {
   const [data, setData] = useState<AnalyticsResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     dashboard.analytics()
       .then(setData)
-      .catch(() => {})
+      .catch((e: unknown) => setError(e instanceof Error ? e.message : "Failed to load analytics"))
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <div className="page"><p>Loading...</p></div>;
+  if (loading) return <div className="page loading-center"><div className="spinner" /></div>;
+  if (error) return <div className="page"><div className="error-banner">{error}</div></div>;
 
   const daily = data?.daily ?? [];
   const totals = data?.totals ?? { requests: 0, searches: 0, embeddings: 0, memories: 0, storage_bytes: 0 };

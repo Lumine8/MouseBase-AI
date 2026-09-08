@@ -112,7 +112,7 @@ export default function MemoryExplorer() {
       setTimeline(res.entries);
       setTimelineTotal(res.total);
       setTimelineTotalPages(res.total_pages);
-    } catch {}
+    } catch (e: unknown) { setError(e instanceof Error ? e.message : "Failed to load timeline"); }
     finally { setLoadingTimeline(false); }
   }, [projectId, timelinePage]);
 
@@ -208,7 +208,7 @@ export default function MemoryExplorer() {
   const handleDeleteOne = async (id: string) => {
     if (!window.confirm("Delete this memory?")) return;
     try { await api.memory.delete(id); loadMemories(); }
-    catch {}
+    catch (e: unknown) { setError(e instanceof Error ? e.message : "Failed to delete memory"); }
   };
 
   const handleInspectorUpdated = (updated: MemoryListItem) => {

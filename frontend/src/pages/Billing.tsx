@@ -186,7 +186,7 @@ export default function Billing() {
   const searchPct = usage?.plan_limits ? Math.min(100, Math.round((usage.monthly_searches / usage.plan_limits.max_searches_per_month) * 100)) : 0;
 
   if (loading) {
-    return <div className="page page-centered"><p>Loading billing...</p></div>;
+    return <div className="page page-centered"><div className="spinner" /></div>;
   }
 
   return (

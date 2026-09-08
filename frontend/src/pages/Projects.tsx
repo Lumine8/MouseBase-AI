@@ -13,21 +13,24 @@ export default function Projects() {
   const [creating, setCreating] = useState(false);
   const [createdKey, setCreatedKey] = useState<string | null>(null);
   const [copyMsg, setCopyMsg] = useState("");
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    api.projects.list().then(setProjects).catch(() => {}).finally(() => setLoading(false));
+    api.projects.list().then(setProjects).catch((e) => setError(e instanceof Error ? e.message : "Failed to load projects")).finally(() => setLoading(false));
   }, []);
 
   const handleCreate = async () => {
     if (!newName.trim()) return;
     setCreating(true);
+    setError("");
     try {
       const result = await api.projects.create({ name: newName.trim(), description: newDesc.trim() || null });
       setCreatedKey(result.api_key ?? null);
       setProjects((prev) => [...prev, result]);
       setNewName("");
       setNewDesc("");
-    } catch {} finally { setCreating(false); }
+    } catch (e: unknown) { setError(e instanceof Error ? e.message : "Failed to create project"); }
+    finally { setCreating(false); }
   };
 
   const handleCopyKey = async (p: Project) => {
@@ -36,7 +39,7 @@ export default function Projects() {
       navigator.clipboard.writeText(full.api_key!);
       setCopyMsg("Copied!");
       setTimeout(() => setCopyMsg(""), 2000);
-    } catch {}
+    } catch (e: unknown) { setError(e instanceof Error ? e.message : "Failed to rotate key"); }
   };
 
   const handleDelete = async (id: string, name: string) => {
@@ -44,7 +47,7 @@ export default function Projects() {
     try {
       await api.projects.delete(id);
       setProjects((prev) => prev.filter((p) => p.id !== id));
-    } catch {}
+    } catch (e: unknown) { setError(e instanceof Error ? e.message : "Failed to delete project"); }
   };
 
   if (loading) return <div className="loading-center"><div className="spinner" /></div>;
@@ -60,6 +63,8 @@ export default function Projects() {
           <FiPlus /> New Project
         </button>
       </div>
+
+      {error && <div className="error-banner">{error}</div>}
 
       {createdKey && (
         <div className="alert alert-info" style={{ marginBottom: 24 }}>

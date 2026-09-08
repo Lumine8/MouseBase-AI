@@ -287,7 +287,8 @@ code, pre {
 }
 
 /* ----- Page ----- */
-.page { max-width: 1200px; margin: 0 auto; }
+.page { max-width: 1200px; margin: 0 auto; padding: 32px 40px; }
+.page-centered { display: flex; align-items: center; justify-content: center; min-height: 60vh; }
 
 .page-header {
   display: flex;
@@ -998,6 +999,54 @@ tbody tr.clickable { cursor: pointer; }
 
 /* ----- Loading Center ----- */
 .loading-center { display: flex; align-items: center; justify-content: center; padding: 80px 0; }
+
+/* ----- Error Banner ----- */
+.error-banner {
+  padding: 12px 16px;
+  background: rgba(255, 92, 92, 0.1);
+  border: 1px solid rgba(255, 92, 92, 0.25);
+  border-radius: var(--radius-sm);
+  color: var(--red);
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+/* ----- Search Results ----- */
+.results-list { display: flex; flex-direction: column; gap: 12px; }
+.result-card {
+  padding: 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  transition: border-color var(--duration) var(--ease);
+}
+.result-card:hover { border-color: var(--accent); }
+.result-card p { color: var(--text-primary); font-size: 14px; line-height: 1.6; }
+.result-card-footer {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-subtle);
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* ----- Navbar Avatar ----- */
+.navbar-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--bg-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
 
 /* ----- Doc Sidebar ----- */
 .doc-layout { display: flex; gap: 40px; }

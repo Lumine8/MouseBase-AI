@@ -19,10 +19,12 @@ async function request<T>(
   body?: unknown,
   authToken?: string | null,
   useApiKey?: boolean,
+  returnBlob?: boolean,
 ): Promise<T> {
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-  };
+  const headers: Record<string, string> = {};
+  if (!returnBlob) {
+    headers["Content-Type"] = "application/json";
+  }
 
   const apiKey = localStorage.getItem("mb_api_key");
   const token = localStorage.getItem("mb_token");
@@ -52,6 +54,14 @@ async function request<T>(
 
   if (res.status === 204) {
     return undefined as T;
+  }
+
+  if (returnBlob) {
+    if (!res.ok) {
+      const errText = await res.text();
+      throw new ApiError(res.status, "export_failed", errText || "Export failed");
+    }
+    return await res.blob() as unknown as T;
   }
 
   if (res.status === 401 && !useApiKey && !path.includes("/auth/login") && !path.includes("/auth/signup") && !path.includes("/auth/refresh")) {
@@ -503,5 +513,10 @@ export const api = {
       request<{ updated: number }>("POST", `/projects/${projectId}/memories/batch-add-metadata`, { memory_ids: memoryIds, metadata }),
     timeline: (projectId: string, page: number = 1, perPage: number = 50) =>
       request<TimelineResponse>("GET", `/projects/${projectId}/memories/timeline?page=${page}&per_page=${perPage}`),
+  },
+
+  auth: {
+    delete: () => request<void>("DELETE", "/auth/delete"),
+    export: () => request<Blob>("GET", "/auth/export", undefined, null, false, true),
   },
 };
