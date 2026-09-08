@@ -1,7 +1,7 @@
 from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func, cast, String, Numeric
+from sqlalchemy import select, func, cast, Numeric
 
 from app.core.config import settings
 from app.services.embedding_service import EmbeddingService

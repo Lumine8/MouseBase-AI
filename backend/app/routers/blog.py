@@ -34,7 +34,7 @@ async def list_posts(
 ) -> list[BlogPostListItem]:
     query = select(BlogPost).order_by(BlogPost.created_at.desc())
     if published_only:
-        query = query.where(BlogPost.published == True)
+        query = query.where(BlogPost.published)
     result = await db.execute(query)
     posts = result.scalars().all()
     return [

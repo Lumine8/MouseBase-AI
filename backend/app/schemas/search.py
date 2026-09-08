@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field, field_validator
 from uuid import UUID
-from typing import Any, Union
+from typing import Any
 from datetime import datetime
 
 

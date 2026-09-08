@@ -1,14 +1,10 @@
 from sqlalchemy import String, DateTime, Text, Boolean
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column
 
-from typing import TYPE_CHECKING
 from app.models.base import Base
 
 from datetime import datetime, timezone
 import uuid
-
-if TYPE_CHECKING:
-    from app.models.user import User
 
 
 class BlogPost(Base):

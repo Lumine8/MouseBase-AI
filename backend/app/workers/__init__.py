@@ -5,10 +5,9 @@
 """
 
 import asyncio
-import logging
 from datetime import datetime, timezone, timedelta
 
-from sqlalchemy import select, update, delete, func
+from sqlalchemy import update, delete
 
 from app.core.config import settings
 from app.core.log_config import get_logger
