@@ -1,6 +1,19 @@
 import { useState, useEffect } from "react";
 import { MemoryListItem, Memory } from "../lib/api";
-import { FiX, FiEdit, FiTrash2, FiCopy, FiCheck } from "react-icons/fi";
+import { FiX, FiEdit, FiTrash2, FiCopy, FiCheck, FiClock, FiRotateCcw } from "react-icons/fi";
+
+interface MemoryVersion {
+  id: string;
+  memory_id: string;
+  version: number;
+  content: string;
+  metadata: Record<string, unknown> | null;
+  external_id: string | null;
+  importance: number;
+  source: string | null;
+  confidence: number | null;
+  created_at: string;
+}
 
 interface Props {
   memory: MemoryListItem;
@@ -11,7 +24,7 @@ interface Props {
 }
 
 export default function MemoryInspector({ memory, onClose, onDelete, onUpdated }: Props) {
-  const [tab, setTab] = useState<"details" | "json">("details");
+  const [tab, setTab] = useState<"details" | "json" | "versions">("details");
   const [copied, setCopied] = useState(false);
   const [editing, setEditing] = useState(false);
   const [editContent, setEditContent] = useState(memory.content);
@@ -21,6 +34,9 @@ export default function MemoryInspector({ memory, onClose, onDelete, onUpdated }
   const [error, setError] = useState("");
   const [fullMemory, setFullMemory] = useState<Memory | null>(null);
   const [loadingDetail, setLoadingDetail] = useState(true);
+  const [versions, setVersions] = useState<MemoryVersion[]>([]);
+  const [loadingVersions, setLoadingVersions] = useState(false);
+  const [restoring, setRestoring] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -32,6 +48,24 @@ export default function MemoryInspector({ memory, onClose, onDelete, onUpdated }
       finally { setLoadingDetail(false); }
     })();
   }, [memory.id]);
+
+  useEffect(() => {
+    if (tab === "versions") {
+      setLoadingVersions(true);
+      (async () => {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_URL ?? "/api/v1"}/memory/${memory.id}/versions`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("mb_token") || localStorage.getItem("mb_api_key")}` },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setVersions(data);
+        }
+      } catch {}
+        finally { setLoadingVersions(false); }
+      })();
+    }
+  }, [tab, memory.id]);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(JSON.stringify(fullMemory || memory, null, 2));
@@ -58,6 +92,31 @@ export default function MemoryInspector({ memory, onClose, onDelete, onUpdated }
     finally { setSaving(false); }
   };
 
+  const handleRestoreVersion = async (versionId: string) => {
+    if (!window.confirm("Restore this version? Current state will be saved as a new version.")) return;
+    setRestoring(versionId);
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL ?? "/api/v1"}/memory/${memory.id}/restore/${versionId}`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${localStorage.getItem("mb_token") || localStorage.getItem("mb_api_key")}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setFullMemory(data);
+        onUpdated({ ...memory, content: data.content, metadata: data.metadata, external_id: data.external_id, updated_at: data.updated_at });
+        setEditContent(data.content);
+        setEditMeta(JSON.stringify(data.metadata, null, 2));
+        setEditExtId(data.external_id || "");
+        // Reload versions
+        const versionsRes = await fetch(`${import.meta.env.VITE_API_URL ?? "/api/v1"}/memory/${memory.id}/versions`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("mb_token") || localStorage.getItem("mb_api_key")}` },
+        });
+        if (versionsRes.ok) setVersions(await versionsRes.json());
+      }
+    } catch {}
+    finally { setRestoring(null); }
+  };
+
   const handleDelete = () => {
     if (window.confirm("Delete this memory? This cannot be undone.")) {
       onDelete(memory.id);
@@ -78,6 +137,9 @@ export default function MemoryInspector({ memory, onClose, onDelete, onUpdated }
 
         <div className="inspector-tabs">
           <button className={`inspector-tab ${tab === "details" ? "active" : ""}`} onClick={() => setTab("details")}>Details</button>
+          <button className={`inspector-tab ${tab === "versions" ? "active" : ""}`} onClick={() => setTab("versions")}>
+            <FiClock style={{ marginRight: 4 }} /> Versions
+          </button>
           <button className={`inspector-tab ${tab === "json" ? "active" : ""}`} onClick={() => setTab("json")}>JSON</button>
         </div>
 
@@ -159,6 +221,52 @@ export default function MemoryInspector({ memory, onClose, onDelete, onUpdated }
                 </>
               )}
             </div>
+          ) : tab === "versions" ? (
+            <div className="inspector-details" style={{ padding: "12px 20px" }}>
+              {loadingVersions ? (
+                <div style={{ textAlign: "center", padding: 20 }}><span className="spinner" /></div>
+              ) : versions.length === 0 ? (
+                <div style={{ textAlign: "center", padding: 20, color: "var(--text-muted)", fontSize: 14 }}>
+                  No version history yet. Versions are created when you update a memory.
+                </div>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  {versions.map((v) => (
+                    <div key={v.id} style={{
+                      background: "var(--bg-elevated)",
+                      border: "1px solid var(--border-default)",
+                      borderRadius: 8,
+                      padding: "12px 16px",
+                    }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)" }}>
+                          Version {v.version}
+                        </div>
+                        <button
+                          onClick={() => handleRestoreVersion(v.id)}
+                          disabled={restoring === v.id}
+                          style={{
+                            display: "flex", alignItems: "center", gap: 4,
+                            padding: "4px 10px", fontSize: 12,
+                            background: "var(--bg-card)", border: "1px solid var(--border-default)",
+                            borderRadius: 6, cursor: "pointer", color: "var(--accent)",
+                          }}
+                        >
+                          {restoring === v.id ? <span className="spinner" style={{ width: 12, height: 12 }} /> : <FiRotateCcw size={12} />}
+                          Restore
+                        </button>
+                      </div>
+                      <div style={{ fontSize: 13, color: "var(--text-secondary)", marginBottom: 4, lineHeight: 1.5 }}>
+                        {v.content.length > 200 ? v.content.slice(0, 200) + "..." : v.content}
+                      </div>
+                      <div style={{ fontSize: 11, color: "var(--text-muted)" }}>
+                        {formatDate(v.created_at)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           ) : (
             <pre className="inspector-json inspector-json-full">{JSON.stringify(displayMemory, null, 2)}</pre>
           )}
@@ -166,7 +274,7 @@ export default function MemoryInspector({ memory, onClose, onDelete, onUpdated }
 
         <div className="inspector-footer">
           <button onClick={handleCopy} className="btn-secondary btn-sm"><FiCopy /> {copied ? "Copied!" : "Copy JSON"}</button>
-          {!editing && <button onClick={() => setEditing(true)} className="btn-secondary btn-sm"><FiEdit /> Edit</button>}
+          {!editing && tab === "details" && <button onClick={() => setEditing(true)} className="btn-secondary btn-sm"><FiEdit /> Edit</button>}
           <button onClick={handleDelete} className="btn-danger btn-sm"><FiTrash2 /> Delete</button>
         </div>
       </div>
