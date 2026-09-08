@@ -157,6 +157,20 @@ Full control over memory lifecycle — no data loss, no clutter.
 
 Set `expires_at` on any memory for automatic cleanup on access.
 
+### Version History
+
+Every memory update is automatically versioned. View history, compare changes, and restore to any previous version.
+
+```python
+# Get version history
+versions = client.versions("memory-id")
+for v in versions:
+    print(f"v{v.version}: {v.content[:50]}... ({v.created_at})")
+
+# Restore to a specific version
+client.restore_version("memory-id", "version-id")
+```
+
 ### Project Isolation
 
 Every memory is scoped to a project. Multiple projects, each with its own API key, memory store, and usage tracking.
@@ -186,13 +200,15 @@ All endpoints are available at `https://api.mousebase.dev/api/v1`.
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
-| `POST` | `/remember/` | API key | Store a memory (supports `expires_at`) |
-| `POST` | `/search/` | API key | Hybrid search (semantic + keyword + metadata) |
+| `POST` | `/remember/` | API key | Store a memory (supports `expires_at`, `importance`, `source`, `confidence`) |
+| `POST` | `/search/` | API key | Hybrid search (semantic + keyword + metadata + recency + importance) |
 | `GET` | `/memory/{id}` | API key | Get a memory by ID |
-| `PATCH` | `/memory/{id}` | API key | Update a memory |
+| `PATCH` | `/memory/{id}` | API key | Update a memory (auto-versions previous state) |
 | `DELETE` | `/memory/{id}` | API key | Soft-delete a memory |
 | `POST` | `/memory/{id}/archive` | API key | Archive a memory |
 | `POST` | `/memory/{id}/restore` | API key | Restore an archived memory |
+| `GET` | `/memory/{id}/versions` | API key | Get version history |
+| `POST` | `/memory/{id}/restore/{version_id}` | API key | Restore to a specific version |
 
 ### Memory Explorer
 
@@ -493,8 +509,8 @@ alembic upgrade head
 
 MouseBase is in active development. The API is stable and ready for production use.
 
-- **Python SDK**: v0.3.3 ([PyPI](https://pypi.org/project/mousebase/))
-- **JavaScript SDK**: v0.1.8 ([npm](https://www.npmjs.com/package/mousebase))
+- **Python SDK**: v0.3.4 ([PyPI](https://pypi.org/project/mousebase/))
+- **JavaScript SDK**: v0.1.10 ([npm](https://www.npmjs.com/package/mousebase))
 - **Backend API**: v0.1.0 ([api.mousebase.dev](https://api.mousebase.dev))
 - **Dashboard**: [mousebase.dev](https://mousebase.dev)
 

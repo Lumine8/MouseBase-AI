@@ -42,8 +42,24 @@ export interface MemoryResponse {
   status: string;
   expires_at: string | null;
   importance: number;
+  source: string | null;
+  confidence: number | null;
+  supersedes_id: string | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface MemoryVersionResponse {
+  id: string;
+  memory_id: string;
+  version: number;
+  content: string;
+  metadata: Record<string, unknown> | null;
+  external_id: string | null;
+  importance: number;
+  source: string | null;
+  confidence: number | null;
+  created_at: string;
 }
 
 export interface UpdateOptions {

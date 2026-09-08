@@ -3,6 +3,19 @@ import Footer from "../components/Footer";
 import SEO from "../components/SEO";
 
 const entries = [
+  { date: "2026-09-08", version: "v0.3.4", items: [
+    "Version history: every memory update is automatically versioned",
+    "GET /memory/{id}/versions — view full version history",
+    "POST /memory/{id}/restore/{version_id} — restore to any previous version",
+    "Provenance fields: source (api/import/enrichment/conversation), confidence (0-1), supersedes_id",
+    "Advanced metadata filters: range queries ($gt, $lt, $gte, $lte), IN lists, nested keys",
+    "Memory lifecycle workers: automatic expiry + hard-delete after retention period",
+    "Python SDK v0.3.4: versions(), restore_version(), source/confidence/supersedes_id",
+    "JS SDK v0.1.10: versions(), restoreVersion(), source/confidence/supersedes_id",
+    "MemoryInspector: new Versions tab with restore-to-version UI",
+    "Blog admin: CRUD API + editor at /admin/blog",
+    "3 blog posts: tutorial, launch announcement, hybrid search deep-dive",
+  ]},
   { date: "2026-09-08", version: "v0.3.3", items: [
     "Memory lifecycle: soft-delete, archive, restore, expiration",
     "Importance field (0.0–1.0) for weighted search ranking",

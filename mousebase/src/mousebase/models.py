@@ -36,8 +36,24 @@ class MemoryResponse(BaseModel):
     status: str = "active"
     expires_at: datetime | None = None
     importance: float = 0.5
+    source: str | None = None
+    confidence: float | None = None
+    supersedes_id: str | None = None
     created_at: datetime
     updated_at: datetime
+
+
+class MemoryVersionResponse(BaseModel):
+    id: str
+    memory_id: str
+    version: int
+    content: str
+    metadata: dict[str, Any] | None = None
+    external_id: str | None = None
+    importance: float = 0.5
+    source: str | None = None
+    confidence: float | None = None
+    created_at: datetime
 
 
 class ProjectResponse(BaseModel):

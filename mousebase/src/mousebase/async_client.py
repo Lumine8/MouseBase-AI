@@ -21,6 +21,7 @@ from mousebase.models import (
     ApiKeyResponse,
     AuthResponse,
     MemoryResponse,
+    MemoryVersionResponse,
     MessageResponse,
     ProjectKeyResponse,
     ProjectResponse,
@@ -215,6 +216,14 @@ class AsyncMouseBase:
 
     async def restore(self, memory_id: str) -> MemoryResponse:
         data = await self._request("POST", f"/memory/{memory_id}/restore")
+        return MemoryResponse.model_validate(data)
+
+    async def versions(self, memory_id: str) -> list[MemoryVersionResponse]:
+        data = await self._request("GET", f"/memory/{memory_id}/versions")
+        return [MemoryVersionResponse.model_validate(v) for v in data]
+
+    async def restore_version(self, memory_id: str, version_id: str) -> MemoryResponse:
+        data = await self._request("POST", f"/memory/{memory_id}/restore/{version_id}")
         return MemoryResponse.model_validate(data)
 
     async def signup(

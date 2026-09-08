@@ -4,6 +4,7 @@ import {
   type ClientConfig,
   type MessageResponse,
   type MemoryResponse,
+  type MemoryVersionResponse,
   type ProjectCreateOptions,
   type ProjectKeyResponse,
   type ProjectResponse,
@@ -173,6 +174,14 @@ export class MouseBase {
 
   async restore(memoryId: string): Promise<MemoryResponse> {
     return this._request("POST", `/memory/${memoryId}/restore`);
+  }
+
+  async versions(memoryId: string): Promise<MemoryVersionResponse[]> {
+    return this._request("GET", `/memory/${memoryId}/versions`);
+  }
+
+  async restoreVersion(memoryId: string, versionId: string): Promise<MemoryResponse> {
+    return this._request("POST", `/memory/${memoryId}/restore/${versionId}`);
   }
 
   async signup(email: string, password: string, fullName?: string): Promise<AuthResponse> {
