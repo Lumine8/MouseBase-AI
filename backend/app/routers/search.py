@@ -11,7 +11,8 @@ from app.services.search_service import SearchService
 from app.services import create_embedding_service
 from app.services.usage_service import UsageService
 from app.services.rate_limiter import enforce_rate_limit
-from app.core.plan_enforcer import get_effective_limits
+from app.core.plan_enforcer import get_effective_limits, check_search_limit
+from app.exceptions.memory import SearchLimitError
 
 router = APIRouter(
     prefix="/search",
@@ -52,6 +53,11 @@ async def search(
 ) -> SearchResponse:
     limits = await get_effective_limits(db, project.owner_id)
     await enforce_rate_limit(project.owner_id, limits["requests_per_hour"])
+
+    limited, msg = await check_search_limit(db, project.owner_id)
+    if limited:
+        raise SearchLimitError(msg)
+
     embedding_service = create_embedding_service()
     search_service = SearchService(db=db, embedding_service=embedding_service)
 

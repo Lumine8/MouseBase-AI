@@ -18,3 +18,12 @@ class MemoryLimitError(APIException):
             message=message,
             status_code=status.HTTP_402_PAYMENT_REQUIRED,
         )
+
+
+class SearchLimitError(APIException):
+    def __init__(self, message: str):
+        super().__init__(
+            code="search_limit_reached",
+            message=message,
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+        )

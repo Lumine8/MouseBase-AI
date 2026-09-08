@@ -97,3 +97,27 @@ async def get_effective_limits(db: AsyncSession, owner_id: UUID) -> dict:
         ),
         "plan": plan.value,
     }
+
+
+async def check_search_limit(
+    db: AsyncSession,
+    owner_id: UUID,
+) -> tuple[bool, str]:
+    from app.services.usage_service import UsageService
+
+    sub_result = await db.execute(
+        select(Subscription).where(Subscription.user_id == owner_id)
+    )
+    sub = sub_result.scalar_one_or_none()
+    if sub is None:
+        plan_limits = PLAN_LIMITS[PlanType.FREE]
+        max_searches = plan_limits["max_searches_per_month"]
+    else:
+        plan_limits = PLAN_LIMITS.get(sub.plan, PLAN_LIMITS[PlanType.FREE])
+        max_searches = max(sub.max_searches_per_month, plan_limits["max_searches_per_month"])
+
+    usage_service = UsageService(db)
+    used = await usage_service.get_monthly_searches(owner_id)
+    if used >= max_searches:
+        return True, f"Monthly search limit reached ({max_searches})"
+    return False, ""
