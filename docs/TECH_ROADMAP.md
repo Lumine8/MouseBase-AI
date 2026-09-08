@@ -113,10 +113,10 @@ Add fields only where semantics are clear and they affect retrieval or governanc
 
 ### 1E — Version History (MEDIUM-LOW priority)
 
-- [ ] `MemoryVersion` table — snapshots on every update (content, metadata, timestamp)
-- [ ] `GET /memory/{id}/versions` — returns version history
-- [ ] `PATCH /memory/{id}/restore/{version_id}` — revert to a specific version
-- [ ] Search only returns latest version by default
+- [x] `MemoryVersion` table — snapshots on every update (content, metadata, timestamp)
+- [x] `GET /memory/{id}/versions` — returns version history
+- [x] `PATCH /memory/{id}/restore/{version_id}` — revert to a specific version
+- [x] Search only returns latest version by default
 
 ---
 

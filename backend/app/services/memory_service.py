@@ -15,6 +15,7 @@ from app.exceptions.embedding import EmbeddingServiceUnavailableError
 
 
 from app.models.memory import Memory, MemoryStatus
+from app.models.version import MemoryVersion
 from app.schemas.memory import MemoryResponse
 from app.schemas.update import UpdateMemoryRequest
 from app.schemas.explorer import (
@@ -160,6 +161,27 @@ class MemoryService:
             and request.external_id is None
         ):
             raise EmptyUpdateError()
+
+        # Record version before update
+        version_count_result = await self.db.execute(
+            select(func.count(MemoryVersion.id)).where(
+                MemoryVersion.memory_id == memory.id
+            )
+        )
+        current_version = version_count_result.scalar() or 0
+
+        version = MemoryVersion(
+            memory_id=memory.id,
+            version=current_version + 1,
+            content=memory.content,
+            metadata_=memory.metadata_,
+            external_id=memory.external_id,
+            importance=memory.importance,
+            source=memory.source,
+            confidence=memory.confidence,
+            created_at=memory.created_at,
+        )
+        self.db.add(version)
 
         if request.content is not None and request.content != memory.content:
             if self.embedding_service is None:
