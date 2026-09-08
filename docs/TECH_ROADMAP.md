@@ -77,9 +77,9 @@ final_score =
 
 ### 1B — Search Refinement (HIGH priority)
 
-- [ ] Importance field — user-defined float 0-1, replaces recency when set
-- [ ] Deterministic tie-breaking — sort by final_score DESC, then created_at DESC, then id ASC
-- [ ] Advanced metadata filters — range queries (gt, lt, gte, lte), IN lists, nested key access
+- [x] Importance field — user-defined float 0-1, replaces recency when set
+- [x] Deterministic tie-breaking — sort by final_score DESC, then created_at DESC, then id ASC
+- [x] Advanced metadata filters — range queries (gt, lt, gte, lte), IN lists, nested key access
 
 ### 1C — Memory Lifecycle (HIGH priority, user-facing)
 
@@ -153,6 +153,7 @@ Each page: clear title, H1, answer-first structure (first paragraph answers the 
 - [x] `/persistent-memory-for-ai` — "Persistent memory for AI agents and applications"
 - [x] `/blog` — fix to support individual posts (currently 2 hardcoded placeholders)
 - [x] Blog post: "How to Add Persistent Memory to an AI Agent" (Python + JS examples)
+- [x] Blog admin: CRUD API + editor at `/admin/blog` (admin-only)
 
 ### P3 — Documentation & Authority
 

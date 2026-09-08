@@ -1,5 +1,7 @@
+from typing import Any
+
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func
+from sqlalchemy import select, func, cast, String, Numeric
 
 from app.core.config import settings
 from app.services.embedding_service import EmbeddingService
@@ -13,6 +15,59 @@ WEIGHT_KEYWORD = 0.20
 WEIGHT_METADATA = 0.10
 WEIGHT_RECENCY = 0.05
 WEIGHT_IMPORTANCE = 0.15
+
+
+def _build_metadata_clause(key: str, value: Any):
+    """Build a SQLAlchemy WHERE clause for a metadata filter.
+
+    Supports:
+    - Exact match: {"key": "value"}
+    - Range: {"key": {"$gt": 25}}, {"$lt": 100}, {"$gte": 25}, {"$lte": 100}
+    - IN: {"key": {"$in": ["a", "b"]}}
+    - Nested: {"user.name": "John"} (dot-notation access)
+    """
+    # Handle nested keys with dot notation
+    metadata_col = Memory.metadata_
+    if "." in key:
+        parts = key.split(".")
+        for part in parts[:-1]:
+            metadata_col = metadata_col[part]
+        leaf_key = parts[-1]
+    else:
+        leaf_key = key
+
+    if isinstance(value, dict):
+        # Operator-based filters
+        clauses = []
+        for op, operand in value.items():
+            if op == "$gt":
+                clauses.append(cast(metadata_col[leaf_key].astext, Numeric) > operand)
+            elif op == "$gte":
+                clauses.append(cast(metadata_col[leaf_key].astext, Numeric) >= operand)
+            elif op == "$lt":
+                clauses.append(cast(metadata_col[leaf_key].astext, Numeric) < operand)
+            elif op == "$lte":
+                clauses.append(cast(metadata_col[leaf_key].astext, Numeric) <= operand)
+            elif op == "$in":
+                if isinstance(operand, list) and len(operand) > 0:
+                    clauses.append(
+                        metadata_col[leaf_key].astext.in_([str(v) for v in operand])
+                    )
+                else:
+                    # Empty IN list means nothing matches
+                    clauses.append(func.false())
+            elif op == "$ne":
+                clauses.append(metadata_col[leaf_key].astext != str(operand))
+            else:
+                raise ValueError(f"Unsupported operator: {op}")
+        if len(clauses) == 1:
+            return clauses[0]
+        from sqlalchemy import and_
+
+        return and_(*clauses)
+    else:
+        # Exact match
+        return metadata_col[leaf_key].astext == str(value)
 
 
 class SearchService:
@@ -46,7 +101,7 @@ class SearchService:
 
         if request.metadata_filters:
             for key, value in request.metadata_filters.items():
-                where_clauses.append(Memory.metadata_[key].astext == str(value))
+                where_clauses.append(_build_metadata_clause(key, value))
 
         stmt = (
             select(

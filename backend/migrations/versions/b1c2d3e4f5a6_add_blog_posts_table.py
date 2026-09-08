@@ -5,6 +5,7 @@ Revises: e4f5a6b7c8d9
 Create Date: 2026-09-08
 
 """
+
 from alembic import op
 import sqlalchemy as sa
 
@@ -23,7 +24,9 @@ def upgrade() -> None:
         sa.Column("excerpt", sa.String(500), nullable=False),
         sa.Column("content", sa.Text(), nullable=False),
         sa.Column("tags", sa.String(500), nullable=False, server_default=""),
-        sa.Column("published", sa.Boolean(), nullable=False, server_default=sa.text("false")),
+        sa.Column(
+            "published", sa.Boolean(), nullable=False, server_default=sa.text("false")
+        ),
         sa.Column("author_id", sa.Uuid(), nullable=False),
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
         sa.Column("updated_at", sa.DateTime(timezone=True), nullable=False),
@@ -32,7 +35,12 @@ def upgrade() -> None:
     )
     op.create_index("ix_blog_posts_slug", "blog_posts", ["slug"])
     op.create_index("ix_blog_posts_published", "blog_posts", ["published"])
-    op.add_column("users", sa.Column("is_admin", sa.Boolean(), nullable=False, server_default=sa.text("false")))
+    op.add_column(
+        "users",
+        sa.Column(
+            "is_admin", sa.Boolean(), nullable=False, server_default=sa.text("false")
+        ),
+    )
 
 
 def downgrade() -> None:

@@ -1,7 +1,19 @@
 from pydantic import BaseModel, Field, field_validator
 from uuid import UUID
-from typing import Any
+from typing import Any, Union
 from datetime import datetime
+
+
+class MetadataFilter(BaseModel):
+    """Advanced metadata filter supporting exact match, range queries, and IN lists.
+
+    Exact match: {"key": "value"}
+    Range queries: {"key": {"$gt": 25}}, {"key": {"$lt": 100}}, {"key": {"$gte": 25}}, {"key": {"$lte": 100}}
+    IN lists: {"key": {"$in": ["a", "b", "c"]}}
+    Nested keys: {"user.name": "John"}
+    """
+
+    pass
 
 
 class SearchRequest(BaseModel):
@@ -19,7 +31,13 @@ class SearchRequest(BaseModel):
     )
     metadata_filters: dict[str, Any] | None = Field(
         default=None,
-        description="Filter results by metadata key-value pairs. Supports exact match.",
+        description="""Filter results by metadata. Supports:
+- Exact match: {"key": "value"}
+- GT/LT: {"key": {"$gt": 25}}, {"key": {"$lt": 100}}
+- GTE/LTE: {"key": {"$gte": 25}}, {"key": {"$lte": 100}}
+- IN: {"key": {"$in": ["a", "b"]}}
+- Nested: {"user.name": "John"}
+""",
     )
 
     @field_validator("query")

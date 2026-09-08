@@ -182,7 +182,7 @@ export interface SearchResponse {
 export interface SearchRequest {
   query: string;
   top_k?: number;
-  metadata_filters?: Record<string, unknown>;
+  metadata_filters?: Record<string, unknown> | null;
 }
 
 export interface UserResponse {
