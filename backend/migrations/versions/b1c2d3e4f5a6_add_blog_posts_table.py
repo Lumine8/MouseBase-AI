@@ -27,7 +27,7 @@ def upgrade() -> None:
         sa.Column(
             "published", sa.Boolean(), nullable=False, server_default=sa.text("false")
         ),
-        sa.Column("author_id", sa.Uuid(), nullable=False),
+        sa.Column("author_id", sa.Uuid(), nullable=True),
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
         sa.Column("updated_at", sa.DateTime(timezone=True), nullable=False),
         sa.PrimaryKeyConstraint("id"),

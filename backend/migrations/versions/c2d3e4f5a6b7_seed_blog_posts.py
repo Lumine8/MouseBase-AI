@@ -7,7 +7,6 @@ Create Date: 2026-09-08
 """
 
 from alembic import op
-import sqlalchemy as sa
 
 revision = "c2d3e4f5a6b7"
 down_revision = "b1c2d3e4f5a6"
@@ -18,8 +17,7 @@ depends_on = None
 def upgrade() -> None:
     op.execute("""
         INSERT INTO blog_posts (id, slug, title, excerpt, content, tags, published, author_id, created_at, updated_at)
-        VALUES
-        (
+        SELECT
             gen_random_uuid(),
             'introducing-mousebase',
             'Introducing MouseBase: Persistent Memory for AI Agents',
@@ -27,10 +25,10 @@ def upgrade() -> None:
             'We''re launching MouseBase — persistent memory infrastructure for AI agents and applications. Here''s why we''re building it and what it does.',
             'announcement',
             true,
-            (SELECT id FROM users WHERE email = 'sankargopan1@gmail.com' LIMIT 1),
+            (SELECT id FROM users LIMIT 1),
             '2026-07-09 00:00:00+00',
             '2026-07-09 00:00:00+00'
-        );
+        WHERE NOT EXISTS (SELECT 1 FROM blog_posts WHERE slug = 'introducing-mousebase');
     """)
 
 

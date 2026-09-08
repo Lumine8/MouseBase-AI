@@ -17,7 +17,7 @@ class BlogPost(Base):
     content: Mapped[str] = mapped_column(Text, nullable=False)
     tags: Mapped[str] = mapped_column(String(500), nullable=False, default="")
     published: Mapped[bool] = mapped_column(Boolean, default=False)
-    author_id: Mapped[uuid.UUID] = mapped_column(nullable=False)
+    author_id: Mapped[uuid.UUID | None] = mapped_column(nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
