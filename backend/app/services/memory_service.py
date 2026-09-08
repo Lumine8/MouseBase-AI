@@ -51,6 +51,9 @@ async def remember(
         external_id=request.external_id,
         expires_at=request.expires_at,
         importance=request.importance,
+        source=request.source,
+        confidence=request.confidence,
+        supersedes_id=request.supersedes_id,
     )
     db.add(memory)
     await db.flush()
@@ -83,6 +86,9 @@ async def remember(
         status=memory.status,
         expires_at=memory.expires_at,
         importance=memory.importance,
+        source=memory.source,
+        confidence=memory.confidence,
+        supersedes_id=str(memory.supersedes_id) if memory.supersedes_id else None,
         created_at=memory.created_at,
         updated_at=memory.updated_at,
         embedding_model=embedding.model,
@@ -129,6 +135,9 @@ class MemoryService:
             status=memory.status,
             expires_at=memory.expires_at,
             importance=memory.importance,
+            source=memory.source,
+            confidence=memory.confidence,
+            supersedes_id=str(memory.supersedes_id) if memory.supersedes_id else None,
             created_at=memory.created_at,
             updated_at=memory.updated_at,
             embedding_model=embedding.model if embedding else None,
@@ -289,6 +298,9 @@ class MemoryService:
                 content=m.content,
                 metadata=m.metadata_ or {},
                 importance=m.importance,
+                source=m.source,
+                confidence=m.confidence,
+                supersedes_id=str(m.supersedes_id) if m.supersedes_id else None,
                 created_at=m.created_at,
                 updated_at=m.updated_at,
             )

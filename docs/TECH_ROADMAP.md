@@ -105,11 +105,11 @@ Most likely source of user pain: stale, duplicated, contradictory, or undeletabl
 
 Add fields only where semantics are clear and they affect retrieval or governance.
 
-- [ ] `source` field — string enum: `api`, `import`, `enrichment`, `conversation`
-- [ ] `confidence` field — float 0-1, how certain the system is about this memory
-- [ ] `importance` field — float 0-1, user-defined priority, affects ranking
-- [ ] `supersedes_id` field — FK to the memory this one replaces
-- [ ] Search ranking integrates importance: `final_score = 0.55*semantic + 0.25*keyword + 0.10*metadata + 0.10*importance`
+- [x] `source` field — string enum: `api`, `import`, `enrichment`, `conversation`
+- [x] `confidence` field — float 0-1, how certain the system is about this memory
+- [x] `importance` field — float 0-1, user-defined priority, affects ranking
+- [x] `supersedes_id` field — FK to the memory this one replaces
+- [x] Search ranking integrates importance: `final_score = 0.55*semantic + 0.25*keyword + 0.10*metadata + 0.10*importance`
 
 ### 1E — Version History (MEDIUM-LOW priority)
 

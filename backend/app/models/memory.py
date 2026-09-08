@@ -20,6 +20,13 @@ class MemoryStatus(str, enum.Enum):
     DELETED = "deleted"
 
 
+class MemorySource(str, enum.Enum):
+    API = "api"
+    IMPORT = "import"
+    ENRICHMENT = "enrichment"
+    CONVERSATION = "conversation"
+
+
 class Memory(Base):
     __tablename__ = "memories"
     __table_args__ = (
@@ -53,6 +60,20 @@ class Memory(Base):
     importance: Mapped[float] = mapped_column(
         nullable=False,
         default=0.5,
+        index=True,
+    )
+    source: Mapped[Optional[str]] = mapped_column(
+        String(20),
+        nullable=True,
+        default=None,
+    )
+    confidence: Mapped[Optional[float]] = mapped_column(
+        nullable=True,
+        default=None,
+    )
+    supersedes_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+        nullable=True,
+        default=None,
         index=True,
     )
     created_at: Mapped[datetime] = mapped_column(

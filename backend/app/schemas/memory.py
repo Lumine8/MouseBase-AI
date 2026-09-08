@@ -30,6 +30,18 @@ class MemoryResponse(BaseModel):
         default=0.5,
         description="Importance weight for search ranking (0.0–1.0).",
     )
+    source: str | None = Field(
+        default=None,
+        description="Provenance tag: api, import, enrichment, or conversation.",
+    )
+    confidence: float | None = Field(
+        default=None,
+        description="Confidence score (0.0–1.0). How certain the system is about this memory.",
+    )
+    supersedes_id: str | None = Field(
+        default=None,
+        description="UUID of the memory this one replaces (supersedes).",
+    )
     created_at: datetime = Field(
         ..., description="Timestamp when the memory was created"
     )

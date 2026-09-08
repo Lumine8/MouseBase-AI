@@ -13,6 +13,9 @@ class MemoryListItem(BaseModel):
     content: str = Field(...)
     metadata: dict[str, Any] = Field(default_factory=dict)
     importance: float = Field(default=0.5)
+    source: str | None = Field(default=None)
+    confidence: float | None = Field(default=None)
+    supersedes_id: str | None = Field(default=None)
     created_at: datetime = Field(...)
     updated_at: datetime = Field(...)
 

@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -27,6 +27,20 @@ class RememberRequest(BaseModel):
         ge=0.0,
         le=1.0,
         description="Importance weight for search ranking (0.0–1.0). Higher values rank memories higher in results.",
+    )
+    source: Literal["api", "import", "enrichment", "conversation"] | None = Field(
+        default=None,
+        description="Where this memory originated. Optional provenance tag.",
+    )
+    confidence: float | None = Field(
+        default=None,
+        ge=0.0,
+        le=1.0,
+        description="Confidence score (0.0–1.0). How certain the system is about this memory.",
+    )
+    supersedes_id: str | None = Field(
+        default=None,
+        description="UUID of the memory this one replaces (supersedes).",
     )
 
     @field_validator("content")

@@ -147,6 +147,9 @@ export interface RememberRequest {
   external_id?: string | null;
   metadata?: Record<string, unknown>;
   importance?: number;
+  source?: "api" | "import" | "enrichment" | "conversation" | null;
+  confidence?: number | null;
+  supersedes_id?: string | null;
 }
 
 export interface Memory {
@@ -154,6 +157,12 @@ export interface Memory {
   external_id: string | null;
   content: string;
   metadata: Record<string, unknown>;
+  status: string;
+  expires_at: string | null;
+  importance: number;
+  source: string | null;
+  confidence: number | null;
+  supersedes_id: string | null;
   created_at: string;
   updated_at: string;
   embedding_model?: string;
@@ -387,6 +396,9 @@ export interface MemoryListItem {
   content: string;
   metadata: Record<string, unknown>;
   importance: number;
+  source: string | null;
+  confidence: number | null;
+  supersedes_id: string | null;
   created_at: string;
   updated_at: string;
   embedding_model?: string;
