@@ -485,7 +485,6 @@ Frontend (Vercel)  ──▶  API (Render)  ──▶  PostgreSQL (Neon)
 |----------|---------|-------------|
 | Backend CI | Push to main/develop, PRs | Ruff lint, Black format, pytest |
 | Deploy Frontend | Push to main (frontend/) | Build + deploy to Vercel |
-| Keepalive | Every 3 minutes | Pings Render + Neon to prevent free-tier sleep |
 
 ### Commands
 
